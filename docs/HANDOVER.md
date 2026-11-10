@@ -52,7 +52,7 @@
 | 기상 예보 (같은 5개 지역, 하늘상태·강수확률·일최고기온) | 2023 ~ 2025 | 원본 손상으로 15일만 빔 |
 | 공휴일 | 2023 ~ 2026 | 81일. **팀원 한 명이 한국천문연구원 특일정보와 대조 필요** |
 
-열의 뜻, 단위, 시간 기준, 결함은 전부 [`data/DATA_DICTIONARY.md`](../data/DATA_DICTIONARY.md)에 있다. 바뀐 내역은 [`CHANGELOG.md`](../CHANGELOG.md).
+있는 자료·없는 자료와 이유는 [`docs/DATA_STATUS.md`](DATA_STATUS.md). 열의 뜻, 단위, 시간 기준, 결함은 전부 [`data/DATA_DICTIONARY.md`](../data/DATA_DICTIONARY.md)에 있다. 바뀐 내역은 [`CHANGELOG.md`](../CHANGELOG.md).
 
 ### 꼭 알아야 할 함정
 1. **시간 기준이 자료마다 다르다.** 전력 자료는 1~24시 번호, 기상 관측은 한국 시간 0~23시, **기상 예보는 국제표준시(UTC)** → 9시간 더해서 써야 한다.
