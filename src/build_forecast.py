@@ -123,12 +123,19 @@ def main():
         if lost:
             check(f"{dong} {elem_kr} {y}: 값 숫자 변환", False, f"{lost}칸")
         df = df.drop(columns="value_raw")
+        # 기상청 결측 표시값 -999.9 (원본에는 -999.900024 로 저장) → 숫자가 아니라 빈칸. 표시 열로 남긴다.
+        df["value_missing_code"] = df["value"] <= -999
+        df.loc[df["value_missing_code"], "value"] = pd.NA
+        n_miss = int(df["value_missing_code"].sum())
+        if n_miss:
+            excluded.append({"zip": "(여러 파일)", "file": f"{dong}_{elem_kr}_{y}", "reason": "missing_code_-999.9",
+                             "rows": n_miss})
         df.insert(0, "element", ELEM[elem_kr])
         df.insert(0, "grid", LOC[dong][1])
         df.insert(0, "dong", dong)
         df.insert(0, "station_area", LOC[dong][0])
         days_expected = 366 if int(y) % 4 == 0 else 365
-        days = df["issue_date_utc"].nunique()
+        days = df.loc[~df["value_missing_code"], "issue_date_utc"].nunique()  # 결측 표시값만 있는 날은 빠진 날로 셈
         summary.append({"area": LOC[dong][0], "dong": dong, "element": ELEM[elem_kr], "year": y,
                         "issue_days": days, "days_in_year": days_expected,
                         "missing_days": days_expected - days, "rows": len(df), "conflicts": len(bad)})

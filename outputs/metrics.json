@@ -1,0 +1,317 @@
+{
+ "periods": {
+  "val": [
+   "2025-01-01",
+   "2025-06-30"
+  ],
+  "test": [
+   "2025-07-01",
+   "2025-12-31"
+  ]
+ },
+ "scheme": "매달 1일 재학습(그 전날까지 전체 자료)",
+ "features": [
+  "month",
+  "doy_sin",
+  "doy_cos",
+  "dow",
+  "is_holiday",
+  "is_workers_day",
+  "is_offday",
+  "offday_run_len",
+  "prev_offday",
+  "next_offday",
+  "fc_sky_mean",
+  "fc_clear_share",
+  "fc_pop_mean",
+  "fc_pop_max",
+  "fc_sw_sky_mean",
+  "fc_sw_pop_mean",
+  "fc_tmx_mean",
+  "dem_mid_lag7",
+  "dem_mid_lag1",
+  "dem_min_lag7",
+  "sol_mid_lag1",
+  "sol_mid_mean7",
+  "sol_share_lag1",
+  "nuc_lag1",
+  "sol_cap_lag1",
+  "curt_lag1",
+  "curt_cnt7",
+  "curt_cnt30",
+  "curt_cnt90",
+  "days_since_curt"
+ ],
+ "base_rate_test": 0.147,
+ "val_search_logistic": [
+  {
+   "params": {
+    "C": 0.01
+   },
+   "val_pr_auc": 0.647
+  },
+  {
+   "params": {
+    "C": 0.1
+   },
+   "val_pr_auc": 0.668
+  },
+  {
+   "params": {
+    "C": 1.0
+   },
+   "val_pr_auc": 0.651
+  }
+ ],
+ "val_search_hgb": [
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 2,
+    "iters": 100
+   },
+   "val_pr_auc": 0.528
+  },
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 2,
+    "iters": 300
+   },
+   "val_pr_auc": 0.556
+  },
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 3,
+    "iters": 100
+   },
+   "val_pr_auc": 0.524
+  },
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 3,
+    "iters": 300
+   },
+   "val_pr_auc": 0.619
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 2,
+    "iters": 100
+   },
+   "val_pr_auc": 0.559
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 2,
+    "iters": 300
+   },
+   "val_pr_auc": 0.61
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 3,
+    "iters": 100
+   },
+   "val_pr_auc": 0.608
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 3,
+    "iters": 300
+   },
+   "val_pr_auc": 0.664
+  }
+ ],
+ "chosen_params": {
+  "rule": {},
+  "logistic": {
+   "C": 0.1
+  },
+  "hgb": {
+   "lr": 0.1,
+   "depth": 3,
+   "iters": 300
+  }
+ },
+ "val": {
+  "rule": {
+   "pr_auc": 0.645,
+   "roc_auc": 0.843,
+   "precision": 0.543,
+   "recall": 0.909,
+   "f1": 0.68,
+   "threshold": 0.75,
+   "n_days": 181,
+   "n_pos": 55,
+   "n_pred_pos": 92,
+   "hits": 50,
+   "false_alarms": 42,
+   "misses": 5
+  },
+  "logistic": {
+   "pr_auc": 0.668,
+   "roc_auc": 0.809,
+   "precision": 0.609,
+   "recall": 0.709,
+   "f1": 0.655,
+   "threshold": 0.642,
+   "n_days": 181,
+   "n_pos": 55,
+   "n_pred_pos": 64,
+   "hits": 39,
+   "false_alarms": 25,
+   "misses": 16
+  },
+  "hgb": {
+   "pr_auc": 0.664,
+   "roc_auc": 0.838,
+   "precision": 0.565,
+   "recall": 0.873,
+   "f1": 0.686,
+   "threshold": 0.027,
+   "n_days": 181,
+   "n_pos": 55,
+   "n_pred_pos": 85,
+   "hits": 48,
+   "false_alarms": 37,
+   "misses": 7
+  }
+ },
+ "test": {
+  "rule": {
+   "pr_auc": 0.521,
+   "roc_auc": 0.896,
+   "precision": 0.522,
+   "recall": 0.889,
+   "f1": 0.658,
+   "threshold": 0.75,
+   "n_days": 184,
+   "n_pos": 27,
+   "n_pred_pos": 46,
+   "hits": 24,
+   "false_alarms": 22,
+   "misses": 3,
+   "pr_auc_ci95": [
+    0.367,
+    0.697
+   ]
+  },
+  "logistic": {
+   "pr_auc": 0.606,
+   "roc_auc": 0.874,
+   "precision": 0.386,
+   "recall": 0.815,
+   "f1": 0.524,
+   "threshold": 0.642,
+   "n_days": 184,
+   "n_pos": 27,
+   "n_pred_pos": 57,
+   "hits": 22,
+   "false_alarms": 35,
+   "misses": 5,
+   "pr_auc_ci95": [
+    0.425,
+    0.784
+   ]
+  },
+  "hgb": {
+   "pr_auc": 0.742,
+   "roc_auc": 0.938,
+   "precision": 0.321,
+   "recall": 0.963,
+   "f1": 0.481,
+   "threshold": 0.027,
+   "n_days": 184,
+   "n_pos": 27,
+   "n_pred_pos": 81,
+   "hits": 26,
+   "false_alarms": 55,
+   "misses": 1,
+   "pr_auc_ci95": [
+    0.573,
+    0.897
+   ]
+  }
+ },
+ "learning_curve": [
+  {
+   "months": 6,
+   "train_pos_at_july": 55,
+   "logistic_test_pr_auc": 0.751,
+   "hgb_test_pr_auc": 0.521
+  },
+  {
+   "months": 12,
+   "train_pos_at_july": 63,
+   "logistic_test_pr_auc": 0.596,
+   "hgb_test_pr_auc": 0.736
+  },
+  {
+   "months": 18,
+   "train_pos_at_july": 82,
+   "logistic_test_pr_auc": 0.649,
+   "hgb_test_pr_auc": 0.831
+  },
+  {
+   "months": 24,
+   "train_pos_at_july": 82,
+   "logistic_test_pr_auc": 0.611,
+   "hgb_test_pr_auc": 0.851
+  },
+  {
+   "months": "전체",
+   "train_pos_at_july": 84,
+   "logistic_test_pr_auc": 0.606,
+   "hgb_test_pr_auc": 0.742
+  }
+ ],
+ "top_features_hgb": [
+  [
+   "쉬는 날",
+   0.2841
+  ],
+  [
+   "마지막 출력제어 후 경과일",
+   0.1488
+  ],
+  [
+   "지난주 최저 수요",
+   0.0461
+  ],
+  [
+   "계절(코사인)",
+   0.0227
+  ],
+  [
+   "예보 최고기온",
+   0.0178
+  ],
+  [
+   "지난주 같은 요일 한낮 수요",
+   0.0176
+  ],
+  [
+   "요일",
+   0.0134
+  ],
+  [
+   "최근 30일 출력제어",
+   0.0129
+  ],
+  [
+   "어제 출력제어",
+   0.0095
+  ],
+  [
+   "어제 한낮 수요",
+   0.0088
+  ]
+ ]
+}

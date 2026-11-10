@@ -2443,11 +2443,12 @@
   {
    "check": "제외한 원본 행 기록",
    "ok": true,
-   "detail": "{\"bad_day\": 141352, \"day_mismatch\": 8981}"
+   "detail": "{\"bad_day\": 141352, \"day_mismatch\": 8981, \"missing_code_-999.9\": 2540}"
   }
  ],
  "excluded_rows": {
   "bad_day": 141352,
-  "day_mismatch": 8981
+  "day_mismatch": 8981,
+  "missing_code_-999.9": 2540
  }
 }

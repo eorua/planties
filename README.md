@@ -7,6 +7,8 @@
 - 시연 방식: 2025년의 실제 날짜를 골라 "그 전날 17시에 알 수 있던 정보만으로" 예측을 재현한다.
 - 정답 자료: 전력거래소 출력제어 실적 (육지 출력제어 발생일 2023년 2일 → 2024년 27일 → 2025년 82일)
 
+1차 결과: 2025년 하반기 시험에서 출력제어 27일 중 26일을 전날 예측 (PR-AUC 0.74) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md)
+
 처음 보는 팀원은 **[인수인계 문서(docs/HANDOVER.md)](docs/HANDOVER.md)**부터 읽는다. 어떤 자료가 있고 없는지는 [자료 현황(docs/DATA_STATUS.md)](docs/DATA_STATUS.md).
 
 ## 폴더
@@ -18,7 +20,7 @@ data/raw/            원본 (읽기 전용, 받은 이름 그대로)
   kma_forecast/zips/ 기상청 단기예보 과거 발표분 (5개 지역 × 3개 요소 × 2023~2025)
 data/clean/          정리본 (형식만 통일, 값은 그대로)  ← src/build_*.py가 만듦
 data/manual/         손으로 입력한 자료 (공휴일, 출처 열 포함)
-data/features/       학습용 특징 표 (예정)
+data/features/       학습용 특징 표 (날짜마다 1행, 설명은 FEATURES.md)
 data/MANIFEST.csv    raw·clean·manual 파일 지문(SHA-256)
 data/DATA_DICTIONARY.md  열의 뜻·단위·시간 기준·알려진 결함
 docs/templates/      대회 발표 템플릿
@@ -28,11 +30,13 @@ outputs/             그래프·표 (코드로만 생성)
 
 ## 다시 만들기
 
-Python 3.11 이상, pandas 필요.
+Python 3.11 이상. `pip install -r requirements.txt` (pandas, numpy, scikit-learn, matplotlib). 그래프 한글 글꼴은 Noto Sans CJK KR.
 
 ```bash
 python src/build_clean.py      # 전력·기상 관측 raw → clean (검증 17개)
 python src/build_forecast.py   # 기상 예보 raw → clean (검증 489개)
+python src/build_features.py   # clean → 특징 표 (data/features)
+python src/train.py            # 모델 평가·학습 곡선·그래프 (outputs/, 약 1분 30초)
 python src/manifest.py write   # 지문 기록 (build 직후에만)
 python src/manifest.py verify  # 쓰기 전 매번 확인 → "문제 0개"
 ```

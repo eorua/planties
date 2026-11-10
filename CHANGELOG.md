@@ -2,6 +2,12 @@
 
 데이터나 처리 방식이 바뀌면 여기에 적는다. 그래프·PPT의 숫자가 어느 버전에서 나왔는지 이걸로 추적한다.
 
+## 2026-11-10 (모델 1차)
+- 특징 표 추가 (src/build_features.py, data/features/), 모델 비교·평가 (src/train.py, outputs/, docs/MODEL_RESULTS.md)
+- 예보 결측 표시값 -999.9를 빈칸으로 처리하고 value_missing_code 열 추가 (2023-11-07 하늘상태 5개 지역). 빠진 조합·일 15 → 20
+- 예보 시간 표시를 관측과 대조해 확인: SKY·POP lead = 발표 후 시간, TMX lead = 날짜 코드
+- manifest 대상에 data/features 추가
+
 ## 2026-11-10
 - build_forecast.py: gzip 압축 시각을 고정해 다시 만들어도 같은 파일이 나오게 함 (내용은 그대로, 지문만 갱신)
 - 공휴일 목록 추가 (data/manual/holidays_kr.csv), 인수인계 문서 추가 (docs/HANDOVER.md)

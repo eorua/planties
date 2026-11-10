@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "data" / "MANIFEST.csv"
-TARGETS = ["data/raw", "data/clean", "data/manual"]
+TARGETS = ["data/raw", "data/clean", "data/manual", "data/features"]
 
 
 def sha256(p: Path) -> str:
