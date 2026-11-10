@@ -137,7 +137,8 @@ def main():
     for y, parts in by_year.items():
         out = pd.concat(parts).sort_values(["station_area", "element", "issue_date_utc", "issue_hhmm_utc", "lead_h"])
         out["issue_date_utc"] = pd.to_datetime(out["issue_date_utc"]).dt.strftime("%Y-%m-%d")
-        out.to_csv(CLEAN / f"kma_forecast_{y}.csv.gz", index=False, compression="gzip")
+        out.to_csv(CLEAN / f"kma_forecast_{y}.csv.gz", index=False,
+                   compression={"method": "gzip", "mtime": 0})  # 시각 고정 → 다시 만들어도 같은 파일
     pd.DataFrame(summary).to_csv(CLEAN / "kma_forecast_coverage.csv", index=False, encoding="utf-8-sig")
     pd.DataFrame(excluded).to_csv(CLEAN / "kma_forecast_excluded.csv", index=False, encoding="utf-8-sig")
 
