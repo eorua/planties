@@ -8,7 +8,11 @@
 - rule: 간단한 규칙 점수 (봄·가을 + 쉬는 날 + 맑음 + 최근 출력제어)
 - logistic: 로지스틱 회귀 (빈칸은 중앙값 + 빈칸 표시 열, 표준화)
 - hgb: 사이킷런 HistGradientBoosting (빈칸을 그대로 처리)
-경보 기준(임계값)은 검증 기간 예측에서 F1이 가장 큰 값으로 정한다.
+경보 기준(임계값): 매달 1일, 직전 12개월의 예측 결과에서 F1 이 가장 큰 값으로 다시 정한다
+(그 12개월에 출력제어가 15일보다 적으면 3개월씩 더 과거까지 넓힌다). 그달의 답은 보지 않는다.
+- 2026-11-10 실험(src/experiments.py): 검증 기간에서 "고정 기준", "누적 기준"과 F1 이 같았고(0.66),
+  계절이 바뀌는 데 맞춰 가는 운영 원칙에 따라 이 방식을 골랐다.
+- 같은 실험에서 새 항목(예보 변화, 더위·추위, 같은 종류 날 수요)과 방향 제약은 검증에서 효과가 없어 본 모델에 넣지 않았다.
 """
 import json
 from pathlib import Path
@@ -36,6 +40,10 @@ OUT = ROOT / "outputs"
 SEED = 0
 P = {"val": ("2025-01-01", "2025-06-30"), "test": ("2025-07-01", "2025-12-31")}
 META = {"date", "y", "fc_n_areas", "fc_fallback"}
+# 특징 표에는 있지만 본 모델에는 넣지 않는 항목 (검증에서 효과 없음, docs/MODEL_RESULTS.md 7장)
+NOT_USED = {"fc_clear_share_d2", "fc_clear_delta", "fc_pop_delta", "fc_cool_deg", "fc_heat_deg", "dem_mid_lastsame"}
+OOT_START = "2023-07-01"   # 경보 기준을 정하는 데 쓸 과거 예측을 이때부터 만들어 둔다
+THR_MONTHS, THR_MIN_POS = 12, 15
 
 NAMES = {  # 그래프·문서용 한글 이름
     "month": "월", "doy_sin": "계절(사인)", "doy_cos": "계절(코사인)", "dow": "요일", "is_holiday": "공휴일",
@@ -53,7 +61,7 @@ NAMES = {  # 그래프·문서용 한글 이름
 
 def load():
     df = pd.read_csv(ROOT / "data" / "features" / "daily_features.csv")
-    feats = [c for c in df.columns if c not in META and not c.startswith("post_")]
+    feats = [c for c in df.columns if c not in META and c not in NOT_USED and not c.startswith("post_")]
     return df, feats
 
 
@@ -91,12 +99,30 @@ def best_threshold(y, s):
     return float(t[i])
 
 
+def rolling_threshold(df, s, a, b):
+    """a~b 의 날마다 경보 기준. s 는 날짜 인덱스(df.index)를 가진 과거 예측 결과(매달 재학습)."""
+    out = pd.Series(index=s.index[(df.date[s.index] >= a) & (df.date[s.index] <= b)], dtype=float)
+    for m0 in pd.date_range(a, b, freq="MS"):
+        start, end = m0.strftime("%Y-%m-%d"), (m0 + pd.offsets.MonthEnd(0)).strftime("%Y-%m-%d")
+        idx = out.index[(df.date[out.index] >= start) & (df.date[out.index] <= end)]
+        before = s.index[df.date[s.index] < start]
+        k = THR_MONTHS
+        while True:
+            w = before[df.date[before] >= (m0 - pd.DateOffset(months=k)).strftime("%Y-%m-%d")]
+            if df.y[w].sum() >= THR_MIN_POS or k >= 30:
+                break
+            k += 3
+        out[idx] = best_threshold(df.y[w], s[w])
+    return out
+
+
 def metrics(y, s, thr):
+    thr = np.asarray(thr, dtype=float) * np.ones(len(s))
     pred = (s >= thr).astype(int)
     return {"pr_auc": round(average_precision_score(y, s), 3), "roc_auc": round(roc_auc_score(y, s), 3),
             "precision": round(precision_score(y, pred, zero_division=0), 3),
             "recall": round(recall_score(y, pred), 3), "f1": round(f1_score(y, pred), 3),
-            "threshold": round(thr, 3), "n_days": int(len(y)), "n_pos": int(y.sum()),
+            "threshold_mean": round(float(np.mean(thr)), 3), "n_days": int(len(y)), "n_pos": int(y.sum()),
             "n_pred_pos": int(pred.sum()), "hits": int(((pred == 1) & (y == 1)).sum()),
             "false_alarms": int(((pred == 1) & (y == 0)).sum()), "misses": int(((pred == 0) & (y == 1)).sum())}
 
@@ -137,18 +163,26 @@ def main():
         report[f"val_search_{kind}"] = [{"params": o, "val_pr_auc": round(v, 3)} for v, o, _ in res]
     report["chosen_params"] = chosen
 
-    # 2) 경보 기준: 검증 기간 예측에서 정함
-    thr = {k: best_threshold(va.y, v) for k, v in val_scores.items()}
-    report["val"] = {k: metrics(va.y.values, val_scores[k], thr[k]) for k in thr}
+    # 2) 고른 설정으로 2023-07 ~ 2025-12 를 매달 재학습해 예측해 둔다 (경보 기준을 정할 과거 자료)
+    oot = {k: pd.Series(backtest(k, chosen[k], OOT_START, P["test"][1]),
+                        index=df.index[(df.date >= OOT_START) & (df.date <= P["test"][1])])
+           for k in ("rule", "logistic", "hgb")}
+    thr_v = {k: rolling_threshold(df, s, *P["val"]) for k, s in oot.items()}
+    thr_t = {k: rolling_threshold(df, s, *P["test"]) for k, s in oot.items()}
+    val_scores = {k: s[thr_v[k].index].values for k, s in oot.items()}
+    test_scores = {k: s[thr_t[k].index].values for k, s in oot.items()}
+    report["threshold_method"] = f"매달 직전 {THR_MONTHS}개월 예측에서 F1 최대 (출력제어 {THR_MIN_POS}일 미만이면 기간 확장)"
+    report["val"] = {k: metrics(va.y.values, val_scores[k], thr_v[k].values) for k in oot}
 
-    # 3) 시험: 같은 방식(매달 재학습)으로 2025 하반기를 한 번 예측
-    test_scores = {k: backtest(k, chosen[k], *P["test"]) for k in ("rule", "logistic", "hgb")}
-    report["test"] = {k: metrics(te.y.values, s, thr[k]) for k, s in test_scores.items()}
+    # 3) 시험: 같은 방식으로 2025 하반기를 한 번 평가
+    report["test"] = {k: metrics(te.y.values, test_scores[k], thr_t[k].values) for k in oot}
     pred = te[["date", "y"]].copy()
     for k, s in test_scores.items():
         pred[f"p_{k}"] = np.round(s, 4)
-        pred[f"alert_{k}"] = (s >= thr[k]).astype(int)
+        pred[f"thr_{k}"] = np.round(thr_t[k].values, 4)
+        pred[f"alert_{k}"] = (s >= thr_t[k].values).astype(int)
     pred.to_csv(OUT / "test_predictions.csv", index=False, encoding="utf-8-sig")
+    thr = {k: thr_t[k].values for k in thr_t}
     trf = df[df.date <= "2025-06-30"]
     final = {k: make(k, **chosen[k]).fit(trf[feats], trf.y) for k in ("logistic", "hgb")}  # 설명용
 
@@ -229,7 +263,7 @@ def charts(te, s, thr, lcdf, imp):
     d = pd.to_datetime(te.date)
     ax.fill_between(d, 0, 1, where=te.y.values == 1, color="#f7c1c1", step="mid", label="실제 출력제어일")
     ax.plot(d, s["hgb"], color="#2a78d6", lw=1.5, label="예측 확률 (그래디언트 부스팅)")
-    ax.axhline(thr["hgb"], color="#444441", ls="--", lw=1, label=f"경보 기준 {thr['hgb']:.2f}")
+    ax.step(d, thr["hgb"], where="mid", color="#444441", ls="--", lw=1, label="경보 기준 (매달 다시 정함)")
     ax.set_ylim(0, 1); ax.legend(fontsize=8, frameon=False, ncol=3, loc="upper left")
     ax.set_title("2025년 하반기: 전날 예측 확률과 실제 출력제어", fontsize=11)
     ax.spines[["top", "right"]].set_visible(False); fig.tight_layout(); fig.savefig(OUT / "test_timeline.png"); plt.close(fig)

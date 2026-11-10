@@ -127,7 +127,8 @@ def main():
                  "시험 ROC-AUC": round(roc_auc_score(te.y, rule_t), 3),
                  "재현율80% 정밀도": round(prec_at_recall(te.y.values, rule_t), 3), "소요(초)": 0})
     out = pd.DataFrame(rows).sort_values("검증 PR-AUC", ascending=False)
-    out.to_csv(ROOT / "outputs" / "model_comparison.csv", index=False, encoding="utf-8-sig")
+    # 소요 시간은 실행할 때마다 달라서 파일에는 남기지 않는다 (다시 만들어도 같은 파일)
+    out.drop(columns="소요(초)").to_csv(ROOT / "outputs" / "model_comparison.csv", index=False, encoding="utf-8-sig")
     print(out.drop(columns="key").to_string(index=False))
 
 

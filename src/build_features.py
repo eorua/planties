@@ -33,6 +33,13 @@ def labels():
     return set(m.date)
 
 
+def offday_series(dates):
+    h = pd.read_csv(ROOT / "data" / "manual" / "holidays_kr.csv")
+    hol = set(h[h.official_holiday == "Y"].date)
+    d = pd.to_datetime(pd.Index(dates))
+    return pd.Series(((d.dayofweek >= 5) | pd.Index(dates).isin(hol)), index=pd.Index(dates))
+
+
 def calendar(days):
     h = pd.read_csv(ROOT / "data" / "manual" / "holidays_kr.csv")
     hol = set(h[h.official_holiday == "Y"].date)
@@ -56,25 +63,18 @@ def calendar(days):
 
 
 def forecast(days):
-    parts = [pd.read_csv(CLEAN / f"kma_forecast_{y}.csv.gz") for y in (2022 + np.arange(1, 4))]
+    parts = [pd.read_csv(CLEAN / f"kma_forecast_{y}.csv.gz") for y in (2023, 2024, 2025)]
     f = pd.concat(parts)
     f["issue_date"] = pd.to_datetime(f.issue_date_utc)
-    rows = []
-    for D in pd.to_datetime(days):
-        prev = D - pd.Timedelta(days=1)
-        rec = {"date": D.strftime("%Y-%m-%d")}
-        rows.append(rec)
-    out = pd.DataFrame(rows)
+    index = pd.Index(days, name="date")
 
-    def pick(issue_hhmm, leads_sky, tmx_lead):
+    def pick(issue_hhmm, days_ahead, leads_sky, tmx_lead):
+        """발표일 + days_ahead = 목표일(D). 그 발표분에서 D 11~14시 SKY·POP 과 D 의 TMX 를 고른다."""
         g = f[f.issue_hhmm_utc == issue_hhmm].copy()
-        g["target"] = (g.issue_date + pd.Timedelta(days=1)).dt.strftime("%Y-%m-%d")
+        g["target"] = (g.issue_date + pd.Timedelta(days=days_ahead)).dt.strftime("%Y-%m-%d")
         sp = g[g.element.isin(["SKY", "POP"]) & g.lead_h.isin(leads_sky)]
         tx = g[(g.element == "TMX") & (g.lead_h == tmx_lead)]
         return sp, tx
-
-    sp8, tx8 = pick(800, [18, 19, 20, 21], 6)
-    sp5, tx5 = pick(500, [21, 22, 23, 24], 6)
 
     def summarize(sp, tx):
         sky = sp[sp.element == "SKY"]
@@ -88,19 +88,27 @@ def forecast(days):
         res["fc_sw_sky_mean"] = sws.groupby("target").value.mean()
         res["fc_sw_pop_mean"] = pop[pop.station_area.isin(SW)].groupby("target").value.mean()
         res["fc_tmx_mean"] = tx.groupby("target").value.mean()
-        # 지역 수 (5곳 중 몇 곳 예보가 있었나)
-        res["fc_n_areas"] = sky.groupby("target").station_area.nunique()
-        return res
+        res["fc_n_areas"] = sky.groupby("target").station_area.nunique()  # 5곳 중 몇 곳 예보가 있었나
+        return res.reindex(index)
 
-    a, b = summarize(sp8, tx8), summarize(sp5, tx5)
-    out = out.set_index("date")
-    a = a.reindex(out.index)
-    b = b.reindex(out.index)
+    # 기본: D-1 17시 KST(08:00 UTC) 발표, 없으면 D-1 14시 KST(05:00 UTC) 발표
+    a = summarize(*pick(800, 1, [18, 19, 20, 21], 6))
+    b = summarize(*pick(500, 1, [21, 22, 23, 24], 6))
     use_b = a["fc_sky_mean"].isna() & b["fc_sky_mean"].notna()
     res = a.copy()
     res.loc[use_b] = b.loc[use_b]
     res["fc_fallback"] = use_b.astype(int)
-    return res.reset_index().rename(columns={"index": "date"})
+
+    # 예보 변화: 하루 전(D-2 17시) 발표분과 비교. 예보가 많이 바뀐 날은 그만큼 불확실하다.
+    c = summarize(*pick(800, 2, [42, 43, 44, 45], 7))
+    res["fc_clear_share_d2"] = c["fc_clear_share"]
+    res["fc_clear_delta"] = res["fc_clear_share"] - c["fc_clear_share"]
+    res["fc_pop_delta"] = res["fc_pop_mean"] - c["fc_pop_mean"]
+
+    # 더위·추위: 냉난방 수요가 늘어나는 정도 (낮 최고기온 기준)
+    res["fc_cool_deg"] = (res["fc_tmx_mean"] - 28).clip(lower=0)
+    res["fc_heat_deg"] = (10 - res["fc_tmx_mean"]).clip(lower=0)
+    return res.reset_index()
 
 
 def power(days):
@@ -124,6 +132,17 @@ def power(days):
     out["dem_mid_lag7"] = lag("dm", 7) / 1000          # 지난주 같은 요일 한낮 수요 (GW)
     out["dem_mid_lag1"] = lag("dm", 1) / 1000          # 어제 한낮 수요
     out["dem_min_lag7"] = lag("dmin", 7) / 1000
+    # 같은 종류 날(쉬는 날↔쉬는 날, 평일↔평일) 중 가장 최근 날의 한낮 수요.
+    # 평일에 낀 공휴일은 지난주 같은 요일(평일)과 수요가 크게 달라서, 지난주 값만으로는 과대평가된다.
+    off = offday_series(s.index)
+    last_same = []
+    for d in out.index:
+        i = s.index.get_loc(d)
+        j = i - 1
+        while j >= 0 and off.iloc[j] != off.loc[d]:
+            j -= 1
+        last_same.append(s["dm"].iloc[j] if j >= 0 else np.nan)
+    out["dem_mid_lastsame"] = np.array(last_same) / 1000
     out["sol_mid_lag1"] = lag("sol", 1) / 1000         # 어제 한낮 시장 태양광 (GW)
     out["sol_mid_mean7"] = s["sol"].shift(1).rolling(7, min_periods=5).mean().reindex(out.index) / 1000
     out["sol_share_lag1"] = out.sol_mid_lag1 / out.dem_mid_lag1

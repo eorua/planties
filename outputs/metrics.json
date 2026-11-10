@@ -140,6 +140,7 @@
    "iters": 300
   }
  },
+ "threshold_method": "매달 직전 12개월 예측에서 F1 최대 (출력제어 15일 미만이면 기간 확장)",
  "val": {
   "rule": {
    "pr_auc": 0.645,
@@ -147,7 +148,7 @@
    "precision": 0.543,
    "recall": 0.909,
    "f1": 0.68,
-   "threshold": 0.75,
+   "threshold_mean": 0.75,
    "n_days": 181,
    "n_pos": 55,
    "n_pred_pos": 92,
@@ -158,30 +159,30 @@
   "logistic": {
    "pr_auc": 0.668,
    "roc_auc": 0.809,
+   "precision": 0.513,
+   "recall": 0.727,
+   "f1": 0.602,
+   "threshold_mean": 0.454,
+   "n_days": 181,
+   "n_pos": 55,
+   "n_pred_pos": 78,
+   "hits": 40,
+   "false_alarms": 38,
+   "misses": 15
+  },
+  "hgb": {
+   "pr_auc": 0.664,
+   "roc_auc": 0.838,
    "precision": 0.609,
    "recall": 0.709,
    "f1": 0.655,
-   "threshold": 0.642,
+   "threshold_mean": 0.101,
    "n_days": 181,
    "n_pos": 55,
    "n_pred_pos": 64,
    "hits": 39,
    "false_alarms": 25,
    "misses": 16
-  },
-  "hgb": {
-   "pr_auc": 0.664,
-   "roc_auc": 0.838,
-   "precision": 0.565,
-   "recall": 0.873,
-   "f1": 0.686,
-   "threshold": 0.027,
-   "n_days": 181,
-   "n_pos": 55,
-   "n_pred_pos": 85,
-   "hits": 48,
-   "false_alarms": 37,
-   "misses": 7
   }
  },
  "test": {
@@ -191,7 +192,7 @@
    "precision": 0.522,
    "recall": 0.889,
    "f1": 0.658,
-   "threshold": 0.75,
+   "threshold_mean": 0.75,
    "n_days": 184,
    "n_pos": 27,
    "n_pred_pos": 46,
@@ -206,16 +207,16 @@
   "logistic": {
    "pr_auc": 0.606,
    "roc_auc": 0.874,
-   "precision": 0.386,
-   "recall": 0.815,
-   "f1": 0.524,
-   "threshold": 0.642,
+   "precision": 0.392,
+   "recall": 0.741,
+   "f1": 0.513,
+   "threshold_mean": 0.692,
    "n_days": 184,
    "n_pos": 27,
-   "n_pred_pos": 57,
-   "hits": 22,
-   "false_alarms": 35,
-   "misses": 5,
+   "n_pred_pos": 51,
+   "hits": 20,
+   "false_alarms": 31,
+   "misses": 7,
    "pr_auc_ci95": [
     0.425,
     0.784
@@ -224,16 +225,16 @@
   "hgb": {
    "pr_auc": 0.742,
    "roc_auc": 0.938,
-   "precision": 0.321,
-   "recall": 0.963,
-   "f1": 0.481,
-   "threshold": 0.027,
+   "precision": 0.571,
+   "recall": 0.889,
+   "f1": 0.696,
+   "threshold_mean": 0.223,
    "n_days": 184,
    "n_pos": 27,
-   "n_pred_pos": 81,
-   "hits": 26,
-   "false_alarms": 55,
-   "misses": 1,
+   "n_pred_pos": 42,
+   "hits": 24,
+   "false_alarms": 18,
+   "misses": 3,
    "pr_auc_ci95": [
     0.573,
     0.897
