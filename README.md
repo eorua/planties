@@ -7,7 +7,7 @@
 - 시연 방식: 2025년의 실제 날짜를 골라 "그 전날 17시에 알 수 있던 정보만으로" 예측을 재현한다.
 - 정답 자료: 전력거래소 출력제어 실적 (육지 출력제어 발생일 2023년 2일 → 2024년 27일 → 2025년 82일)
 
-현재 결과: 2025년 하반기 시험에서 출력제어 27일 중 24일을 전날 예측, 헛경보 15번, 경보 정확도 62% (PR-AUC 0.78) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
+현재 결과: 2025년 하반기 시험에서 출력제어 27일 중 25일을 전날 예측, 놓침 2일, 헛경보 31번, 경보 정확도 45% (PR-AUC 0.78) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
 
 처음 보는 팀원은 **[인수인계 문서(docs/HANDOVER.md)](docs/HANDOVER.md)**부터 읽는다. 어떤 자료가 있고 없는지는 [자료 현황(docs/DATA_STATUS.md)](docs/DATA_STATUS.md).
 

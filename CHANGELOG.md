@@ -2,6 +2,12 @@
 
 데이터나 처리 방식이 바뀌면 여기에 적는다. 그래프·PPT의 숫자가 어느 버전에서 나왔는지 이걸로 추적한다.
 
+## 2026-11-11 밤 (원전 입력 B안 반영)
+- 팀 결정: 원전 입력(nuc_lag1)을 어제 하루 전체 평균 → 어제 1~16시 평균으로 (전날 17시 규칙 준수). 브랜치 nuc-1to16의 build_features.py 수정을 main에 반영
+- 특징 표 다시 만들고 train.py, compare_models.py, experiments.py 다시 실행 → outputs/ 전부 갱신
+- **본 모델 시험: PR-AUC 0.782 → 0.776, 잡음/헛경보/놓침 24/15/3 → 25/31/2.** 같은 재현율(80%)에서 정밀도 71% → 82%
+- README, HANDOVER, MODEL_RESULTS, PRESENTATION_NOTES, FEATURES, LEAKAGE_AUDIT(후속 조치), 예선 PPT 초안 숫자 갱신
+
 ## 2026-11-11 저녁 (다시 돌리기, 공휴일, 예선 PPT 초안)
 - 모델 10가지 비교(compare_models.py)·개선 실험(experiments.py)을 새 특징 표로 다시 실행 → outputs/model_comparison.csv, experiment_*.csv 갱신, MODEL_RESULTS 6·7장 숫자 갱신. 그래디언트 부스팅 유지 결론은 같음. 검증 기준 선택이 0.01 차이로 뒤집힘(입력 A→B, 경보 기준 12개월→고정) → 잡음 수준이라 본 모델 설정은 그대로, MODEL_RESULTS 9장에 기록
 - 원전 입력을 어제 1~16시 평균으로 고친 버전은 브랜치 nuc-1to16에만 (PR-AUC 0.782 → 0.776, 헛경보 15 → 31번). main 반영은 팀 결정
