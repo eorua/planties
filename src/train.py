@@ -39,9 +39,10 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "outputs"
 SEED = 0
 P = {"val": ("2025-01-01", "2025-06-30"), "test": ("2025-07-01", "2025-12-31")}
-META = {"date", "y", "fc_n_areas", "fc_fallback"}
+META = {"date", "y", "label_source", "fc_n_areas", "fc_fallback"}
 # 특징 표에는 있지만 본 모델에는 넣지 않는 항목 (검증에서 효과 없음, docs/MODEL_RESULTS.md 7장)
-NOT_USED = {"fc_clear_share_d2", "fc_clear_delta", "fc_pop_delta", "fc_cool_deg", "fc_heat_deg", "dem_mid_lastsame"}
+NOT_USED = {"fc_clear_share_d2", "fc_clear_delta", "fc_pop_delta", "fc_cool_deg", "fc_heat_deg", "dem_mid_lastsame",
+            "sup_mid_lag1", "res_rate_mid_lag1"}  # 공급능력·예비율(EPSIS)은 2026년 시험용 실험 항목
 OOT_START = "2023-07-01"   # 경보 기준을 정하는 데 쓸 과거 예측을 이때부터 만들어 둔다
 THR_MONTHS, THR_MIN_POS = 12, 15
 

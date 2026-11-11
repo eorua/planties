@@ -11,6 +11,9 @@
 - 날짜마다 "Start : YYYYMMDD" 줄 뒤에 그 날 발표분이 이어진다.
 - 행: 일, 발표시각(HHMM, UTC), 선행시간(+h), 값 [, KST 일, KST 시각 (2025 파일만)]
 
+2026년분 (k26_*.zip, 2026-11-11 수집): 2026-01-01 ~ 2026-10-31, 한 달 단위 요청 + 깨진 날 하루 단위 재요청.
+- 2026년 시험(독립 시험)용. 기간 끝은 YEAR_END 에 적는다.
+
 보충분 (refill_*.zip)
 - 결함 때문에 빠진 날을 하루 단위로 다시 요청해 받은 것. 기존 행과 같은 키면 값이 같을 때만 합친다.
 - 하루 단위로 다시 받아도 깨져 오는 날은 원본 손상으로 보고 빈칸으로 둔다.
@@ -34,6 +37,7 @@ CLEAN = ROOT / "data" / "clean"
 LOC = {"운암1동": ("광주", "59_75"), "연산동": ("목포", "50_67"), "송천1동": ("전주", "63_90"),
        "신암1동": ("대구", "89_91"), "대청동": ("부산", "97_74")}
 ELEM = {"하늘상태": "SKY", "강수확률": "POP", "일최고기온": "TMX"}
+YEAR_END = {"2026": "20261031"}   # 다 받지 않은 해의 마지막 날
 NAME_RE = re.compile(r"(.+?)_(.+?)_(\d{8})_(\d{8})\.csv$")
 
 checks, excluded = [], []
@@ -89,7 +93,7 @@ def main():
         dong, elem_kr, f, t, grid, rows = parse(zipname, name, text)
         check(f"{name}: 머리말 격자 = 지점 격자", grid == LOC[dong][1], f"{grid} vs {LOC[dong][1]}")
         key = (dong, elem_kr, f[:4])
-        if not zipname.startswith("refill_"):  # 보충분(빠진 날 다시 받은 것)은 기간 점검에서 뺀다
+        if not zipname.startswith("refill_") and f != t:  # 보충분(빠진 날 하루 단위로 다시 받은 것)은 기간 점검에서 뺀다
             coverage[key].append((f, t))
         d = acc[key]
         for date, hhmm, lead, val in rows:
@@ -99,11 +103,12 @@ def main():
             d[k] = val
 
     check("원본 파일 수", n_files > 0, f"{n_files}개")
-    check("지점·요소·연도 조합 45개", len(acc) == 45, f"{len(acc)}개")
+    n_years = len({k[2] for k in acc})
+    check(f"지점·요소·연도 조합 {15 * n_years}개", len(acc) == 15 * n_years, f"{len(acc)}개")
     for key, ranges in coverage.items():
         rs = sorted(ranges)
         y = key[2]
-        cont = rs[0][0] == y + "0101" and rs[-1][1] == y + "1231" and all(
+        cont = rs[0][0] == y + "0101" and rs[-1][1] == YEAR_END.get(y, y + "1231") and all(
             (pd.Timestamp(a[1]) + pd.Timedelta(days=1)) == pd.Timestamp(b[0]) for a, b in zip(rs, rs[1:]))
         if not cont:
             check(f"{key}: 요청 기간이 1년을 빈틈없이 덮음", False, str(rs))
@@ -134,7 +139,7 @@ def main():
         df.insert(0, "grid", LOC[dong][1])
         df.insert(0, "dong", dong)
         df.insert(0, "station_area", LOC[dong][0])
-        days_expected = 366 if int(y) % 4 == 0 else 365
+        days_expected = (pd.Timestamp(YEAR_END.get(y, y + "1231")) - pd.Timestamp(y + "0101")).days + 1
         days = df.loc[~df["value_missing_code"], "issue_date_utc"].nunique()  # 결측 표시값만 있는 날은 빠진 날로 셈
         summary.append({"area": LOC[dong][0], "dong": dong, "element": ELEM[elem_kr], "year": y,
                         "issue_days": days, "days_in_year": days_expected,

@@ -60,7 +60,7 @@
    "params": {
     "C": 1.0
    },
-   "val_pr_auc": 0.651
+   "val_pr_auc": 0.65
   }
  ],
  "val_search_hgb": [
@@ -70,7 +70,7 @@
     "depth": 2,
     "iters": 100
    },
-   "val_pr_auc": 0.528
+   "val_pr_auc": 0.531
   },
   {
    "params": {
@@ -78,7 +78,7 @@
     "depth": 2,
     "iters": 300
    },
-   "val_pr_auc": 0.556
+   "val_pr_auc": 0.566
   },
   {
    "params": {
@@ -86,7 +86,7 @@
     "depth": 3,
     "iters": 100
    },
-   "val_pr_auc": 0.524
+   "val_pr_auc": 0.506
   },
   {
    "params": {
@@ -94,7 +94,7 @@
     "depth": 3,
     "iters": 300
    },
-   "val_pr_auc": 0.619
+   "val_pr_auc": 0.615
   },
   {
    "params": {
@@ -102,7 +102,7 @@
     "depth": 2,
     "iters": 100
    },
-   "val_pr_auc": 0.559
+   "val_pr_auc": 0.558
   },
   {
    "params": {
@@ -110,7 +110,7 @@
     "depth": 2,
     "iters": 300
    },
-   "val_pr_auc": 0.61
+   "val_pr_auc": 0.602
   },
   {
    "params": {
@@ -118,7 +118,7 @@
     "depth": 3,
     "iters": 100
    },
-   "val_pr_auc": 0.608
+   "val_pr_auc": 0.585
   },
   {
    "params": {
@@ -126,7 +126,7 @@
     "depth": 3,
     "iters": 300
    },
-   "val_pr_auc": 0.664
+   "val_pr_auc": 0.65
   }
  ],
  "chosen_params": {
@@ -171,18 +171,18 @@
    "misses": 15
   },
   "hgb": {
-   "pr_auc": 0.664,
-   "roc_auc": 0.838,
-   "precision": 0.609,
-   "recall": 0.709,
-   "f1": 0.655,
-   "threshold_mean": 0.101,
+   "pr_auc": 0.65,
+   "roc_auc": 0.83,
+   "precision": 0.554,
+   "recall": 0.745,
+   "f1": 0.636,
+   "threshold_mean": 0.066,
    "n_days": 181,
    "n_pos": 55,
-   "n_pred_pos": 64,
-   "hits": 39,
-   "false_alarms": 25,
-   "misses": 16
+   "n_pred_pos": 74,
+   "hits": 41,
+   "false_alarms": 33,
+   "misses": 14
   }
  },
  "test": {
@@ -205,39 +205,39 @@
    ]
   },
   "logistic": {
-   "pr_auc": 0.606,
+   "pr_auc": 0.607,
    "roc_auc": 0.874,
-   "precision": 0.392,
+   "precision": 0.417,
    "recall": 0.741,
-   "f1": 0.513,
-   "threshold_mean": 0.692,
+   "f1": 0.533,
+   "threshold_mean": 0.707,
    "n_days": 184,
    "n_pos": 27,
-   "n_pred_pos": 51,
+   "n_pred_pos": 48,
    "hits": 20,
-   "false_alarms": 31,
+   "false_alarms": 28,
    "misses": 7,
    "pr_auc_ci95": [
-    0.425,
+    0.426,
     0.784
    ]
   },
   "hgb": {
-   "pr_auc": 0.742,
-   "roc_auc": 0.938,
-   "precision": 0.571,
+   "pr_auc": 0.782,
+   "roc_auc": 0.943,
+   "precision": 0.615,
    "recall": 0.889,
-   "f1": 0.696,
-   "threshold_mean": 0.223,
+   "f1": 0.727,
+   "threshold_mean": 0.256,
    "n_days": 184,
    "n_pos": 27,
-   "n_pred_pos": 42,
+   "n_pred_pos": 39,
    "hits": 24,
-   "false_alarms": 18,
+   "false_alarms": 15,
    "misses": 3,
    "pr_auc_ci95": [
-    0.573,
-    0.897
+    0.62,
+    0.92
    ]
   }
  },
@@ -251,7 +251,7 @@
   {
    "months": 12,
    "train_pos_at_july": 63,
-   "logistic_test_pr_auc": 0.596,
+   "logistic_test_pr_auc": 0.595,
    "hgb_test_pr_auc": 0.736
   },
   {
@@ -269,50 +269,50 @@
   {
    "months": "전체",
    "train_pos_at_july": 84,
-   "logistic_test_pr_auc": 0.606,
-   "hgb_test_pr_auc": 0.742
+   "logistic_test_pr_auc": 0.607,
+   "hgb_test_pr_auc": 0.782
   }
  ],
  "top_features_hgb": [
   [
    "쉬는 날",
-   0.2841
+   0.3119
   ],
   [
    "마지막 출력제어 후 경과일",
-   0.1488
-  ],
-  [
-   "지난주 최저 수요",
-   0.0461
+   0.1538
   ],
   [
    "계절(코사인)",
-   0.0227
+   0.0417
   ],
   [
    "예보 최고기온",
-   0.0178
+   0.04
   ],
   [
-   "지난주 같은 요일 한낮 수요",
-   0.0176
-  ],
-  [
-   "요일",
-   0.0134
-  ],
-  [
-   "최근 30일 출력제어",
-   0.0129
-  ],
-  [
-   "어제 출력제어",
-   0.0095
+   "지난주 최저 수요",
+   0.038
   ],
   [
    "어제 한낮 수요",
-   0.0088
+   0.0271
+  ],
+  [
+   "최근 30일 출력제어",
+   0.0161
+  ],
+  [
+   "요일",
+   0.0135
+  ],
+  [
+   "지난주 같은 요일 한낮 수요",
+   0.0118
+  ],
+  [
+   "최근 7일 한낮 태양광",
+   0.0012
   ]
  ]
 }

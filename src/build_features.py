@@ -22,7 +22,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 CLEAN = ROOT / "data" / "clean"
 OUT = ROOT / "data" / "features"
-START, END = "2023-01-01", "2025-12-31"
+START, END = "2023-01-01", "2026-10-31"
+OFFICIAL_LABEL_END = "2026-06-13"   # 공식 실적 파일의 마지막 날. 그 뒤는 게시판 실적으로 정답을 만든다.
 MID = [11, 12, 13, 14]                      # 한낮 시간대 (전력 자료 시간 번호, 관측 시각 모두 같은 숫자로 맞춤)
 SW = ["광주", "목포", "전주"]                # 태양광이 많은 남서부
 
@@ -30,7 +31,9 @@ SW = ["광주", "목포", "전주"]                # 태양광이 많은 남서�
 def labels():
     c = pd.read_csv(CLEAN / "curtailment_daily.csv")
     m = c[(c.grid == "육지") & ((c.n_hours_controlled.fillna(0) > 0) | c.has_blank_hour)]
-    return set(m.date)
+    b = pd.read_csv(CLEAN / "kpx_board_daily.csv")
+    board = set(b[(b.occurred == 1) & (b.date > OFFICIAL_LABEL_END)].date)
+    return set(m.date) | board
 
 
 def offday_series(dates):
@@ -63,7 +66,7 @@ def calendar(days):
 
 
 def forecast(days):
-    parts = [pd.read_csv(CLEAN / f"kma_forecast_{y}.csv.gz") for y in (2023, 2024, 2025)]
+    parts = [pd.read_csv(p) for p in sorted(CLEAN.glob("kma_forecast_20*.csv.gz"))]
     f = pd.concat(parts)
     f["issue_date"] = pd.to_datetime(f.issue_date_utc)
     index = pd.Index(days, name="date")
@@ -125,8 +128,17 @@ def power(days):
     cap = fu[fu.fuel_raw == "태양광"].groupby("date").capacity_mw.max()
 
     idx = pd.date_range(pd.Timestamp(START) - pd.Timedelta(days=14), END).strftime("%Y-%m-%d")
+    # EPSIS 실시간 수급: 공공데이터 수요 파일이 없는 2026년은 EPSIS 부하로 수요를 채운다 (오차 중앙값 0.11%).
+    ep = pd.read_csv(CLEAN / "epsis_hourly.csv")
+    ep_dm = ep[ep.hour.isin(MID)].groupby("date").load_mw.mean()
+    ep_dmin = ep.groupby("date").load_mw.min()
+    ep_sup = ep[ep.hour.isin(MID)].groupby("date").supply_mw.mean()
+    ep_res = (ep[ep.hour.isin(MID)].assign(r=lambda x: x.reserve_mw / x.load_mw).groupby("date").r.mean())
     s = pd.DataFrame(index=idx)
     s["dm"], s["dmin"], s["sol"], s["nuc"], s["cap"] = dm, dmin, sol, nuc, cap
+    s["dm"] = s["dm"].combine_first(ep_dm.reindex(s.index))
+    s["dmin"] = s["dmin"].combine_first(ep_dmin.reindex(s.index))
+    s["sup"], s["res"] = ep_sup, ep_res
     out = pd.DataFrame(index=pd.Index(days, name="date"))
     lag = lambda col, k: s[col].shift(k).reindex(out.index)
     out["dem_mid_lag7"] = lag("dm", 7) / 1000          # 지난주 같은 요일 한낮 수요 (GW)
@@ -148,6 +160,8 @@ def power(days):
     out["sol_share_lag1"] = out.sol_mid_lag1 / out.dem_mid_lag1
     out["nuc_lag1"] = lag("nuc", 1) / 1000             # 어제 원전 평균 출력 (GW), 2024년 없음
     out["sol_cap_lag1"] = lag("cap", 1) / 1000         # 어제 시장 태양광 설비용량 (GW)
+    out["sup_mid_lag1"] = lag("sup", 1) / 1000         # 어제 한낮 공급능력 (GW, EPSIS) — 켜져 있는 발전기 규모
+    out["res_rate_mid_lag1"] = lag("res", 1)           # 어제 한낮 공급예비율 (예비력 ÷ 부하)
     # 설명용 사후값: 입력에 쓰지 않는다
     out["post_dem_mid"] = s["dm"].reindex(out.index) / 1000
     out["post_sol_mid"] = s["sol"].reindex(out.index) / 1000
@@ -176,6 +190,7 @@ def main():
     for part in (forecast(days), power(days), history(days, pos)):
         df = df.merge(part, on="date", how="left")
     df.insert(1, "y", df.date.isin(pos).astype(int))
+    df.insert(2, "label_source", np.where(df.date <= OFFICIAL_LABEL_END, "공식", "게시판"))
     df.to_csv(OUT / "daily_features.csv", index=False, encoding="utf-8-sig")
     print(df.shape, "출력제어일", df.y.sum())
     print(df.isna().sum()[df.isna().sum() > 0].to_string())
