@@ -124,7 +124,8 @@ def power(days):
     sol = r.groupby(["date", "hour"]).value_mwh.sum().groupby("date").mean()
 
     fu = pd.read_csv(CLEAN / "fuel_hourly.csv")
-    nuc = fu[fu.fuel_raw == "원자력"].groupby("date").generation_mwh.mean()
+    # 원전: 예측 시각(전날 17시)에 끝난 시간만 쓴다 → 어제 1~16시(시간 끝 기준 16시까지) 평균 (2026-11-11 수정, 이전은 하루 전체 평균)
+    nuc = fu[(fu.fuel_raw == "원자력") & (fu.hour <= 16)].groupby("date").generation_mwh.mean()
     cap = fu[fu.fuel_raw == "태양광"].groupby("date").capacity_mw.max()
 
     idx = pd.date_range(pd.Timestamp(START) - pd.Timedelta(days=14), END).strftime("%Y-%m-%d")
@@ -158,7 +159,7 @@ def power(days):
     out["sol_mid_lag1"] = lag("sol", 1) / 1000         # 어제 한낮 시장 태양광 (GW)
     out["sol_mid_mean7"] = s["sol"].shift(1).rolling(7, min_periods=5).mean().reindex(out.index) / 1000
     out["sol_share_lag1"] = out.sol_mid_lag1 / out.dem_mid_lag1
-    out["nuc_lag1"] = lag("nuc", 1) / 1000             # 어제 원전 평균 출력 (GW), 2024년 없음
+    out["nuc_lag1"] = lag("nuc", 1) / 1000             # 어제 1~16시 원전 평균 출력 (GW), 2024년 없음
     out["sol_cap_lag1"] = lag("cap", 1) / 1000         # 어제 시장 태양광 설비용량 (GW)
     out["sup_mid_lag1"] = lag("sup", 1) / 1000         # 어제 한낮 공급능력 (GW, EPSIS) — 켜져 있는 발전기 규모
     out["res_rate_mid_lag1"] = lag("res", 1)           # 어제 한낮 공급예비율 (예비력 ÷ 부하)

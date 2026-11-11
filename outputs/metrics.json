@@ -70,7 +70,7 @@
     "depth": 2,
     "iters": 100
    },
-   "val_pr_auc": 0.531
+   "val_pr_auc": 0.527
   },
   {
    "params": {
@@ -78,7 +78,7 @@
     "depth": 2,
     "iters": 300
    },
-   "val_pr_auc": 0.566
+   "val_pr_auc": 0.565
   },
   {
    "params": {
@@ -86,7 +86,7 @@
     "depth": 3,
     "iters": 100
    },
-   "val_pr_auc": 0.506
+   "val_pr_auc": 0.521
   },
   {
    "params": {
@@ -94,7 +94,7 @@
     "depth": 3,
     "iters": 300
    },
-   "val_pr_auc": 0.615
+   "val_pr_auc": 0.621
   },
   {
    "params": {
@@ -102,7 +102,7 @@
     "depth": 2,
     "iters": 100
    },
-   "val_pr_auc": 0.558
+   "val_pr_auc": 0.569
   },
   {
    "params": {
@@ -110,7 +110,7 @@
     "depth": 2,
     "iters": 300
    },
-   "val_pr_auc": 0.602
+   "val_pr_auc": 0.601
   },
   {
    "params": {
@@ -118,7 +118,7 @@
     "depth": 3,
     "iters": 100
    },
-   "val_pr_auc": 0.585
+   "val_pr_auc": 0.627
   },
   {
    "params": {
@@ -126,7 +126,7 @@
     "depth": 3,
     "iters": 300
    },
-   "val_pr_auc": 0.65
+   "val_pr_auc": 0.648
   }
  ],
  "chosen_params": {
@@ -158,31 +158,31 @@
   },
   "logistic": {
    "pr_auc": 0.668,
-   "roc_auc": 0.809,
-   "precision": 0.513,
+   "roc_auc": 0.808,
+   "precision": 0.519,
    "recall": 0.727,
-   "f1": 0.602,
-   "threshold_mean": 0.454,
+   "f1": 0.606,
+   "threshold_mean": 0.455,
    "n_days": 181,
    "n_pos": 55,
-   "n_pred_pos": 78,
+   "n_pred_pos": 77,
    "hits": 40,
-   "false_alarms": 38,
+   "false_alarms": 37,
    "misses": 15
   },
   "hgb": {
-   "pr_auc": 0.65,
-   "roc_auc": 0.83,
-   "precision": 0.554,
-   "recall": 0.745,
-   "f1": 0.636,
-   "threshold_mean": 0.066,
+   "pr_auc": 0.648,
+   "roc_auc": 0.826,
+   "precision": 0.519,
+   "recall": 0.727,
+   "f1": 0.606,
+   "threshold_mean": 0.036,
    "n_days": 181,
    "n_pos": 55,
-   "n_pred_pos": 74,
-   "hits": 41,
-   "false_alarms": 33,
-   "misses": 14
+   "n_pred_pos": 77,
+   "hits": 40,
+   "false_alarms": 37,
+   "misses": 15
   }
  },
  "test": {
@@ -207,15 +207,15 @@
   "logistic": {
    "pr_auc": 0.607,
    "roc_auc": 0.874,
-   "precision": 0.417,
+   "precision": 0.4,
    "recall": 0.741,
-   "f1": 0.533,
-   "threshold_mean": 0.707,
+   "f1": 0.519,
+   "threshold_mean": 0.691,
    "n_days": 184,
    "n_pos": 27,
-   "n_pred_pos": 48,
+   "n_pred_pos": 50,
    "hits": 20,
-   "false_alarms": 28,
+   "false_alarms": 30,
    "misses": 7,
    "pr_auc_ci95": [
     0.426,
@@ -223,21 +223,21 @@
    ]
   },
   "hgb": {
-   "pr_auc": 0.782,
-   "roc_auc": 0.943,
-   "precision": 0.615,
-   "recall": 0.889,
-   "f1": 0.727,
-   "threshold_mean": 0.256,
+   "pr_auc": 0.776,
+   "roc_auc": 0.941,
+   "precision": 0.446,
+   "recall": 0.926,
+   "f1": 0.602,
+   "threshold_mean": 0.127,
    "n_days": 184,
    "n_pos": 27,
-   "n_pred_pos": 39,
-   "hits": 24,
-   "false_alarms": 15,
-   "misses": 3,
+   "n_pred_pos": 56,
+   "hits": 25,
+   "false_alarms": 31,
+   "misses": 2,
    "pr_auc_ci95": [
-    0.62,
-    0.92
+    0.604,
+    0.93
    ]
   }
  },
@@ -246,73 +246,73 @@
    "months": 6,
    "train_pos_at_july": 55,
    "logistic_test_pr_auc": 0.751,
-   "hgb_test_pr_auc": 0.521
+   "hgb_test_pr_auc": 0.545
   },
   {
    "months": 12,
    "train_pos_at_july": 63,
-   "logistic_test_pr_auc": 0.595,
-   "hgb_test_pr_auc": 0.736
+   "logistic_test_pr_auc": 0.598,
+   "hgb_test_pr_auc": 0.689
   },
   {
    "months": 18,
    "train_pos_at_july": 82,
-   "logistic_test_pr_auc": 0.649,
-   "hgb_test_pr_auc": 0.831
+   "logistic_test_pr_auc": 0.645,
+   "hgb_test_pr_auc": 0.807
   },
   {
    "months": 24,
    "train_pos_at_july": 82,
-   "logistic_test_pr_auc": 0.611,
-   "hgb_test_pr_auc": 0.851
+   "logistic_test_pr_auc": 0.606,
+   "hgb_test_pr_auc": 0.86
   },
   {
    "months": "전체",
    "train_pos_at_july": 84,
    "logistic_test_pr_auc": 0.607,
-   "hgb_test_pr_auc": 0.782
+   "hgb_test_pr_auc": 0.776
   }
  ],
  "top_features_hgb": [
   [
    "쉬는 날",
-   0.3119
+   0.3471
   ],
   [
    "마지막 출력제어 후 경과일",
-   0.1538
-  ],
-  [
-   "계절(코사인)",
-   0.0417
+   0.1661
   ],
   [
    "예보 최고기온",
-   0.04
+   0.0589
+  ],
+  [
+   "계절(코사인)",
+   0.0482
   ],
   [
    "지난주 최저 수요",
-   0.038
+   0.0445
   ],
   [
    "어제 한낮 수요",
-   0.0271
-  ],
-  [
-   "최근 30일 출력제어",
-   0.0161
+   0.0397
   ],
   [
    "요일",
-   0.0135
+   0.024
+  ],
+  [
+   "최근 30일 출력제어",
+   0.0201
   ],
   [
    "지난주 같은 요일 한낮 수요",
-   0.0118
+   0.0197
   ],
   [
-   "최근 7일 한낮 태양광",
-   0.0012
+   "연휴 길이",
+   0.0101
   ]
  ]
 }
