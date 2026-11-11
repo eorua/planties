@@ -2,6 +2,13 @@
 
 데이터나 처리 방식이 바뀌면 여기에 적는다. 그래프·PPT의 숫자가 어느 버전에서 나왔는지 이걸로 추적한다.
 
+## 2026-11-12 (공개 자료 모델, D안)
+- 전력거래소 게시판 글 354개 확인: 육지 실적 글 162건 중 당일 등록 0건, 1일~11주 지연(2025 하반기 중앙값 17일) → data/manual/kpx_board_result_post_lag.csv
+- 출력제어 이력 5개 입력을 전날 17시에 공개 자료로 알 수 없으므로, 팀 결정(D안)으로 **공개 자료 모델을 본 숫자로**: train.py 에 PLANTIES_VARIANT=public 변형 추가(이력 제외, 규칙도 이력 항목 제외) → outputs/public/
+- 공개 자료 모델 시험: PR-AUC 0.59, 23 / 36 / 4, 낮음 44일 중 0일. 규칙 0.49. 검증에서는 규칙 0.62 대 모델 0.61
+- explain.py, build_demo.py 가 변형을 따르게 함. 시연 화면은 공개 자료 모델
+- MODEL_RESULTS 11장, LEAKAGE_AUDIT, PRESENTATION_NOTES, FINAL_DECK_PLAN, HANDOVER, README, 예선 PPT 초안 갱신. 실시간 정보 모델(outputs/)은 그대로
+
 ## 2026-11-11 밤 (위험도·원인 설명·전력거래소 비교·시연 화면)
 - src/explain.py: 위험도 3단계(높음 = 경보 기준, 주의 = 직전 12개월 출력제어일 90%를 잡는 선), 입력 묶음별 원인 설명, 전력거래소 전날 공지와 비교 → outputs/explain_summary.json, outputs/demo_days.csv
 - 시험: 높음 56일 중 25일(45%), 주의 60일 중 2일, 낮음 68일 중 0일 출력제어

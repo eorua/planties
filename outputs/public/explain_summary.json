@@ -1,0 +1,85 @@
+{
+ "made": "src/explain.py",
+ "check_vs_train_max_gap": 0.0,
+ "risk_levels": {
+  "rule": "높음 = 경보 기준(직전 12개월 F1 최대) 이상, 주의 = 직전 12개월 출력제어일의 90%가 이 값 이상이 되는 선 이상, 낮음 = 그 아래",
+  "val": {
+   "높음": {
+    "days": 83,
+    "curtailed": 35,
+    "rate": 0.422
+   },
+   "주의": {
+    "days": 61,
+    "curtailed": 17,
+    "rate": 0.279
+   },
+   "낮음": {
+    "days": 37,
+    "curtailed": 3,
+    "rate": 0.081
+   }
+  },
+  "test": {
+   "높음": {
+    "days": 59,
+    "curtailed": 23,
+    "rate": 0.39
+   },
+   "주의": {
+    "days": 81,
+    "curtailed": 4,
+    "rate": 0.049
+   },
+   "낮음": {
+    "days": 44,
+    "curtailed": 0,
+    "rate": 0.0
+   }
+  }
+ },
+ "kpx_compare": {
+  "period": [
+   "2024-10-01",
+   "2025-06-30"
+  ],
+  "days": 273,
+  "curtailed": 63,
+  "kpx_notice": {
+   "alerts": 43,
+   "hits": 36,
+   "false_alarms": 7,
+   "misses": 27,
+   "recall": 0.571,
+   "precision": 0.837
+  },
+  "model_alert": {
+   "alerts": 101,
+   "hits": 39,
+   "false_alarms": 62,
+   "misses": 24,
+   "recall": 0.619,
+   "precision": 0.386
+  },
+  "model_top_same_count": {
+   "alerts": 43,
+   "hits": 25,
+   "false_alarms": 18,
+   "misses": 38,
+   "recall": 0.397,
+   "precision": 0.581,
+   "note": "공지와 같은 수만큼, 확률이 높은 날부터 경보했다고 볼 때"
+  },
+  "model_pr_auc": 0.56,
+  "curtailed_without_notice_caught_by_model": 8,
+  "curtailed_without_notice": 27,
+  "both_alert": 34
+ },
+ "top_reason_counts_test_high": {
+  "쉬는 날": 35,
+  "전력수요": 8,
+  "최고기온 예보": 7,
+  "어제 태양광": 5,
+  "원전": 4
+ }
+}

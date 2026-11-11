@@ -1,0 +1,6 @@
+﻿months,train_pos_at_july,logistic_test_pr_auc,hgb_test_pr_auc
+6,55,0.425,0.492
+12,63,0.319,0.681
+18,82,0.275,0.678
+24,82,0.292,0.682
+전체,84,0.3,0.586

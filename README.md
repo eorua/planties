@@ -7,7 +7,7 @@
 - 시연 방식: 2025년의 실제 날짜를 골라 "그 전날 17시에 알 수 있던 정보만으로" 예측을 재현한다.
 - 정답 자료: 전력거래소 출력제어 실적 (육지 출력제어 발생일 2023년 2일 → 2024년 27일 → 2025년 82일)
 
-현재 결과: 2025년 하반기 시험에서 출력제어 27일 중 25일을 전날 예측, 놓침 2일, 헛경보 31번, 경보 정확도 45% (PR-AUC 0.78) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
+현재 결과 (2025년 하반기 시험, 출력제어 27일): **공개 자료만으로** 27일 중 23일을 전날 예측, 위험도 "낮음" 44일 중 출력제어 0일, PR-AUC 0.59 (무작위 0.15). 실시간 출력제어 정보가 있으면 25일, PR-AUC 0.78. 두 모델의 차이는 [MODEL_RESULTS 11장](docs/MODEL_RESULTS.md) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
 
 처음 보는 팀원은 **[인수인계 문서(docs/HANDOVER.md)](docs/HANDOVER.md)**부터 읽는다. 어떤 자료가 있고 없는지는 [자료 현황(docs/DATA_STATUS.md)](docs/DATA_STATUS.md).
 
@@ -39,7 +39,9 @@ python src/build_clean.py      # 전력·기상 관측 raw → clean (검증 17�
 python src/build_forecast.py   # 기상 예보 raw → clean (검증 489개)
 python src/build_extra.py      # EPSIS 실시간 수급(시간별), 게시판(날짜별) 정리본
 python src/build_features.py   # clean → 특징 표 (data/features)
-python src/train.py            # 모델 평가·학습 곡선·그래프 (outputs/, 약 1분 40초)
+python src/train.py            # 실시간 정보 모델 평가 (outputs/, 약 2분)
+PLANTIES_VARIANT=public python src/train.py          # 공개 자료 모델 = 발표 본 숫자 (outputs/public/)
+cd src && PLANTIES_VARIANT=public python explain.py   # 공개 자료 모델의 위험도·원인·공지 비교 (시연 화면용)
 python src/test_2026.py        # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 2026년 예보를 받은 뒤 실행)
 python src/explain.py          # 위험도 3단계·원인 설명·전력거래소 공지 비교 (outputs/demo_days.csv)
 python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림)

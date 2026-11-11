@@ -5,7 +5,10 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-d = pd.read_csv(ROOT / "outputs" / "demo_days.csv").fillna("")
+# 시연은 공개 자료 모델(outputs/public/)을 쓴다 (docs/MODEL_RESULTS.md 11장). 없으면 outputs/ 의 것.
+SRC = ROOT / "outputs" / "public" / "demo_days.csv"
+SRC = SRC if SRC.exists() else ROOT / "outputs" / "demo_days.csv"
+d = pd.read_csv(SRC).fillna("")
 rows = d.to_dict(orient="records")
 tpl = (ROOT / "demo" / "template.html").read_text(encoding="utf-8")
 html = tpl.replace("__DATA__", json.dumps(rows, ensure_ascii=False, separators=(",", ":")))

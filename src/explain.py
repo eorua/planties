@@ -30,7 +30,7 @@ from sklearn.metrics import average_precision_score, precision_recall_curve
 import train as T
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "outputs"
+OUT = T.OUT   # 변형(PLANTIES_VARIANT)에 따라 outputs/ 또는 outputs/public/
 START, END = T.OOT_START, "2025-12-31"
 DEMO = ("2025-01-01", "2025-12-31")
 KPX = ("2024-10-01", "2025-06-30")

@@ -1,0 +1,313 @@
+{
+ "periods": {
+  "val": [
+   "2025-01-01",
+   "2025-06-30"
+  ],
+  "test": [
+   "2025-07-01",
+   "2025-12-31"
+  ]
+ },
+ "scheme": "매달 1일 재학습(그 전날까지 전체 자료)",
+ "features": [
+  "month",
+  "doy_sin",
+  "doy_cos",
+  "dow",
+  "is_holiday",
+  "is_workers_day",
+  "is_offday",
+  "offday_run_len",
+  "prev_offday",
+  "next_offday",
+  "fc_sky_mean",
+  "fc_clear_share",
+  "fc_pop_mean",
+  "fc_pop_max",
+  "fc_sw_sky_mean",
+  "fc_sw_pop_mean",
+  "fc_tmx_mean",
+  "dem_mid_lag7",
+  "dem_mid_lag1",
+  "dem_min_lag7",
+  "sol_mid_lag1",
+  "sol_mid_mean7",
+  "sol_share_lag1",
+  "nuc_lag1",
+  "sol_cap_lag1"
+ ],
+ "base_rate_test": 0.147,
+ "val_search_logistic": [
+  {
+   "params": {
+    "C": 0.01
+   },
+   "val_pr_auc": 0.607
+  },
+  {
+   "params": {
+    "C": 0.1
+   },
+   "val_pr_auc": 0.624
+  },
+  {
+   "params": {
+    "C": 1.0
+   },
+   "val_pr_auc": 0.611
+  }
+ ],
+ "val_search_hgb": [
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 2,
+    "iters": 100
+   },
+   "val_pr_auc": 0.489
+  },
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 2,
+    "iters": 300
+   },
+   "val_pr_auc": 0.535
+  },
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 3,
+    "iters": 100
+   },
+   "val_pr_auc": 0.448
+  },
+  {
+   "params": {
+    "lr": 0.03,
+    "depth": 3,
+    "iters": 300
+   },
+   "val_pr_auc": 0.557
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 2,
+    "iters": 100
+   },
+   "val_pr_auc": 0.546
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 2,
+    "iters": 300
+   },
+   "val_pr_auc": 0.598
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 3,
+    "iters": 100
+   },
+   "val_pr_auc": 0.562
+  },
+  {
+   "params": {
+    "lr": 0.1,
+    "depth": 3,
+    "iters": 300
+   },
+   "val_pr_auc": 0.605
+  }
+ ],
+ "chosen_params": {
+  "rule": {},
+  "logistic": {
+   "C": 0.1
+  },
+  "hgb": {
+   "lr": 0.1,
+   "depth": 3,
+   "iters": 300
+  }
+ },
+ "threshold_method": "매달 직전 12개월 예측에서 F1 최대 (출력제어 15일 미만이면 기간 확장)",
+ "val": {
+  "rule": {
+   "pr_auc": 0.618,
+   "roc_auc": 0.824,
+   "precision": 0.495,
+   "recall": 0.964,
+   "f1": 0.654,
+   "threshold_mean": 0.667,
+   "n_days": 181,
+   "n_pos": 55,
+   "n_pred_pos": 107,
+   "hits": 53,
+   "false_alarms": 54,
+   "misses": 2
+  },
+  "logistic": {
+   "pr_auc": 0.624,
+   "roc_auc": 0.765,
+   "precision": 0.42,
+   "recall": 0.618,
+   "f1": 0.5,
+   "threshold_mean": 0.396,
+   "n_days": 181,
+   "n_pos": 55,
+   "n_pred_pos": 81,
+   "hits": 34,
+   "false_alarms": 47,
+   "misses": 21
+  },
+  "hgb": {
+   "pr_auc": 0.605,
+   "roc_auc": 0.762,
+   "precision": 0.422,
+   "recall": 0.636,
+   "f1": 0.507,
+   "threshold_mean": 0.065,
+   "n_days": 181,
+   "n_pos": 55,
+   "n_pred_pos": 83,
+   "hits": 35,
+   "false_alarms": 48,
+   "misses": 20
+  }
+ },
+ "test": {
+  "rule": {
+   "pr_auc": 0.493,
+   "roc_auc": 0.89,
+   "precision": 0.446,
+   "recall": 0.926,
+   "f1": 0.602,
+   "threshold_mean": 0.667,
+   "n_days": 184,
+   "n_pos": 27,
+   "n_pred_pos": 56,
+   "hits": 25,
+   "false_alarms": 31,
+   "misses": 2,
+   "pr_auc_ci95": [
+    0.336,
+    0.653
+   ]
+  },
+  "logistic": {
+   "pr_auc": 0.3,
+   "roc_auc": 0.583,
+   "precision": 0.167,
+   "recall": 0.333,
+   "f1": 0.222,
+   "threshold_mean": 0.783,
+   "n_days": 184,
+   "n_pos": 27,
+   "n_pred_pos": 54,
+   "hits": 9,
+   "false_alarms": 45,
+   "misses": 18,
+   "pr_auc_ci95": [
+    0.164,
+    0.468
+   ]
+  },
+  "hgb": {
+   "pr_auc": 0.586,
+   "roc_auc": 0.9,
+   "precision": 0.39,
+   "recall": 0.852,
+   "f1": 0.535,
+   "threshold_mean": 0.202,
+   "n_days": 184,
+   "n_pos": 27,
+   "n_pred_pos": 59,
+   "hits": 23,
+   "false_alarms": 36,
+   "misses": 4,
+   "pr_auc_ci95": [
+    0.423,
+    0.81
+   ]
+  }
+ },
+ "learning_curve": [
+  {
+   "months": 6,
+   "train_pos_at_july": 55,
+   "logistic_test_pr_auc": 0.425,
+   "hgb_test_pr_auc": 0.492
+  },
+  {
+   "months": 12,
+   "train_pos_at_july": 63,
+   "logistic_test_pr_auc": 0.319,
+   "hgb_test_pr_auc": 0.681
+  },
+  {
+   "months": 18,
+   "train_pos_at_july": 82,
+   "logistic_test_pr_auc": 0.275,
+   "hgb_test_pr_auc": 0.678
+  },
+  {
+   "months": 24,
+   "train_pos_at_july": 82,
+   "logistic_test_pr_auc": 0.292,
+   "hgb_test_pr_auc": 0.682
+  },
+  {
+   "months": "전체",
+   "train_pos_at_july": 84,
+   "logistic_test_pr_auc": 0.3,
+   "hgb_test_pr_auc": 0.586
+  }
+ ],
+ "top_features_hgb": [
+  [
+   "쉬는 날",
+   0.1676
+  ],
+  [
+   "요일",
+   0.0727
+  ],
+  [
+   "어제 한낮 수요",
+   0.0583
+  ],
+  [
+   "지난주 최저 수요",
+   0.0491
+  ],
+  [
+   "계절(코사인)",
+   0.0409
+  ],
+  [
+   "지난주 같은 요일 한낮 수요",
+   0.0216
+  ],
+  [
+   "예보 최고기온",
+   0.0206
+  ],
+  [
+   "예보 맑음 비율",
+   0.0067
+  ],
+  [
+   "어제 한낮 태양광",
+   0.0005
+  ],
+  [
+   "예보 강수확률 최대",
+   0.0002
+  ]
+ ]
+}
