@@ -7,7 +7,7 @@
 - 시연 방식: 2025년의 실제 날짜를 골라 "그 전날 17시에 알 수 있던 정보만으로" 예측을 재현한다.
 - 정답 자료: 전력거래소 출력제어 실적 (육지 출력제어 발생일 2023년 2일 → 2024년 27일 → 2025년 82일)
 
-현재 결과: 2025년 하반기 시험에서 출력제어 27일 중 24일을 전날 예측, 경보 정확도 57% (PR-AUC 0.74) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md)
+현재 결과: 2025년 하반기 시험에서 출력제어 27일 중 24일을 전날 예측, 헛경보 15번, 경보 정확도 62% (PR-AUC 0.78) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
 
 처음 보는 팀원은 **[인수인계 문서(docs/HANDOVER.md)](docs/HANDOVER.md)**부터 읽는다. 어떤 자료가 있고 없는지는 [자료 현황(docs/DATA_STATUS.md)](docs/DATA_STATUS.md).
 
@@ -16,6 +16,7 @@
 ```
 data/raw/            원본 (읽기 전용, 받은 이름 그대로)
   kpx_*              전력거래소: 수요, 태양광·풍력, 연료원, 출력제어 실적, 게시판 공지
+  epsis/             전력통계정보시스템 실시간 전력수급 (5분 단위, 2022-12 ~ 2026-11)
   kma_asos/          기상청 종관기상관측 시간자료
   kma_forecast/zips/ 기상청 단기예보 과거 발표분 (5개 지역 × 3개 요소 × 2023~2025)
 data/clean/          정리본 (형식만 통일, 값은 그대로)  ← src/build_*.py가 만듦
@@ -35,8 +36,10 @@ Python 3.11 이상. `pip install -r requirements.txt` (pandas, numpy, scikit-lea
 ```bash
 python src/build_clean.py      # 전력·기상 관측 raw → clean (검증 17개)
 python src/build_forecast.py   # 기상 예보 raw → clean (검증 489개)
+python src/build_extra.py      # EPSIS 실시간 수급(시간별), 게시판(날짜별) 정리본
 python src/build_features.py   # clean → 특징 표 (data/features)
-python src/train.py            # 모델 평가·학습 곡선·그래프 (outputs/, 약 1분 30초)
+python src/train.py            # 모델 평가·학습 곡선·그래프 (outputs/, 약 1분 40초)
+python src/test_2026.py        # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 2026년 예보를 받은 뒤 실행)
 python src/manifest.py write   # 지문 기록 (build 직후에만)
 python src/manifest.py verify  # 쓰기 전 매번 확인 → "문제 0개"
 ```
@@ -58,6 +61,7 @@ python src/manifest.py verify  # 쓰기 전 매번 확인 → "문제 0개"
 
 - 공공데이터포털 · 한국전력거래소: 시간별 전국 전력수요량, 지역별 시간별 태양광 및 풍력 발전량, 연료원별 시간대별 설비용량 및 전력거래량, 전국 태양광 풍력 제어횟수 및 제주 풍력 제어량
 - 기상청 기상자료개방포털: 종관기상관측(ASOS) 시간자료, 단기예보 과거 자료
+- 전력통계정보시스템(EPSIS): 실시간 전력수급 (5분 단위)
 - 한국전력거래소 비중앙 출력제어 정보 게시판 (https://kpx.or.kr/menu.es?mid=a10109050000)
 - 공휴일: 관공서의 공휴일에 관한 규정 및 정부 발표 (data/manual/holidays_kr.csv에 날짜별 출처)
 
