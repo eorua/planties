@@ -2,6 +2,13 @@
 
 데이터나 처리 방식이 바뀌면 여기에 적는다. 그래프·PPT의 숫자가 어느 버전에서 나왔는지 이걸로 추적한다.
 
+## 2026-11-11 밤 (위험도·원인 설명·전력거래소 비교·시연 화면)
+- src/explain.py: 위험도 3단계(높음 = 경보 기준, 주의 = 직전 12개월 출력제어일 90%를 잡는 선), 입력 묶음별 원인 설명, 전력거래소 전날 공지와 비교 → outputs/explain_summary.json, outputs/demo_days.csv
+- 시험: 높음 56일 중 25일(45%), 주의 60일 중 2일, 낮음 68일 중 0일 출력제어
+- 전력거래소 공지(2024-10~2025-06): 공지 정밀도 84%·재현율 57%, 모델 경보 정밀도 43%·재현율 71%, 공지 없던 출력제어 27일 중 12일을 모델이 잡음
+- src/build_demo.py, demo/: 시연 화면 (HTML 파일 하나, Streamlit 대신)
+- MODEL_RESULTS 10장, PRESENTATION_NOTES, HANDOVER, README 갱신. 본선 PPT 구성(docs/FINAL_DECK_PLAN.md)
+
 ## 2026-11-11 밤 (원전 입력 B안 반영)
 - 팀 결정: 원전 입력(nuc_lag1)을 어제 하루 전체 평균 → 어제 1~16시 평균으로 (전날 17시 규칙 준수). 브랜치 nuc-1to16의 build_features.py 수정을 main에 반영
 - 특징 표 다시 만들고 train.py, compare_models.py, experiments.py 다시 실행 → outputs/ 전부 갱신

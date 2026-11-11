@@ -27,6 +27,7 @@ data/DATA_DICTIONARY.md  열의 뜻·단위·시간 기준·알려진 결함
 docs/templates/      대회 발표 템플릿
 src/                 처리·학습 코드
 outputs/             그래프·표 (코드로만 생성)
+demo/                시연 화면 (index.html 하나, 서버 없이 열림)
 ```
 
 ## 다시 만들기
@@ -40,6 +41,8 @@ python src/build_extra.py      # EPSIS 실시간 수급(시간별), 게시판(�
 python src/build_features.py   # clean → 특징 표 (data/features)
 python src/train.py            # 모델 평가·학습 곡선·그래프 (outputs/, 약 1분 40초)
 python src/test_2026.py        # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 2026년 예보를 받은 뒤 실행)
+python src/explain.py          # 위험도 3단계·원인 설명·전력거래소 공지 비교 (outputs/demo_days.csv)
+python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림)
 python src/manifest.py write   # 지문 기록 (build 직후에만)
 python src/manifest.py verify  # 쓰기 전 매번 확인 → "문제 0개"
 ```

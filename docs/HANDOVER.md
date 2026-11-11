@@ -89,6 +89,8 @@ python src/build_extra.py      # EPSIS 시간별, 게시판 날짜별 정리본
 python src/build_features.py   # 특징 표 (1,400일 × 45열)
 python src/train.py            # 본 모델 평가·그래프 (outputs/, 약 1분 40초)
 python src/manifest.py verify  # 파일이 바뀌지 않았는지 확인 → "검사 139개, 문제 0개"
+python src/explain.py          # 위험도 3단계, 원인 설명, 전력거래소 공지 비교 (약 30초)
+python src/build_demo.py       # 시연 화면 demo/index.html
 python src/test_2026.py        # 2026년 독립 시험 (예보를 받은 뒤에만 돌아간다)
 ```
 
@@ -111,14 +113,15 @@ python src/test_2026.py        # 2026년 독립 시험 (예보를 받은 뒤에�
 - [x] 모델 10가지 비교·개선 실험을 B안 특징 표로 다시 돌림 (MODEL_RESULTS 6·7장). 결론은 같고, 검증 기준 선택은 작은 차이로 뒤집혀 잡음 수준임을 9장에 기록
 - [x] 공휴일 목록 대조: 2026-05-01 노동절이 관공서 공휴일이 된 것 반영 (2026년 행만 바뀜, 본 모델 결과 영향 없음)
 - [x] 예선 PPT 초안 (`docs/slides/예선발표_초안.pptx`)
+- [x] 위험도 3단계·날마다 원인 3가지·전력거래소 전날 공지 비교 (`src/explain.py`, MODEL_RESULTS 10장)
+- [x] **시연 화면 `demo/index.html`** (`src/build_demo.py`): 파일 하나, 인터넷·서버 없이 브라우저로 열림. 2025년 날짜 고르기 → 위험도·점수 → 원인 3가지 → 대응 → 실제 결과(버튼으로 공개). Streamlit은 이 환경에서 설치가 막혀 HTML로 만들었다
 
 ## 7. 다음 할 일 (순서대로)
 
 - [ ] ① **2026년 1~10월 기상 예보 받기**: 5개 지역(광주 운암1동·목포 연산동·전주 송천1동·대구 신암1동·부산 대청동) × 하늘상태·강수확률·일최고기온. `data/raw/kma_forecast/zips/`에 넣고 `build_forecast.py` → `build_features.py` → `manifest.py write` → `test_2026.py`
 - [ ] ② **게시판 실적 글 등록 시각 확인** (당일인가 다음 날인가). 다음 날이면 본 숫자를 0.67로 쓰거나 예측 시각을 "당일 아침"으로 바꾼다
 - [ ] ④ 예선 PPT 초안 다듬기: 팀원 정보 채우기, 발표 연습, PDF로 저장해 제출 (Pretendard 글꼴 없는 PC 대비)
-- [ ] ⑤ 위험도 3단계 표시 (낮음/주의/높음), 날마다 원인 설명 상위 3개
-- [ ] ⑥ 시연 화면 (Streamlit, 설치 필요): 날짜 고르기 → 확률·위험도 → 원인 → 대응
+- [ ] ⑤ 본선 PPT 15장 내용 (구성: [`FINAL_DECK_PLAN.md`](FINAL_DECK_PLAN.md)), 백업 영상 2분 (시연 화면 녹화)
 - [ ] ⑦ **예선 PPT 제출 (11.18 18:00)** — 넣을 숫자·근거·예상 질문은 [`PRESENTATION_NOTES.md`](PRESENTATION_NOTES.md). 생성형 AI 목록에 팀원이 쓴 ChatGPT·Gemini 추가할 것
 - [ ] ⑧ 공휴일 목록 최종 대조 (팀원, 한국천문연구원 특일정보)
 
