@@ -38,6 +38,10 @@ LOC = {"운암1동": ("광주", "59_75"), "연산동": ("목포", "50_67"), "송
        "신암1동": ("대구", "89_91"), "대청동": ("부산", "97_74")}
 ELEM = {"하늘상태": "SKY", "강수확률": "POP", "일최고기온": "TMX"}
 YEAR_END = {"2026": "20261031"}   # 다 받지 않은 해의 마지막 날
+# 받지 못한 기간 (2026-11-12 기록). 2026년 8월 일최고기온은 한 달 요청이 깨져 기간을 나눠 다시 받던 중 멈췄고,
+# 2026-11-12 다시 요청했을 때는 기상청 서버가 오류 페이지만 돌려줬다. 빈칸으로 둔다 (모델은 빈칸을 처리한다).
+KNOWN_GAPS = {(d, "일최고기온", "2026"): [("20260828", "20260831")] for d in ("운암1동", "연산동", "송천1동", "신암1동")}
+KNOWN_GAPS[("대청동", "일최고기온", "2026")] = [("20260809", "20260831")]
 NAME_RE = re.compile(r"(.+?)_(.+?)_(\d{8})_(\d{8})\.csv$")
 
 checks, excluded = [], []
@@ -93,7 +97,8 @@ def main():
         dong, elem_kr, f, t, grid, rows = parse(zipname, name, text)
         check(f"{name}: 머리말 격자 = 지점 격자", grid == LOC[dong][1], f"{grid} vs {LOC[dong][1]}")
         key = (dong, elem_kr, f[:4])
-        if not zipname.startswith("refill_") and f != t:  # 보충분(빠진 날 하루 단위로 다시 받은 것)은 기간 점검에서 뺀다
+        # 보충분(빠진 날 하루 단위로 다시 받은 것)은 기간 점검에서 뺀다. 2026년 8월 재요청분(k26d_, k26e_)은 하루짜리도 기간에 넣는다
+        if not zipname.startswith("refill_") and (f != t or zipname.startswith(("k26d_", "k26e_"))):
             coverage[key].append((f, t))
         d = acc[key]
         for date, hhmm, lead, val in rows:
@@ -108,6 +113,18 @@ def main():
     for key, ranges in coverage.items():
         rs = sorted(ranges)
         y = key[2]
+        gaps = KNOWN_GAPS.get(key, [])
+        if gaps:  # 알려진 빈 기간은 덮인 것으로 보고, 따로 기록한다
+            check(f"{key}: 알려진 빈 기간 (받지 못함)", True, str(gaps))
+            rs = sorted(rs + gaps)
+            rs = [r for r in rs if not any(r != g and g[0] <= r[0] and r[1] <= g[1] for g in gaps)]
+            rs2 = []
+            for r in rs:  # 겹치는 구간 합치기 (8월 하루 단위 재요청분이 빈 기간과 겹칠 수 있다)
+                if rs2 and r[0] <= rs2[-1][1]:
+                    rs2[-1] = (rs2[-1][0], max(rs2[-1][1], r[1]))
+                else:
+                    rs2.append(r)
+            rs = rs2
         cont = rs[0][0] == y + "0101" and rs[-1][1] == YEAR_END.get(y, y + "1231") and all(
             (pd.Timestamp(a[1]) + pd.Timedelta(days=1)) == pd.Timestamp(b[0]) for a, b in zip(rs, rs[1:]))
         if not cont:

@@ -22,7 +22,7 @@ plt.rcParams["axes.unicode_minus"] = False
 warnings.filterwarnings("ignore")
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "outputs"
+OUT = T.OUT   # 변형(PLANTIES_VARIANT)에 따라 outputs/ 또는 outputs/public/
 PERIODS = {"시험1 (1/1~6/13, 공식)": ("2026-01-01", "2026-06-13"),
            "시험2 (6/14~10/31, 게시판)": ("2026-06-14", "2026-10-31"),
            "합계 (1/1~10/31)": ("2026-01-01", "2026-10-31")}
