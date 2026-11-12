@@ -8,3 +8,5 @@ secrets*
 ~$*
 .DS_Store
 Thumbs.db
+data/live/
+secrets_kma_key.txt

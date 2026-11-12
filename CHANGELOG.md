@@ -2,6 +2,13 @@
 
 데이터나 처리 방식이 바뀌면 여기에 적는다. 그래프·PPT의 숫자가 어느 버전에서 나왔는지 이걸로 추적한다.
 
+## 2026-11-12 (실시간 내일 예보)
+- `src/forecast_tomorrow.py`: 기상청 단기예보 API(인증키) + EPSIS 실시간 수요(키 없음) + 공휴일로 내일 위험도·원인 계산. 2026년 독립 시험 주 모델(N+C, 공개 자료)과 같은 모델·같은 특징 계산. 결과는 outputs/public/live_days.csv, 받은 원본은 data/live/(저장소 제외)
+- `src/check_forecast_tomorrow.py`: 과거 자료를 API 응답 모양으로 바꿔 실시간 계산과 특징 표를 비교 → 44일 × 26항목 일치 (수요 0.1MW 반올림까지 맞춤)
+- `src/explain_2026.py`: 실시간용 경보 선 저장 (outputs/public/live_thresholds.json: 2025-11 ~ 2026-10 예측 기준 높음 0.102, 주의 0.026)
+- 시연 화면: 실시간 예보가 있으면 "내일 예보 (실시간)" 단추, 예보 시각·학습 기간 안내, 결과 칸은 "아직 일어나지 않은 날"
+- requirements.txt 에 requests, .gitignore 에 data/live/·secrets_kma_key.txt. 사용법 docs/LIVE_FORECAST.md
+
 ## 2026-11-12 (시연 화면에 2026년 추가)
 - `src/explain_2026.py` 새로 만듦: 2026년 독립 시험 주 모델(N+C)로 날짜별 위험도 3단계·원인. test_2026.py 의 예측·경보와 같은지 확인한 뒤 저장 (outputs/public/demo_days_2026.csv, explain_2026_summary.json)
 - 2026년 위험도 (공개 자료): 높음 168일 중 출력제어 65일, 주의 64일 중 4일, 낮음 72일 중 1일

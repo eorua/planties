@@ -40,7 +40,7 @@ button.primary{background:var(--accent);border-color:var(--accent);color:#fff;fo
 .cal button.lv-높음{background:var(--hi-bg)} .cal button.lv-주의{background:var(--wa-bg)} .cal button.lv-낮음{background:var(--lo-bg)}
 .cal button.sel{border-color:var(--accent)}
 .cal button.act::after{content:"";position:absolute;right:4px;top:4px;width:6px;height:6px;border-radius:50%;background:var(--ink)}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}.seg button{font-size:13px;padding:6px 4px}.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}.seg #golive{grid-column:1/-1}.seg button{font-size:13px;padding:6px 4px}.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .note{font-size:13px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 10px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px;color:var(--muted)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
@@ -73,7 +73,7 @@ footer{font-size:12.5px;color:var(--muted)}
 
 <div class="grid">
   <section class="panel" aria-label="날짜 고르기">
-    <div class="seg" role="group" aria-label="시험 기간"><button id="go25">2025년 하반기 시험</button><button id="go26">2026년 독립 시험</button></div>
+    <div class="seg" role="group" aria-label="시험 기간"><button id="go25">2025년 하반기 시험</button><button id="go26">2026년 독립 시험</button><button id="golive" hidden>내일 예보 (실시간)</button></div>
     <div class="mnav"><button id="prev" aria-label="이전 달">◀</button><h2 id="mtitle"></h2><button id="next" aria-label="다음 달">▶</button></div>
     <div class="cal" id="cal"></div>
     <div class="legend"><span><i style="background:var(--hi-bg)"></i>높음 (경보)</span><span><i style="background:var(--wa-bg)"></i>주의</span><span><i style="background:var(--lo-bg)"></i>낮음</span><span id="actlg" hidden>● 실제 출력제어</span></div>
@@ -129,7 +129,8 @@ footer{font-size:12.5px;color:var(--muted)}
 const D=__DATA__;
 const byDate={};D.forEach(r=>byDate[r.date]=r);
 let cur=new Date(2025,10,1), sel="2025-11-02", reveal=false;
-const MIN=new Date(2025,6,1), MAX=new Date(2026,9,1);
+const LIVE=D.filter(r=>r.period==="live");const lastLive=LIVE.length?LIVE[LIVE.length-1].date:null;
+const MIN=new Date(2025,6,1), MAX=lastLive?new Date(+lastLive.slice(0,4),+lastLive.slice(5,7)-1,1):new Date(2026,9,1);
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,"0");
 const TODO={"높음":["정비·점검을 이날 한낮(10~17시)에 배치","ESS는 한낮에 충전할 수 있게 오전까지 비워 두기","전력거래소 게시판의 출력제어 공지 확인"],
@@ -147,7 +148,7 @@ function cal(){
   $("cal").innerHTML=h;
   $("cal").querySelectorAll("button").forEach(b=>b.onclick=()=>{sel=b.dataset.d;reveal=false;cal();show()});
   $("prev").disabled=(cur<=MIN);$("next").disabled=(cur>=MAX);
-  const p26=cur.getFullYear()===2026;$("go25").className=p26?"":"on";$("go26").className=p26?"on":"";$("k25").hidden=p26;$("k26").hidden=!p26;$("actlg").hidden=!$("showact").checked;
+  const isLive=!!(byDate[sel]&&byDate[sel].period==="live");const p26=cur.getFullYear()===2026&&!isLive;$("go25").className=(!p26&&!isLive)?"on":"";$("go26").className=p26?"on":"";$("golive").className=isLive?"on":"";$("k25").hidden=p26||isLive;$("k26").hidden=!(p26||isLive);$("actlg").hidden=!$("showact").checked;
 }
 function rows(el,list,neg){const mx=Math.max(0.05,...list.map(x=>Math.abs(x[1])));
   el.innerHTML=list.map(([t,v])=>'<span>'+t+'</span><span class="b'+(neg?" neg":"")+'" style="width:'+(100*Math.abs(v)/mx).toFixed(0)+'%"></span><span class="num small muted">'+(v>0?"+":"")+v.toFixed(2)+"</span>").join("")||'<span class="muted small">뚜렷한 원인 없음</span>'}
@@ -162,9 +163,11 @@ function show(){
   rows($("up"),parse(r.up),false);const dn=parse(r.down);$("downbox").hidden=!dn.length;rows($("down"),dn,true);
   const tr=parse(r.trend)[0];$("trend").textContent=tr?"배경: "+tr[0]+" — 해마다 늘어나는 추세라 그날의 원인과 따로 표시 ("+(tr[1]>0?"+":"")+tr[1].toFixed(2)+")":"";
   $("todo").innerHTML=TODO[r.level].map(x=>"<li>"+x+"</li>").join("");
-  $("mnote").hidden=r.period!=="2026";$("mnote").textContent="2026년 독립 시험 모델: 태양광·원전 입력 없이(2026년 미공개) 예측했습니다.";
-  $("kpx").innerHTML='<span class="muted">전력거래소 전날 전망 공지:</span> '+(r.kpx_notice?"있었음":"없었음");
-  $("reveal").hidden=reveal;$("res").hidden=!reveal;
+  $("mnote").hidden=r.period==="2025";$("mnote").textContent=r.period==="live"?"실시간 예보: "+r.issued+"에 공개되어 있던 기상청 예보와 전력수요로 계산했습니다 (2026년 독립 시험과 같은 모델, 학습 자료 ~"+r.train_until+").":"2026년 독립 시험 모델: 태양광·원전 입력 없이(2026년 미공개) 예측했습니다.";
+  if(r.period==="live")$("when").textContent="예보 시각: "+r.issued;
+  $("kpx").innerHTML=r.period==="live"?"":'<span class="muted">전력거래소 전날 전망 공지:</span> '+(r.kpx_notice?"있었음":"없었음");
+  $("reveal").hidden=reveal||r.period==="live";$("res").hidden=!(reveal||r.period==="live");
+  if(r.period==="live"){$("res").innerHTML='<span class="muted">아직 일어나지 않은 날입니다. 다음 날 전력거래소 게시판 실적으로 확인합니다.</span>';return}
   const src=r.label==="공식"?"전력거래소 공식 실적":"전력거래소 게시판 실적";
   $("res").innerHTML=(r.y?'<span class="yes">실제로 출력제어가 있었습니다</span>'+(r.board_hours?' · '+r.board_hours:'')+(r.board_reason?' · 게시판 사유: '+r.board_reason+' 제약':''):(r.label.includes("잠정")?'<span class="no">게시판에 출력제어 실적 글이 아직 없습니다</span>':'<span class="no">실제로 출력제어가 없었습니다</span>'))+'<div class="small muted">정답 출처: '+src+(r.label.includes("잠정")?' (10/2 이후 실적 글 미공개, 잠정)':'')+'</div>';
 }
@@ -173,6 +176,8 @@ $("next").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);cal()}
 $("reveal").onclick=()=>{reveal=true;show()};
 $("showact").onchange=cal;
 $("go25").onclick=()=>{cur=new Date(2025,10,1);sel="2025-11-02";reveal=false;cal();show()};
+$("golive").onclick=()=>{sel=lastLive;cur=new Date(+sel.slice(0,4),+sel.slice(5,7)-1,1);reveal=false;cal();show()};
 $("go26").onclick=()=>{cur=new Date(2026,4,1);sel="2026-05-05";reveal=false;cal();show()};
+$("golive").hidden=!lastLive;
 cal();show();
 </script>

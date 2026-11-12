@@ -1,0 +1,41 @@
+{
+ "made": "src/explain_2026.py",
+ "model": "N+C",
+ "features": [
+  "month",
+  "doy_sin",
+  "doy_cos",
+  "dow",
+  "is_holiday",
+  "is_workers_day",
+  "is_offday",
+  "offday_run_len",
+  "prev_offday",
+  "next_offday",
+  "fc_sky_mean",
+  "fc_clear_share",
+  "fc_pop_mean",
+  "fc_pop_max",
+  "fc_sw_sky_mean",
+  "fc_sw_pop_mean",
+  "fc_tmx_mean",
+  "dem_mid_lag7",
+  "dem_mid_lag1",
+  "dem_min_lag7",
+  "fc_clear_share_d2",
+  "fc_clear_delta",
+  "fc_pop_delta",
+  "fc_cool_deg",
+  "fc_heat_deg",
+  "dem_mid_lastsame"
+ ],
+ "from_month": "2026-11",
+ "window": [
+  "2025-11-01",
+  "2026-10-31"
+ ],
+ "window_curtailed_days": 76,
+ "thr_high": 0.102,
+ "thr_watch": 0.0256,
+ "note": "10월 2일 이후 정답은 게시판 실적 미공개로 잠정 (2026-11-12 확인)"
+}

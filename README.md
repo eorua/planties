@@ -49,6 +49,10 @@ PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인
 python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
 python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분 32초, 자막 포함)
 
+# 실시간 "내일 예보" (인터넷·기상청 인증키 필요, 자세히: docs/LIVE_FORECAST.md)
+python src/check_forecast_tomorrow.py   # 실시간 계산이 학습 때와 같은지 확인 (인터넷 불필요)
+python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/public/live_days.csv → build_demo.py 다시
+
 # 실시간 정보 모델 (비교용, outputs/): 위 네 줄을 PLANTIES_VARIANT 없이 실행
 python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```

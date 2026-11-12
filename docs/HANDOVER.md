@@ -108,6 +108,10 @@ PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인
 python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
 python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분 32초, 자막 포함)
 
+# 실시간 "내일 예보" (인터넷·기상청 인증키 필요, 자세히: docs/LIVE_FORECAST.md)
+python src/check_forecast_tomorrow.py   # 실시간 계산이 학습 때와 같은지 확인 (인터넷 불필요)
+python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/public/live_days.csv → build_demo.py 다시
+
 # 실시간 정보 모델 (비교용, outputs/): 위 네 줄을 PLANTIES_VARIANT 없이 실행
 python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```
@@ -140,6 +144,7 @@ python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확
 - [x] ① **2026년 1~10월 기상 예보 받기** (11-12 완료, 독립 시험 결과는 MODEL_RESULTS 12장): 5개 지역(광주 운암1동·목포 연산동·전주 송천1동·대구 신암1동·부산 대청동) × 하늘상태·강수확률·일최고기온. `data/raw/kma_forecast/zips/`에 넣고 `build_forecast.py` → `build_features.py` → `manifest.py write` → `test_2026.py`
 - [ ] ⑨ **11월 말 게시판 다시 확인**: 2026년 10월 출력제어 실적 글(아직 안 올라옴)이 올라오면 `kpx_board_scraped_*.csv`에 추가 → `build_extra.py` → `build_features.py` → `test_2026.py` (두 변형). MODEL_RESULTS 12장 갱신
 - [ ] ④ 예선 PPT 초안 다듬기: 팀원 정보 채우기, 발표 연습, PDF로 저장해 제출 (Pretendard 글꼴 없는 PC 대비)
+- [ ] ⑩ **실시간 내일 예보 첫 실행 (팀원)**: 기상청 단기예보 인증키 받기 → 노트북에서 `python src/forecast_tomorrow.py` → 오류 나면 메시지 그대로 공유. 본선까지 매일 돌리면 "실시간 예보 기록"이 쌓인다 ([`LIVE_FORECAST.md`](LIVE_FORECAST.md))
 - [ ] ⑤ 본선 PPT 15장 내용 (구성: [`FINAL_DECK_PLAN.md`](FINAL_DECK_PLAN.md)). 백업 영상은 초안 있음(`demo/backup_demo.mp4`, 자막만, 목소리는 필요하면 팀이 녹음)
 - [ ] ⑦ **예선 PPT 제출 (11.18 18:00)** — 넣을 숫자·근거·예상 질문은 [`PRESENTATION_NOTES.md`](PRESENTATION_NOTES.md). 생성형 AI 목록에 팀원이 쓴 ChatGPT·Gemini 추가할 것
 - [ ] ⑧ 공휴일 목록 최종 대조 (팀원, 한국천문연구원 특일정보)

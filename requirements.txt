@@ -2,3 +2,4 @@ pandas>=2.2
 numpy>=1.26
 scikit-learn>=1.5
 matplotlib>=3.8
+requests>=2.31   # 실시간 예보(src/forecast_tomorrow.py)에서만

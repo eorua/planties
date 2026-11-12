@@ -108,6 +108,24 @@ def main():
     hs = demo[demo.level == "높음"]
     summ["top_reason_counts_high"] = hs.up.str.split(" \\(|:").str[0].value_counts().to_dict()
     (OUT / "explain_2026_summary.json").write_text(json.dumps(summ, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    # 실시간 예보(src/forecast_tomorrow.py)용 경보 선: 학습 자료가 끝난 다음 달(2026-11)부터 쓰는 값.
+    # 시험 때와 같은 규칙 — 직전 12개월(2025-11 ~ 2026-10) 예측에서 F1 최대 = 높음, 출력제어일 90% 선 = 주의.
+    nxt = (pd.Timestamp(END) + pd.Timedelta(days=1))
+    k = T.THR_MONTHS
+    while True:
+        w = p.index[(df.date[p.index] >= (nxt - pd.DateOffset(months=k)).strftime("%Y-%m-%d"))]
+        if df.y[w].sum() >= T.THR_MIN_POS or k >= 30:
+            break
+        k += 3
+    hi_n = float(T.best_threshold(df.y[w].values, p[w].values))
+    wa_n = min(float(X.watch_threshold(df.y[w].values, p[w].values)), hi_n)
+    (OUT / "live_thresholds.json").write_text(json.dumps({
+        "made": "src/explain_2026.py", "model": "N+C", "features": feats, "from_month": nxt.strftime("%Y-%m"),
+        "window": [df.date[w].min(), df.date[w].max()], "window_curtailed_days": int(df.y[w].sum()),
+        "thr_high": round(hi_n, 4), "thr_watch": round(wa_n, 4),
+        "note": "10월 2일 이후 정답은 게시판 실적 미공개로 잠정 (2026-11-12 확인)"}, ensure_ascii=False, indent=1),
+        encoding="utf-8")
     print(json.dumps(summ, ensure_ascii=False, indent=1))
 
 
