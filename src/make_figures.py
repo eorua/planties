@@ -2,13 +2,12 @@
 
 1 yearly_curtailment.png   연도별 육지 출력제어 발생일
 2 pipeline.png             전체 구조도
-3 calendar_2026.png        2026년 달력: 날마다 위험도 색 + 실제 출력제어 점   (calendar_2025h2.png 도 같이)
+3 risk_levels.png          위험도(높음·주의·낮음)별 실제 출력제어 비율, 2025 하반기와 2026년
 4 notice_vs_model.png      2026년 출력제어 70일: 전력거래소 공지 / 모델만 / 둘 다 놓침
 5 test_design.png          시험 설계 타임라인
 
 실행: python src/make_figures.py   (공개 자료 모델 결과 outputs/public/ 을 쓴다)
 """
-import calendar
 from pathlib import Path
 
 import matplotlib
@@ -95,42 +94,35 @@ def pipeline():
     save(fig, "pipeline.png")
 
 
-# ---------- 3. 달력 ----------
-def cal(d, months, ncols, name, title, note):
-    d = d.set_index("date")
-    nrows = -(-len(months) // ncols)
-    fig, axes = plt.subplots(nrows, ncols, figsize=(2.55 * ncols, 2.45 * nrows + 1.0))
-    axes = axes.ravel()
-    for ax in axes:
-        ax.axis("off")
-    for ax, (y, m) in zip(axes, months):
-        ax.set_xlim(0, 7)
-        ax.set_ylim(6.9, -1.6)
-        ax.set_aspect("equal")
-        sub = d[d.index.str.startswith(f"{y}-{m:02d}")]
-        ax.text(0, -1.15, f"{m}월", fontsize=12, fontweight="bold", color=INK, va="center")
-        for i, w in enumerate("월화수목금토일"):
-            ax.text(i + 0.5, -0.3, w, fontsize=7, color=MUTED, ha="center", va="center")
-        ax.text(7, -1.15, f"출력제어 {int(sub.y.sum())}일", fontsize=8.5, color=MUTED, ha="right", va="center")
-        first, n = calendar.monthrange(y, m)
-        for day in range(1, n + 1):
-            k = f"{y}-{m:02d}-{day:02d}"
-            pos = first + day - 1
-            cx, cy = pos % 7, pos // 7
-            lv = d.level.get(k)
-            ax.add_patch(Rectangle((cx + 0.05, cy + 0.05), 0.9, 0.9, fc=LV.get(lv, "#eef1f5"), ec="none"))
-            if lv and d.y[k] == 1:
-                ax.plot(cx + 0.5, cy + 0.5, "o", ms=4.6, color=INK, mec=BG, mew=0.6)
-    fig.suptitle(title, fontsize=15, fontweight="bold", color=INK, x=0.03, ha="left", y=0.995)
-    hx = 0.03
-    for lv in ("높음", "주의", "낮음"):
-        fig.patches.append(Rectangle((hx, 0.925), 0.012 * 12.75 / fig.get_figwidth(), 0.022, transform=fig.transFigure, fc=LV[lv], ec="none"))
-        fig.text(hx + 0.017 * 12.75 / fig.get_figwidth(), 0.936, f"위험 {lv}", fontsize=9.5, color=INK, va="center")
-        hx += 0.085 * 12.75 / fig.get_figwidth()
-    fig.text(hx + 0.012, 0.936, "●  실제 출력제어가 있던 날", fontsize=9.5, color=INK, va="center")
-    fig.text(0.03, 0.005, note, fontsize=8.3, color=MUTED)
-    fig.subplots_adjust(left=0.03, right=0.97, top=0.9, bottom=0.05, wspace=0.12, hspace=0.05)
-    save(fig, name)
+# ---------- 3. 위험도별 실제 발생 비율 ----------
+def levels():
+    import json
+    s25 = json.loads((PUB / "explain_summary.json").read_text(encoding="utf-8"))["risk_levels"]["test"]
+    s26 = json.loads((PUB / "explain_2026_summary.json").read_text(encoding="utf-8"))["합계 (1/1~10/31)"]
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.4), sharey=True)
+    for ax, s, title in [(axes[0], s25, "2025년 하반기 시험"), (axes[1], s26, "2026년 독립 시험 (1~10월)")]:
+        tot_d = sum(v["days"] for v in s.values())
+        tot_c = sum(v["curtailed"] for v in s.values())
+        base = tot_c / tot_d
+        names = ["높음", "주의", "낮음"]
+        rates = [s[k]["curtailed"] / max(s[k]["days"], 1) for k in names]
+        bars = ax.bar([f"위험 {k}" for k in names], rates, width=0.55, color=[LV[k] for k in names])
+        for b_, k, r in zip(bars, names, rates):
+            ax.text(b_.get_x() + b_.get_width() / 2, r + 0.012, f"{r:.0%}", ha="center", va="bottom", fontsize=18,
+                    fontweight="bold", color=INK)
+            ax.text(b_.get_x() + b_.get_width() / 2, r + 0.075, f"{s[k]['days']}일 중 {s[k]['curtailed']}일", ha="center",
+                    va="bottom", fontsize=9.5, color=MUTED)
+        ax.set_ylim(0, 0.56)
+        ax.set_yticks([])
+        clean(ax)
+        ax.tick_params(axis="x", labelsize=12, colors=INK)
+        ax.set_title(f"{title}  ·  전체 평균 {base:.0%} ({tot_d}일 중 {tot_c}일)", fontsize=11.5, color=INK, loc="left", pad=10)
+    fig.suptitle("위험도를 높게 낸 날일수록 실제로 출력제어가 많았다", fontsize=15, fontweight="bold", color=INK, x=0.065,
+                 ha="left", y=1.03)
+    fig.text(0.065, -0.04, "막대 = 그 위험도로 예보한 날 중 실제로 출력제어가 있던 날의 비율. 공개 자료 모델, 전날 17시 기준, 미리 보지 않은 기간. "
+             "2026년 10월 정답은 잠정.", fontsize=8.5, color=MUTED)
+    fig.subplots_adjust(left=0.065, right=0.97, wspace=0.08)
+    save(fig, "risk_levels.png")
 
 
 # ---------- 4. 공지와 비교 ----------
@@ -190,10 +182,6 @@ if __name__ == "__main__":
     d26 = pd.read_csv(PUB / "demo_days_2026.csv")
     yearly()
     pipeline()
-    cal(d26, [(2026, m) for m in range(1, 11)], 5, "calendar_2026.png",
-        "2026년 독립 시험: 전날 낸 위험도와 실제 출력제어",
-        "공개 자료 모델, 전날 17시 기준. 6월 14일 이후 정답은 전력거래소 게시판 실적이고, 10월 2일 이후 실적 글은 아직 올라오지 않아 잠정이다.")
-    cal(d25[d25.date >= "2025-07-01"], [(2025, m) for m in range(7, 13)], 3, "calendar_2025h2.png",
-        "2025년 하반기 시험: 전날 낸 위험도와 실제 출력제어", "공개 자료 모델, 전날 17시 기준. 정답은 한국전력거래소 공식 실적.")
+    levels()
     notice(d26)
     design()
