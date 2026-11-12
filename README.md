@@ -47,6 +47,7 @@ PLANTIES_VARIANT=public python src/explain.py        # 위험도·원인·전력
 PLANTIES_VARIANT=public python src/test_2026.py      # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
 PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인 (시연용, 약 20초)
 python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
+python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분 32초, 자막 포함)
 
 # 실시간 정보 모델 (비교용, outputs/): 위 네 줄을 PLANTIES_VARIANT 없이 실행
 python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
