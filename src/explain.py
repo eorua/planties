@@ -51,6 +51,7 @@ GROUPS = {
     "어제 태양광": ["sol_mid_lag1", "sol_mid_mean7", "sol_share_lag1"],
     "태양광 설비": ["sol_cap_lag1"],   # 해마다 늘어나는 추세 (그날의 원인이라기보다 배경)
     "원전": ["nuc_lag1"],
+    "전력거래소 공지": ["kpx_notice"],
 }
 DOW = "월화수목금토일"
 
@@ -209,6 +210,8 @@ def reason_text(g, r, hol):
         return f"어제 태양광 (한낮 시장 거래량 {r.sol_mid_lag1:.1f}GW)" if pd.notna(r.sol_mid_lag1) else "어제 태양광"
     if g == "태양광 설비":
         return f"태양광 설비 증가 (시장 설비 {r.sol_cap_lag1:.1f}GW)" if pd.notna(r.sol_cap_lag1) else "태양광 설비"
+    if g == "전력거래소 공지":
+        return "전력거래소 전날 공지 (있음)" if r.get("kpx_notice", 0) == 1 else "전력거래소 전날 공지 (없음)"
     if g == "원전":
         return f"원전 (어제 1~16시 평균 {r.nuc_lag1:.1f}GW)" if pd.notna(r.nuc_lag1) else "원전 (자료 없음)"
     return g

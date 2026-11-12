@@ -5,34 +5,34 @@
   "rule": "높음 = 경보 기준(직전 12개월 F1 최대) 이상, 주의 = 직전 12개월 출력제어일의 90%가 이 값 이상이 되는 선 이상, 낮음 = 그 아래",
   "val": {
    "높음": {
-    "days": 77,
-    "curtailed": 40,
-    "rate": 0.519
+    "days": 68,
+    "curtailed": 38,
+    "rate": 0.559
    },
    "주의": {
-    "days": 79,
+    "days": 90,
     "curtailed": 14,
-    "rate": 0.177
+    "rate": 0.156
    },
    "낮음": {
-    "days": 25,
-    "curtailed": 1,
-    "rate": 0.04
+    "days": 23,
+    "curtailed": 3,
+    "rate": 0.13
    }
   },
   "test": {
    "높음": {
-    "days": 56,
-    "curtailed": 25,
-    "rate": 0.446
+    "days": 50,
+    "curtailed": 24,
+    "rate": 0.48
    },
    "주의": {
-    "days": 60,
-    "curtailed": 2,
-    "rate": 0.033
+    "days": 70,
+    "curtailed": 3,
+    "rate": 0.043
    },
    "낮음": {
-    "days": 68,
+    "days": 64,
     "curtailed": 0,
     "rate": 0.0
    }
@@ -42,44 +42,44 @@
   "rule": "매우 높음 = 직전 12개월 출력제어일의 절반이 이 값 이상이 되는 선 이상 (높음 선보다 낮으면 높음 선). 2026-11-12 시험 결과를 본 뒤 추가한 표시 방식. 선은 과거 자료로만 정한다",
   "val": {
    "매우 높음": {
-    "days": 64,
-    "curtailed": 36,
-    "rate": 0.562
+    "days": 65,
+    "curtailed": 37,
+    "rate": 0.569
    },
    "높음": {
-    "days": 13,
-    "curtailed": 4,
-    "rate": 0.308
+    "days": 3,
+    "curtailed": 1,
+    "rate": 0.333
    },
    "주의": {
-    "days": 79,
+    "days": 90,
     "curtailed": 14,
-    "rate": 0.177
+    "rate": 0.156
    },
    "낮음": {
-    "days": 25,
-    "curtailed": 1,
-    "rate": 0.04
+    "days": 23,
+    "curtailed": 3,
+    "rate": 0.13
    }
   },
   "test": {
    "매우 높음": {
-    "days": 34,
+    "days": 33,
     "curtailed": 23,
-    "rate": 0.676
+    "rate": 0.697
    },
    "높음": {
-    "days": 22,
-    "curtailed": 2,
-    "rate": 0.091
+    "days": 17,
+    "curtailed": 1,
+    "rate": 0.059
    },
    "주의": {
-    "days": 60,
-    "curtailed": 2,
-    "rate": 0.033
+    "days": 70,
+    "curtailed": 3,
+    "rate": 0.043
    },
    "낮음": {
-    "days": 68,
+    "days": 64,
     "curtailed": 0,
     "rate": 0.0
    }
@@ -99,33 +99,33 @@
    {
     "from": 0.05,
     "to": 0.2,
-    "days": 79,
-    "curtailed": 12,
-    "forecast_mean": 0.106,
-    "actual_rate": 0.152
+    "days": 87,
+    "curtailed": 16,
+    "forecast_mean": 0.105,
+    "actual_rate": 0.184
    },
    {
     "from": 0.2,
     "to": 0.4,
-    "days": 63,
-    "curtailed": 31,
-    "forecast_mean": 0.303,
-    "actual_rate": 0.492
+    "days": 50,
+    "curtailed": 27,
+    "forecast_mean": 0.301,
+    "actual_rate": 0.54
    },
    {
     "from": 0.4,
     "to": 1.0,
-    "days": 15,
+    "days": 20,
     "curtailed": 11,
-    "forecast_mean": 0.563,
-    "actual_rate": 0.733
+    "forecast_mean": 0.509,
+    "actual_rate": 0.55
    }
   ],
   "test": [
    {
     "from": 0.0,
     "to": 0.05,
-    "days": 16,
+    "days": 24,
     "curtailed": 0,
     "forecast_mean": 0.05,
     "actual_rate": 0.0
@@ -133,26 +133,26 @@
    {
     "from": 0.05,
     "to": 0.2,
-    "days": 100,
-    "curtailed": 2,
-    "forecast_mean": 0.127,
-    "actual_rate": 0.02
+    "days": 85,
+    "curtailed": 3,
+    "forecast_mean": 0.12,
+    "actual_rate": 0.035
    },
    {
     "from": 0.2,
     "to": 0.4,
-    "days": 23,
+    "days": 32,
     "curtailed": 1,
-    "forecast_mean": 0.288,
-    "actual_rate": 0.043
+    "forecast_mean": 0.271,
+    "actual_rate": 0.031
    },
    {
     "from": 0.4,
     "to": 1.0,
-    "days": 45,
-    "curtailed": 24,
-    "forecast_mean": 0.575,
-    "actual_rate": 0.533
+    "days": 43,
+    "curtailed": 23,
+    "forecast_mean": 0.539,
+    "actual_rate": 0.535
    }
   ]
  },
@@ -172,33 +172,31 @@
    "precision": 0.837
   },
   "model_alert": {
-   "alerts": 104,
-   "hits": 45,
-   "false_alarms": 59,
-   "misses": 18,
-   "recall": 0.714,
-   "precision": 0.433
+   "alerts": 95,
+   "hits": 43,
+   "false_alarms": 52,
+   "misses": 20,
+   "recall": 0.683,
+   "precision": 0.453
   },
   "model_top_same_count": {
    "alerts": 43,
-   "hits": 28,
-   "false_alarms": 15,
-   "misses": 35,
-   "recall": 0.444,
-   "precision": 0.651,
+   "hits": 29,
+   "false_alarms": 14,
+   "misses": 34,
+   "recall": 0.46,
+   "precision": 0.674,
    "note": "공지와 같은 수만큼, 확률이 높은 날부터 경보했다고 볼 때"
   },
-  "model_pr_auc": 0.616,
-  "curtailed_without_notice_caught_by_model": 12,
+  "model_pr_auc": 0.662,
+  "curtailed_without_notice_caught_by_model": 10,
   "curtailed_without_notice": 27,
   "both_alert": 37
  },
  "top_reason_counts_test_high": {
-  "쉬는 날": 30,
-  "최근 출력제어": 16,
-  "어제 태양광": 4,
-  "전력수요": 3,
-  "맑음 예보": 2,
-  "원전": 1
+  "쉬는 날": 21,
+  "최근 출력제어": 19,
+  "어제 태양광": 5,
+  "전력수요": 5
  }
 }

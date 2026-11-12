@@ -37,13 +37,16 @@ plt.rcParams["font.family"] = "Noto Sans CJK KR"
 plt.rcParams["axes.unicode_minus"] = False
 
 ROOT = Path(__file__).resolve().parents[1]
-# 변형 (2026-11-12 추가, docs/MODEL_RESULTS.md 11장)
-#   full   : 출력제어 이력(어제·최근 7/30/90일·마지막 후 경과일)을 전날 17시에 안다고 가정 = 실시간 출력제어 정보가 있는 운영자
-#   public : 출력제어 이력을 쓰지 않음 = 공개 자료만으로 (전력거래소 실적 글은 1일~11주 늦게 올라와 17시에 알 수 없다)
-#   실행: PLANTIES_VARIANT=public python src/train.py  → outputs/public/
+# 변형 (docs/MODEL_RESULTS.md 11·15장)
+#   full   : 본 모델 (2026-11-12 저녁부터). 사용자가 실제로 아는 두 정보를 쓴다고 가정한다.
+#            ① 전날까지의 출력제어 여부 (어제·최근 7/30/90일·마지막 후 경과일): 사업자·운영자는 당일에 안다
+#            ② 전력거래소 전날 전망 공지 (kpx_notice): 누구나 볼 수 있는 공개 글
+#   public : 두 정보를 모두 쓰지 않음 = 아무것도 모를 때의 하한 (실적 글은 1일~11주 늦게 올라온다)
+#   실행: python src/train.py → outputs/   ·   PLANTIES_VARIANT=public python src/train.py → outputs/public/
 VARIANT = os.environ.get("PLANTIES_VARIANT", "full")
 assert VARIANT in ("full", "public"), VARIANT
 HISTORY = {"curt_lag1", "curt_cnt7", "curt_cnt30", "curt_cnt90", "days_since_curt"}
+ASSUMED = HISTORY | {"kpx_notice"}
 OUT = ROOT / "outputs" / "public" if VARIANT == "public" else ROOT / "outputs"
 SEED = 0
 P = {"val": ("2025-01-01", "2025-06-30"), "test": ("2025-07-01", "2025-12-31")}
@@ -52,7 +55,7 @@ META = {"date", "y", "label_source", "fc_n_areas", "fc_fallback"}
 NOT_USED = {"fc_clear_share_d2", "fc_clear_delta", "fc_pop_delta", "fc_cool_deg", "fc_heat_deg", "dem_mid_lastsame",
             "sup_mid_lag1", "res_rate_mid_lag1"}  # 공급능력·예비율(EPSIS)은 2026년 시험용 실험 항목
 if VARIANT == "public":
-    NOT_USED = NOT_USED | HISTORY
+    NOT_USED = NOT_USED | ASSUMED
 OOT_START = "2023-07-01"   # 경보 기준을 정하는 데 쓸 과거 예측을 이때부터 만들어 둔다
 THR_MONTHS, THR_MIN_POS = 12, 15
 
@@ -66,7 +69,7 @@ NAMES = {  # 그래프·문서용 한글 이름
     "sol_mid_lag1": "어제 한낮 태양광", "sol_mid_mean7": "최근 7일 한낮 태양광", "sol_share_lag1": "어제 태양광 비중",
     "nuc_lag1": "어제 원전 출력", "sol_cap_lag1": "태양광 설비용량", "curt_lag1": "어제 출력제어",
     "curt_cnt7": "최근 7일 출력제어", "curt_cnt30": "최근 30일 출력제어", "curt_cnt90": "최근 90일 출력제어",
-    "days_since_curt": "마지막 출력제어 후 경과일",
+    "days_since_curt": "마지막 출력제어 후 경과일", "kpx_notice": "전력거래소 전날 공지",
 }
 
 

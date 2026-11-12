@@ -23,7 +23,7 @@ days += ["2026-05-05", "2026-10-03", "2026-10-05", "2026-10-10", "2026-02-17"]  
 bad = []
 for d in sorted(set(days)):
     main, d2, load = F.offline_sources(d)
-    row = F.build_row(d, main, d2, load, False)
+    row = F.build_row(d, main, d2, load, False, set(df.date[(df.y == 1) & (df.date < d)]), int(ref.loc[d, "kpx_notice"]))
     for c in feats:
         a, b = row[c], ref.loc[d, c]
         if (pd.isna(a) and pd.isna(b)) or (pd.notna(a) and pd.notna(b) and abs(float(a) - float(b)) < 1e-6 + 1e-6 * abs(b)):

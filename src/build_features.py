@@ -183,12 +183,22 @@ def history(days, pos):
     return out.reset_index()
 
 
+def notice(days):
+    """전력거래소 전날 전망 공지 (게시판 "출력제어 전망" 글이 그날을 대상으로 있으면 1).
+
+    전날 나오는 공개 글이라 사용자가 본다고 가정한다 (2026-11-12 추가, docs/MODEL_RESULTS.md 15장).
+    공지가 17시 이후에 올라오는 날은 예보 시각이 "전날 저녁, 공지 확인 후"가 된다.
+    """
+    b = pd.read_csv(CLEAN / "kpx_board_daily.csv")
+    return pd.DataFrame({"date": days, "kpx_notice": pd.Series(days).isin(b.date[b.notice_forecast == 1]).astype(int).values})
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     days = pd.date_range(START, END).strftime("%Y-%m-%d")
     pos = labels()
     df = calendar(days)
-    for part in (forecast(days), power(days), history(days, pos)):
+    for part in (forecast(days), power(days), history(days, pos), notice(days)):
         df = df.merge(part, on="date", how="left")
     df.insert(1, "y", df.date.isin(pos).astype(int))
     df.insert(2, "label_source", np.where(df.date <= OFFICIAL_LABEL_END, "공식", "게시판"))

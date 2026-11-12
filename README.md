@@ -7,7 +7,7 @@
 - 시연 방식: 2025년의 실제 날짜를 골라 "그 전날 17시에 알 수 있던 정보만으로" 예측을 재현한다.
 - 정답 자료: 전력거래소 출력제어 실적 (육지 출력제어 발생일 2023년 2일 → 2024년 27일 → 2025년 82일)
 
-현재 결과 (2025년 하반기 시험, 출력제어 27일): **공개 자료만으로** 27일 중 23일을 전날 예측, 위험도 "낮음" 44일 중 출력제어 0일, PR-AUC 0.59 (무작위 0.15). 실시간 출력제어 정보가 있으면 25일, PR-AUC 0.78. 두 모델의 차이는 [MODEL_RESULTS 11장](docs/MODEL_RESULTS.md) → [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
+현재 결과: 2025년 하반기 시험(출력제어 27일)에서 24일을 전날 알림(헛경보 26번), 위험도 "매우 높음"인 날의 70%에 실제 출력제어, "낮음" 64일 중 0일, PR-AUC 0.86 (무작위 0.15). 2026년 1~10월(70일)은 60일, "매우 높음" 68%, PR-AUC 0.76. **가정: 사용자가 전날까지의 출력제어 여부와 전력거래소 전날 공지를 안다.** 두 정보 없이 공개 자료만 쓰면 23/27, 65/70(헛경보 36·103번)으로 내려간다. 자세히: [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) 15장 · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
 
 처음 보는 팀원은 **[인수인계 문서(docs/HANDOVER.md)](docs/HANDOVER.md)**부터 읽는다. 어떤 자료가 있고 없는지는 [자료 현황(docs/DATA_STATUS.md)](docs/DATA_STATUS.md).
 
@@ -41,20 +41,20 @@ python src/build_extra.py      # EPSIS 실시간 수급(시간별), 게시판(�
 python src/build_features.py   # clean → 특징 표 (data/features, 1,400일)
 python src/manifest.py write   # 지문 기록 (build 직후에만)
 
-# 공개 자료 모델 = 발표 본 숫자, 시연 화면 (outputs/public/)
-PLANTIES_VARIANT=public python src/train.py          # 2025년 평가 (약 2분)
-PLANTIES_VARIANT=public python src/explain.py        # 위험도·원인·전력거래소 공지 비교 (2025년)
-PLANTIES_VARIANT=public python src/test_2026.py      # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
-PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인 (시연용, 약 20초)
+# 본 모델 = 발표 본 숫자, 시연 화면 (outputs/). 가정: 전날까지의 출력제어 여부와 전력거래소 전날 공지를 안다
+python src/train.py            # 2025년 평가 (약 2분)
+python src/explain.py          # 확률·위험도 4단계·원인·전력거래소 공지 비교 (2025년)
+python src/test_2026.py        # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
+python src/explain_2026.py     # 2026년 확률·위험도·원인, 실시간 예보용 선 (약 20초)
 python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
 python src/make_figures.py     # 발표용 그림 6장 outputs/figures/ (연도별 막대, 구조도, 위험도 4단계, 예보 확률 대 실제, 공지 비교, 시험 설계)
 python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분 32초, 자막 포함)
 
 # 실시간 "내일 예보" (인터넷·기상청 인증키 필요, 자세히: docs/LIVE_FORECAST.md)
 python src/check_forecast_tomorrow.py   # 실시간 계산이 학습 때와 같은지 확인 (인터넷 불필요)
-python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/public/live_days.csv → build_demo.py 다시
+python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/live_days.csv → build_demo.py 다시
 
-# 실시간 정보 모델 (비교용, outputs/): 위 네 줄을 PLANTIES_VARIANT 없이 실행
+# 하한 (공개 자료만, outputs/public/): 위 네 줄 앞에 PLANTIES_VARIANT=public 을 붙여 실행
 python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```
 

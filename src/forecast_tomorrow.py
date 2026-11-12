@@ -1,16 +1,21 @@
-"""실시간 예보: 지금 공개된 자료로 "내일 육지 출력제어가 있을까?"를 예측한다.
+"""실시간 예보: 지금 알 수 있는 자료로 "내일 육지 출력제어가 있을까?"를 예측한다.
 
-쓰는 모델: 2026년 독립 시험의 주 모델 N+C (공개 자료 변형). 태양광·원전 실적과 출력제어 이력은
-전날 17시에 공개되지 않으므로 쓰지 않는다. 입력은 세 가지뿐이다.
+쓰는 모델: 2026년 독립 시험과 같은 모델(N+C, 본 모델 변형). 2026년 태양광·원전 실적은 아직 공개되지 않아 쓰지 않는다.
+입력
 - 기상청 단기예보 (공공데이터포털 "기상청_단기예보 조회서비스", 인증키 필요, 자동 승인·무료)
   5개 지역(광주·목포·전주·대구·부산) 격자의 하늘상태·강수확률·최고기온
 - 전력거래소 EPSIS 실시간 전력수급 (5분 단위 수요, 인증키 없음)
 - 공휴일 (data/manual/holidays_kr.csv)
+- 최근 출력제어 여부와 전력거래소 전날 공지 (본 모델의 두 가정, docs/MODEL_RESULTS.md 15장)
+  · 자동: 전력거래소 출력제어 게시판 첫 쪽에서 "내일 전망" 글이 있는지, 최근 "실적" 글의 날짜를 읽는다
+  · 게시판 실적은 늦게 올라오므로, 사용자가 아는 최근 출력제어일은 --curtailed 로 직접 알려 줄 수 있다
+    예) python src/forecast_tomorrow.py --curtailed 2026-11-08,2026-11-09 --notice 1
+  · 아무것도 주지 않으면 "특징 표(~2026-10-31) + 게시판에 올라온 실적"까지만 반영하고, 그 사실을 출력한다
 
 실행 (인터넷 되는 노트북에서):
     1) 인증키를 환경변수 KMA_SERVICE_KEY 에 넣거나, 저장소 맨 위에 secrets_kma_key.txt 파일로 둔다
        (.gitignore 에 secrets* 가 있어 저장소에 올라가지 않는다). 공공데이터포털의 "일반 인증키(Decoding)" 값.
-    2) python src/forecast_tomorrow.py            # 내일 예보 → outputs/public/live_days.csv 에 한 줄 추가
+    2) python src/forecast_tomorrow.py            # 내일 예보 → outputs/live_days.csv 에 한 줄 추가
        python src/build_demo.py                   # 시연 화면에 "내일 예보" 단추가 생긴다
     3) (선택) python src/forecast_tomorrow.py --offline 2026-10-10   # 인터넷 없이 과거 자료로 같은 계산 재현
 
@@ -34,7 +39,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-os.environ.setdefault("PLANTIES_VARIANT", "public")   # 실시간 예보는 공개 자료 모델만 가능
+os.environ.pop("PLANTIES_VARIANT", None)   # 실시간 예보는 본 모델(최근 출력제어 + 전날 공지 가정)
 import build_features as BF  # noqa: E402
 import explain as X
 import explain_2026 as X26
@@ -42,7 +47,7 @@ import train as T
 import experiments as E
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "outputs" / "public"
+OUT = ROOT / "outputs"
 LIVE = ROOT / "data" / "live"
 KST = timezone(timedelta(hours=9))
 GRIDS = {"광주": (59, 75), "목포": (50, 67), "전주": (63, 90), "대구": (89, 91), "부산": (97, 74)}
@@ -158,7 +163,42 @@ def hourly_load(e):
     return h
 
 
-def build_row(target, items_main, items_d2, load_5min, fallback):
+BOARD_URL = "https://www.kpx.or.kr/board.es?mid=a10109050000&bid=0216"
+BOARD_RE = re.compile(r"육지\s*출력제어\s*(실적|전망)[^\[<]*\[\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일")
+
+
+def parse_board(html):
+    """게시판 목록에서 (종류, 날짜)를 꺼낸다. 예: "육지 출력제어 실적 안내[2026년 10월 1일(목)]" → ("실적", "2026-10-01")."""
+    return [(k, f"{int(y):04d}-{int(m):02d}-{int(d):02d}") for k, y, m, d in BOARD_RE.findall(html)]
+
+
+def fetch_board():
+    """전력거래소 출력제어 게시판 첫 쪽. 못 받으면 None (공지 없음·추가 실적 없음으로 계산하고 그 사실을 알린다)."""
+    import requests
+    try:
+        r = requests.get(BOARD_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
+        r.encoding = r.apparent_encoding or "utf-8"
+        posts = parse_board(r.text)
+        LIVE.mkdir(parents=True, exist_ok=True)
+        (LIVE / f"kpx_board_{datetime.now(KST):%Y%m%d}.json").write_text(json.dumps(posts, ensure_ascii=False), encoding="utf-8")
+        return posts
+    except Exception as e:
+        print(f"  전력거래소 게시판을 읽지 못했습니다: {e}")
+        return None
+
+
+def history_row(target, pos_dates):
+    """build_features.history 와 같은 계산: 알고 있는 출력제어일(pos_dates)로 최근 이력 5개를 만든다."""
+    idx = pd.date_range("2021-01-01", target).strftime("%Y-%m-%d")
+    y = pd.Series(idx.isin(list(pos_dates)).astype(int), index=idx)
+    prev = y.shift(1)
+    last = pd.Series(np.where(y.values == 1, np.arange(len(y)), np.nan), index=y.index).ffill().shift(1)
+    since = (pd.Series(np.arange(len(y)), index=y.index) - last).clip(upper=365)
+    return {"curt_lag1": prev[target], "curt_cnt7": prev.rolling(7).sum()[target], "curt_cnt30": prev.rolling(30).sum()[target],
+            "curt_cnt90": prev.rolling(90).sum()[target], "days_since_curt": since[target]}
+
+
+def build_row(target, items_main, items_d2, load_5min, fallback, pos_dates=(), notice=0):
     days = pd.date_range(pd.Timestamp(target) - pd.Timedelta(days=30), pd.Timestamp(target) + pd.Timedelta(days=10))
     cal = BF.calendar(days.strftime("%Y-%m-%d")).set_index("date").loc[target].to_dict()
     fc = fc_summary(items_main, target)
@@ -181,7 +221,8 @@ def build_row(target, items_main, items_d2, load_5min, fallback):
     while k <= 30 and off.loc[day(k)] != off.loc[target]:
         k += 1
     pw["dem_mid_lastsame"] = dm.get(day(k), np.nan) / 1000 if k <= 30 else np.nan
-    row = {"date": target, **cal, **fc, **pw, "fc_fallback": int(fallback)}
+    row = {"date": target, **cal, **fc, **pw, **history_row(target, pos_dates), "kpx_notice": int(notice),
+           "fc_fallback": int(fallback)}
     return row
 
 
@@ -219,7 +260,7 @@ def predict(row, issued):
             "level": X.level4(p, vh, hi, wa),
             "up": " | ".join(f"{X.reason_text(g, r, hol)}:{a[g]:+.3f}" for g in up),
             "down": " | ".join(f"{X.reason_text(g, r, hol)}:{a[g]:+.3f}" for g in down),
-            "trend": "", "kpx_notice": "", "board_reason": "", "board_hours": "",
+            "trend": "", "kpx_notice": int(row["kpx_notice"]), "board_reason": "", "board_hours": "",
             "label": "아직 모름", "period": "live", "issued": issued,
             "train_until": trn.date.max(), "fc_fallback": row["fc_fallback"]}
 
@@ -227,12 +268,18 @@ def predict(row, issued):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", metavar="YYYY-MM-DD", help="인터넷 없이 저장소의 과거 자료로 그 날짜 예보를 재현")
+    ap.add_argument("--curtailed", default="", help="사용자가 아는 최근 출력제어일 (쉼표로, YYYY-MM-DD). 게시판에 아직 안 올라온 날")
+    ap.add_argument("--notice", choices=["0", "1"], help="내일 전력거래소 전망 공지가 있는지 직접 지정 (없으면 게시판에서 읽음)")
     args = ap.parse_args()
+    table = pd.read_csv(ROOT / "data" / "features" / "daily_features.csv", usecols=["date", "y", "kpx_notice"])
 
     if args.offline:
         target = args.offline
         items_main, items_d2, load = offline_sources(target)
-        row = build_row(target, items_main, items_d2, load, False)
+        pos = set(table.date[(table.y == 1) & (table.date < target)])
+        nt = int(table.set_index("date").kpx_notice.get(target, 0))
+        row = build_row(target, items_main, items_d2, load, False, pos, nt)
+        known = "특징 표의 실제 기록 (과거 자료 재현)"
         issued = f"{(pd.Timestamp(target) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')} 17:00 (과거 자료 재현)"
     else:
         now = datetime.now(KST)
@@ -254,10 +301,19 @@ def main():
         days = [(now - timedelta(days=k)).strftime("%Y-%m-%d") for k in range(14, -1, -1)]
         print(f"전력수요: EPSIS {days[0]} ~ {days[-1]}")
         load = fetch_epsis(days)
-        row = build_row(target, items_main, items_d2, load, fallback)
+        posts = fetch_board()
+        pos = set(table.date[table.y == 1]) | {d for k, d in (posts or []) if k == "실적"} | {d for d in args.curtailed.split(",") if d}
+        pos = {d for d in pos if d < target}
+        nt = int(args.notice) if args.notice else int(any(k == "전망" and d == target for k, d in (posts or [])))
+        last = max(pos) if pos else "없음"
+        known = (f"특징 표(~{table.date.max()})" + (" + 게시판 실적 글" if posts is not None else " (게시판 읽기 실패)")
+                 + (" + 직접 알려 준 날" if args.curtailed else "") + f", 마지막 출력제어 {last}")
+        print(f"최근 출력제어: {known} · 내일 전망 공지: {'있음' if nt else '없음'}" + (" (직접 지정)" if args.notice else ""))
+        row = build_row(target, items_main, items_d2, load, fallback, pos, nt)
         issued = now.strftime("%Y-%m-%d %H:%M") + f" (기상청 {base_time[:2]}시 발표분)"
 
     res = predict(row, issued)
+    res["known"] = known
     path = OUT / "live_days.csv"
     old = pd.read_csv(path, dtype=str).fillna("") if path.exists() else pd.DataFrame()
     if args.offline:
@@ -267,7 +323,7 @@ def main():
     new = pd.concat([old[old.get("date", pd.Series(dtype=str)) != res["date"]] if len(old) else old,
                      pd.DataFrame([res])]).sort_values("date")
     new.to_csv(path, index=False, encoding="utf-8-sig")
-    pct = "5% 미만" if res["prob"] < 0.05 else f"약 {round(res['prob'] * 10) * 10}%"
+    pct = "5% 미만" if res["prob"] < 0.05 else "70% 이상" if res["prob"] >= 0.65 else f"약 {round(res['prob'] * 10) * 10}%"
     print(f"\n{res['date']} ({res['dow']}) 출력제어 확률 {pct} · 위험 {res['level']}  (모델 점수 {res['p']:.3f}, "
           f"주의 {res['thr_watch']} · 높음 {res['thr_high']} · 매우 높음 {res['thr_vhigh']} 이상)")
     print("  올린 원인:", res["up"] or "뚜렷한 원인 없음")

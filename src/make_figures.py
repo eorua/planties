@@ -7,7 +7,7 @@
 4 notice_vs_model.png      2026년 출력제어 70일: 전력거래소 공지 / 모델만 / 둘 다 놓침
 5 test_design.png          시험 설계 타임라인
 
-실행: python src/make_figures.py   (공개 자료 모델 결과 outputs/public/ 을 쓴다)
+실행: python src/make_figures.py   (본 모델 결과 outputs/ 을 쓴다)
 """
 from pathlib import Path
 
@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import FancyBboxPatch, Rectangle  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-PUB = ROOT / "outputs" / "public"
+PUB = ROOT / "outputs"   # 본 모델 (최근 출력제어 여부 + 전날 공지를 안다고 가정)
 OUT = ROOT / "outputs" / "figures"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -109,18 +109,18 @@ def levels():
         rates = [s[k]["curtailed"] / max(s[k]["days"], 1) for k in names]
         bars = ax.bar([f"위험 {k}" for k in names], rates, width=0.55, color=[LV[k] for k in names])
         for b_, k, r in zip(bars, names, rates):
-            ax.text(b_.get_x() + b_.get_width() / 2, r + 0.012, f"{r:.0%}", ha="center", va="bottom", fontsize=18,
+            ax.text(b_.get_x() + b_.get_width() / 2, r + 0.015, f"{r:.0%}", ha="center", va="bottom", fontsize=18,
                     fontweight="bold", color=INK)
-            ax.text(b_.get_x() + b_.get_width() / 2, r + 0.075, f"{s[k]['days']}일 중 {s[k]['curtailed']}일", ha="center",
+            ax.text(b_.get_x() + b_.get_width() / 2, r + 0.115, f"{s[k]['days']}일 중 {s[k]['curtailed']}일", ha="center",
                     va="bottom", fontsize=9.5, color=MUTED)
-        ax.set_ylim(0, 0.72)
+        ax.set_ylim(0, 0.95)
         ax.set_yticks([])
         clean(ax)
         ax.tick_params(axis="x", labelsize=12, colors=INK)
         ax.set_title(f"{title}  ·  전체 평균 {base:.0%} ({tot_d}일 중 {tot_c}일)", fontsize=11.5, color=INK, loc="left", pad=10)
     fig.suptitle("위험도가 한 단계 오를 때마다 실제 출력제어 비율도 올랐다", fontsize=15, fontweight="bold", color=INK, x=0.065,
                  ha="left", y=1.03)
-    fig.text(0.065, -0.04, "막대 = 그 위험도로 예보한 날 중 실제로 출력제어가 있던 날의 비율. 공개 자료 모델, 전날 17시 기준, 미리 보지 않은 기간. "
+    fig.text(0.065, -0.04, "막대 = 그 위험도로 예보한 날 중 실제로 출력제어가 있던 날의 비율. 미리 보지 않은 기간, 전날 기준. 최근 출력제어 여부와 전력거래소 전날 공지를 안다고 가정. "
              "2026년 10월 정답은 잠정. 단계 선은 매달 그 전 12개월 예보 결과로만 정한다.", fontsize=8.5, color=MUTED)
     fig.subplots_adjust(left=0.065, right=0.97, wspace=0.08)
     save(fig, "risk_levels.png")
@@ -152,7 +152,7 @@ def calibration():
     fig.suptitle("모델이 예보한 확률과 실제로 일어난 비율", fontsize=15, fontweight="bold", color=INK, x=0.065, ha="left", y=1.08)
     fig.text(0.065, 0.965, "막대 = 실제 출력제어 비율      ○ = 그 구간에서 모델이 예보한 확률의 평균", fontsize=10, color=INK)
     fig.text(0.065, -0.1, "○가 막대 위에 있으면 모델이 실제보다 높게 예보한 것이다. 확률은 매달 그 전 12개월 예보 결과로만 보정한다. "
-             "확률이 60% 이상으로 나온 날은 7~11일뿐이라 40% 이상으로 묶었다. 2026년 10월 정답은 잠정.", fontsize=8.5, color=MUTED)
+             "최근 출력제어 여부와 전력거래소 전날 공지를 안다고 가정. 2026년 10월 정답은 잠정.", fontsize=8.5, color=MUTED)
     fig.subplots_adjust(left=0.065, right=0.97, wspace=0.08, top=0.84)
     save(fig, "calibration.png")
 
@@ -180,7 +180,7 @@ def notice(d26):
     ax.text(0, 1.42, f"2026년 출력제어 {tot}일, 누가 전날 알렸나", fontsize=15, fontweight="bold", color=INK)
     hit_n = int(((y.kpx_notice == 1) & al).sum())
     fa = int((d26.level.isin(["높음", "매우 높음"]) & (d26.y == 0)).sum())
-    ax.text(0, -1.3, f"2026-01-01 ~ 10-31, 공개 자료 모델이 '높음' 이상으로 예보한 날 기준. 공지가 있던 {a}일 중 {hit_n}일은 모델도 알렸다. "
+    ax.text(0, -1.3, f"2026-01-01 ~ 10-31, 모델이 '높음' 이상으로 예보한 날 기준 (전날 공지도 입력으로 씀). 공지가 있던 {a}일 중 {hit_n}일은 모델도 알렸다. "
             f"공지는 낸 날의 97%가 맞았고, 모델은 헛경보가 더 많다({fa}번).", fontsize=8.5, color=MUTED)
     save(fig, "notice_vs_model.png")
 

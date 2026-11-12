@@ -8,6 +8,9 @@
 
 ## 0. 지금 바로 알아야 할 것 (2026-11-12 기준)
 
+**★ 2026-11-12 저녁: 본 모델을 바꿨다 (사용자 결정).** 본 모델 = 출력제어 이력 + 전력거래소 전날 공지(`kpx_notice`)를 입력으로 쓰는 모델(`outputs/`, 기본 실행). 가정: 사용자가 ① 전날까지의 출력제어 여부 ② 전날 공지를 안다. 공개 자료 모델(`outputs/public/`)은 하한으로만 쓴다. 본 숫자: 2025년 하반기 24/27·헛경보 26·PR-AUC 0.86, 2026년 60/70·헛경보 54·0.76, 매우 높음 70%·68%, 낮음 0%·4%. 근거와 사전 등록과의 구분은 [`MODEL_RESULTS.md`](MODEL_RESULTS.md) 15장, 발표용 숫자는 [`PRESENTATION_NOTES.md`](PRESENTATION_NOTES.md) 0장. **모델은 고정했고 더 고치지 않는다.** 아래 항목 중 "공개 자료 모델이 본 숫자"라고 적힌 부분은 이 결정 이전 기록이다. 시연 화면·그림·실시간 내일 예보는 모두 본 모델 기준으로 바꿨다.
+
+
 1. **발표의 본 숫자는 "공개 자료 모델": PR-AUC 0.59, 27일 중 23일(놓침 4일), 헛경보 36번, 위험도 "낮음" 44일 중 출력제어 0일.** 전력거래소 출력제어 실적이 1일~11주 늦게 공개되어 "최근 출력제어 이력"을 전날 17시에 공개 자료로 알 수 없기 때문이다(11-12 게시판 354개 확인, 팀 결정 D안). 지금까지의 모델(0.78, 25일, 31번, 낮음 68일 중 0일)은 "실시간 출력제어 정보가 있는 운영자라면"으로 함께 보여 준다. 실행: `PLANTIES_VARIANT=public python src/train.py` → `outputs/public/`. 자세한 내용은 [`MODEL_RESULTS.md`](MODEL_RESULTS.md) 11장. 예전 숫자(0.74 / 18번 등)는 쓰지 않는다.
 2. **2026년 독립 시험을 끝냈다 (11-12).** 실시간 정보 모델 PR-AUC 0.64(규칙 0.54), 공개 자료 모델 0.50(규칙 0.49), 무작위 0.23. 봄 출력제어 48일 중 44~46일을 잡았고 여름·가을(특히 10월)은 헛경보가 많다. 새 항목·공급능력은 효과 없음. [`MODEL_RESULTS.md`](MODEL_RESULTS.md) 12장.
 3. **기상 예보 받는 법 (다른 계정에서 쓰던 방식):** 기상자료개방포털 단기예보(pgmNo=572)에서 요청한 파일 여러 개를 `download_file_irods([이름들])`로 **zip 하나로 한 번에** 받는다. 받은 묶음은 `이름\t크기\n + zip 바이트`를 이어 붙인 `*_ALL.bin` 한 파일로 저장해 다운로드 창이 한 번만 뜨게 한다. 파일마다 따로 받으면 다운로드 창이 수십 개 뜬다. 요청 시 숨은 칸 `from`/`to`와 `from_`/`to_`를 모두 채워야 날짜가 맞게 들어간다. 2026년 8월 말 일최고기온 일부는 서버 오류로 못 받아 빈칸이다(`build_forecast.py` KNOWN_GAPS).
@@ -100,20 +103,20 @@ python src/build_extra.py      # EPSIS 실시간 수급(시간별), 게시판(�
 python src/build_features.py   # clean → 특징 표 (data/features, 1,400일)
 python src/manifest.py write   # 지문 기록 (build 직후에만)
 
-# 공개 자료 모델 = 발표 본 숫자, 시연 화면 (outputs/public/)
-PLANTIES_VARIANT=public python src/train.py          # 2025년 평가 (약 2분)
-PLANTIES_VARIANT=public python src/explain.py        # 위험도·원인·전력거래소 공지 비교 (2025년)
-PLANTIES_VARIANT=public python src/test_2026.py      # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
-PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인 (시연용, 약 20초)
+# 본 모델 = 발표 본 숫자, 시연 화면 (outputs/). 가정: 전날까지의 출력제어 여부와 전력거래소 전날 공지를 안다
+python src/train.py            # 2025년 평가 (약 2분)
+python src/explain.py          # 확률·위험도 4단계·원인·전력거래소 공지 비교 (2025년)
+python src/test_2026.py        # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
+python src/explain_2026.py     # 2026년 확률·위험도·원인, 실시간 예보용 선 (약 20초)
 python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
 python src/make_figures.py     # 발표용 그림 6장 outputs/figures/ (연도별 막대, 구조도, 위험도 4단계, 예보 확률 대 실제, 공지 비교, 시험 설계)
 python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분 32초, 자막 포함)
 
 # 실시간 "내일 예보" (인터넷·기상청 인증키 필요, 자세히: docs/LIVE_FORECAST.md)
 python src/check_forecast_tomorrow.py   # 실시간 계산이 학습 때와 같은지 확인 (인터넷 불필요)
-python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/public/live_days.csv → build_demo.py 다시
+python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/live_days.csv → build_demo.py 다시
 
-# 실시간 정보 모델 (비교용, outputs/): 위 네 줄을 PLANTIES_VARIANT 없이 실행
+# 하한 (공개 자료만, outputs/public/): 위 네 줄 앞에 PLANTIES_VARIANT=public 을 붙여 실행
 python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```
 
@@ -143,7 +146,7 @@ python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확
 ## 7. 다음 할 일 (순서대로)
 
 - [x] ① **2026년 1~10월 기상 예보 받기** (11-12 완료, 독립 시험 결과는 MODEL_RESULTS 12장): 5개 지역(광주 운암1동·목포 연산동·전주 송천1동·대구 신암1동·부산 대청동) × 하늘상태·강수확률·일최고기온. `data/raw/kma_forecast/zips/`에 넣고 `build_forecast.py` → `build_features.py` → `manifest.py write` → `test_2026.py`
-- [ ] ⑨ **11월 말 게시판 다시 확인**: 2026년 10월 출력제어 실적 글(아직 안 올라옴)이 올라오면 `kpx_board_scraped_*.csv`에 추가 → `build_extra.py` → `build_features.py` → `test_2026.py` (두 변형). MODEL_RESULTS 12장 갱신
+- [ ] ⑨ **11월 말 게시판 다시 확인 (고정한 모델의 새 시험)**: 2026년 10월 출력제어 실적 글(아직 안 올라옴)이 올라오면 `kpx_board_scraped_*.csv`에 추가 → `build_extra.py` → `build_features.py` → `test_2026.py` (두 변형). MODEL_RESULTS 12장 갱신
 - [ ] ④ 예선 PPT 초안 다듬기: 팀원 정보 채우기, 발표 연습, PDF로 저장해 제출 (Pretendard 글꼴 없는 PC 대비)
 - [ ] ⑩ **실시간 내일 예보 첫 실행 (팀원)**: 기상청 단기예보 인증키 받기 → 노트북에서 `python src/forecast_tomorrow.py` → 오류 나면 메시지 그대로 공유. 본선까지 매일 돌리면 "실시간 예보 기록"이 쌓인다 ([`LIVE_FORECAST.md`](LIVE_FORECAST.md))
 - [ ] ⑤ 본선 PPT 15장 내용 (구성: [`FINAL_DECK_PLAN.md`](FINAL_DECK_PLAN.md)). 백업 영상은 초안 있음(`demo/backup_demo.mp4`, 자막만, 목소리는 필요하면 팀이 녹음)

@@ -70,7 +70,7 @@ footer{font-size:12.5px;color:var(--muted)}
 <header>
   <div class="small muted">팀 플랜티즈 · 2026 안양대 AI+X 경진대회 시연</div>
   <h1>내일 육지에서 출력제어가 있을까?</h1>
-  <div class="small muted">시험 기간(2025년 7~12월, 2026년 1~10월)의 날짜를 고르면, 그 전날 17시에 공개된 정보만으로 모델이 낸 예보를 그대로 보여 줍니다. 모두 미리 보지 않고 낸 예측입니다.</div>
+  <div class="small muted">시험 기간(2025년 7~12월, 2026년 1~10월)의 날짜를 고르면, 그 전날 알 수 있던 정보만으로 모델이 낸 예보를 그대로 보여 줍니다. 모두 미리 보지 않고 낸 예측입니다.</div>
 </header>
 
 <div class="grid">
@@ -88,7 +88,7 @@ footer{font-size:12.5px;color:var(--muted)}
       <div><span class="muted small">내일 출력제어 확률</span><div class="prob num" id="prob"></div></div>
       <div class="meter" id="meter"></div>
       <div class="scale"><span>0%</span><span>50%</span><span>100%</span></div>
-      <div class="small muted">비 올 확률처럼 읽습니다. 지난 12개월 동안 모델 점수가 이 정도였던 날 중 실제로 출력제어가 있던 비율이고, 10% 단위로 보여 줍니다. <span id="thr"></span></div>
+      <div class="small muted">비 올 확률처럼 읽습니다. 지난 12개월 동안 모델 점수가 이 정도였던 날 중 실제로 출력제어가 있던 비율이고, 10% 단위로 보여 줍니다. 70%를 넘는 날은 "70% 이상"으로 묶습니다. <span id="thr"></span></div>
     </div>
     <div><h2>위험을 올린 원인</h2><div class="reasons" id="up"></div></div>
     <div id="downbox"><h2>위험을 낮춘 원인</h2><div class="reasons" id="down"></div></div>
@@ -104,28 +104,28 @@ footer{font-size:12.5px;color:var(--muted)}
 </div>
 
 <section class="panel" id="k25" aria-label="2025년 하반기 시험 결과">
-  <h2>이 모델의 성적 (2025년 7~12월, 미리 보지 않고 예측, 공개 자료만)</h2>
+  <h2>이 모델의 성적 (2025년 7~12월, 미리 보지 않고 예측)</h2>
   <div class="kpis">
     <div><b>__K25_HIT__</b><span class="small muted">"높음" 이상으로 미리 알린 출력제어</span></div>
     <div><b>__K25_VH__</b><span class="small muted">"매우 높음"인 날 중 실제 출력제어 (__K25_VH_N__)</span></div>
     <div><b>__K25_LO__</b><span class="small muted">"낮음"인 날 중 실제 출력제어 (__K25_LO_N__)</span></div>
     <div><b>__K25_FA__번</b><span class="small muted">헛경보 ("높음" 이상인데 없던 날)</span></div>
   </div>
-  <div class="small muted">위험도별 실제 출력제어 비율: __K25_STAIR__. 이 화면은 공개 자료만 쓰는 모델입니다. 전력거래소 출력제어 실적은 며칠~몇 주 늦게 공개되어 전날 17시에는 알 수 없기 때문입니다. 실시간 출력제어 정보가 있는 운영자라면 27일 중 25일까지 올라갑니다 (PR-AUC 0.59 → 0.78).</div>
+  <div class="small muted">위험도별 실제 출력제어 비율: __K25_STAIR__. 가정 두 가지: ① 전날까지 출력제어가 있었는지 안다(사업자·운영자는 당일에 압니다) ② 전력거래소 전날 공지를 본다(누구나 볼 수 있는 공개 글). 두 정보 없이 공개 자료만 쓰면 __K25PUB_HIT__, 헛경보 __K25PUB_FA__번입니다.</div>
 </section>
 
 <section class="panel" id="k26" aria-label="2026년 독립 시험 결과" hidden>
-  <h2>이 모델의 성적 (2026년 1~10월 독립 시험, 결과를 보기 전에 계획 공개, 공개 자료만)</h2>
+  <h2>이 모델의 성적 (2026년 1~10월 독립 시험)</h2>
   <div class="kpis">
     <div><b>__K26_SPRING__</b><span class="small muted">봄(3~5월) 출력제어 중 "높음" 이상으로 미리 알린 날</span></div>
     <div><b>__K26_NONOTICE__</b><span class="small muted">전력거래소 전날 공지 없이 생긴 출력제어 중 미리 알린 날</span></div>
     <div><b>__K26_VH__</b><span class="small muted">"매우 높음"인 날 중 실제 출력제어 (__K26_VH_N__)</span></div>
     <div><b>__K26_LO__</b><span class="small muted">"낮음"인 날 중 실제 출력제어 (__K26_LO_N__)</span></div>
   </div>
-  <div class="small muted">위험도별 실제 출력제어 비율: __K26_STAIR__. 헛경보("높음" 이상인데 없던 날)는 __K26_FA__번으로 9~10월에 많았습니다. 2026년 시간별 태양광·원전 실적은 아직 공개되지 않아(2027년 예정) 그 입력을 빼고 예측했습니다. 공개 자료만으로는 날짜 순위를 매기는 정확도가 간단한 규칙과 비슷합니다(PR-AUC 0.50 대 0.49). 6/14 이후 정답은 전력거래소 게시판 실적이고, 10/2 이후 실적 글은 아직 올라오지 않아 잠정입니다(2026-11-12 확인).</div>
+  <div class="small muted">위험도별 실제 출력제어 비율: __K26_STAIR__. 헛경보("높음" 이상인데 없던 날)는 __K26_FA__번입니다. 2026년 시간별 태양광·원전 실적은 아직 공개되지 않아(2027년 예정) 그 입력을 빼고 예측했습니다. 결과를 보기 전에 계획을 공개한 시험(전날 공지 입력 없음)은 __K26_PREREG__이었고, 전날 공지 입력은 그 뒤에 더했습니다. 두 정보 없이 공개 자료만 쓰면 __K26PUB_HIT__, 헛경보 __K26PUB_FA__번입니다. 6/14 이후 정답은 전력거래소 게시판 실적이고, 10/2 이후 실적 글은 아직 올라오지 않아 잠정입니다(2026-11-12 확인).</div>
 </section>
 
-<footer>확률과 "매우 높음" 단계는 2026-11-12에 추가한 표시 방식입니다. 모델의 예측 점수와 순위는 그대로이고, 확률 보정과 단계 선은 매달 그 전 12개월의 예보 결과로만 정합니다(그달의 실제 결과는 쓰지 않음). 원인은 입력 묶음 하나를 학습 자료의 중앙값으로 바꿨을 때 점수가 얼마나 내려가는지로 잰 값입니다(그날 예측에 쓴 모델 그대로). 모델이 무엇을 보고 판단했는지를 보여 줄 뿐, 실제 원인을 증명하지는 않습니다. 송전망 제약·원전 정비 일정처럼 공개되지 않은 정보는 모델이 알지 못합니다. 자료: 저장소 eorua/planties의 outputs/public/demo_days.csv (src/explain.py), demo_days_2026.csv (src/explain_2026.py).</footer>
+<footer>이 모델은 사용자가 전날까지의 출력제어 여부와 전력거래소 전날 공지를 안다고 가정합니다. 확률과 "매우 높음" 단계, 전날 공지 입력은 2026-11-12에 더했습니다(시험 결과를 본 뒤). 모델의 예측 점수와 순위는 그대로이고, 확률 보정과 단계 선은 매달 그 전 12개월의 예보 결과로만 정합니다(그달의 실제 결과는 쓰지 않음). 원인은 입력 묶음 하나를 학습 자료의 중앙값으로 바꿨을 때 점수가 얼마나 내려가는지로 잰 값입니다(그날 예측에 쓴 모델 그대로). 모델이 무엇을 보고 판단했는지를 보여 줄 뿐, 실제 원인을 증명하지는 않습니다. 송전망 제약·원전 정비 일정처럼 공개되지 않은 정보는 모델이 알지 못합니다. 자료: 저장소 eorua/planties의 outputs/demo_days.csv (src/explain.py), demo_days_2026.csv (src/explain_2026.py).</footer>
 </div>
 
 <script>
@@ -161,14 +161,14 @@ function show(){
   $("d").textContent=sel+" ("+r.dow+")"+(r.holiday?" · "+r.holiday:"");
   const pv=new Date(dt.getTime()-864e5);$("when").textContent="예보 시각: "+pv.getFullYear()+"-"+pad(pv.getMonth()+1)+"-"+pad(pv.getDate())+" 17:00";
   $("lv").className="pill "+r.level.replace(" ","");$("lv").textContent="위험 "+r.level;
-  const pr=r.prob, pct=pr<0.05?"5% 미만":"약 "+(Math.round(pr*10)*10)+"%";
+  const pr=r.prob, pct=pr<0.05?"5% 미만":pr>=0.65?"70% 이상":"약 "+(Math.round(pr*10)*10)+"%";
   $("prob").textContent=pct;
   $("thr").textContent="(모델 점수 "+r.p.toFixed(3)+" · 주의 "+r.thr_watch.toFixed(3)+" · 높음 "+r.thr_high.toFixed(3)+" · 매우 높음 "+r.thr_vhigh.toFixed(3)+" 이상)";
   $("meter").innerHTML='<span class="mk" style="left:'+Math.min(100,Math.max(0,100*pr)).toFixed(1)+'%"></span>';
   rows($("up"),parse(r.up),false);const dn=parse(r.down);$("downbox").hidden=!dn.length;rows($("down"),dn,true);
   const tr=parse(r.trend)[0];$("trend").textContent=tr?"배경: "+tr[0]+" — 해마다 늘어나는 추세라 그날의 원인과 따로 표시 ("+(tr[1]>0?"+":"")+tr[1].toFixed(2)+")":"";
   $("todo").innerHTML=TODO[r.level].map(x=>"<li>"+x+"</li>").join("");
-  $("mnote").hidden=r.period==="2025";$("mnote").textContent=r.period==="live"?"실시간 예보: "+r.issued+"에 공개되어 있던 기상청 예보와 전력수요로 계산했습니다 (2026년 독립 시험과 같은 모델, 학습 자료 ~"+r.train_until+").":"2026년 독립 시험 모델: 태양광·원전 입력 없이(2026년 미공개) 예측했습니다.";
+  $("mnote").hidden=r.period==="2025";$("mnote").textContent=r.period==="live"?"실시간 예보: "+r.issued+" 기준 기상청 예보와 전력수요로 계산했습니다. 최근 출력제어: "+(r.known||"")+" · 내일 전망 공지 "+(r.kpx_notice==1||r.kpx_notice==="1"?"있음":"없음")+" (학습 자료 ~"+r.train_until+").":"2026년 독립 시험 모델: 태양광·원전 입력 없이(2026년 미공개) 예측했습니다.";
   if(r.period==="live")$("when").textContent="예보 시각: "+r.issued;
   $("kpx").innerHTML=r.period==="live"?"":'<span class="muted">전력거래소 전날 전망 공지:</span> '+(r.kpx_notice?"있었음":"없었음");
   $("reveal").hidden=reveal||r.period==="live";$("res").hidden=!(reveal||r.period==="live");
