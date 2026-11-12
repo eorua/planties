@@ -8,7 +8,7 @@
 
 ## 0. 지금 바로 알아야 할 것 (2026-11-12 기준)
 
-**★ 2026-11-12 저녁: 본 모델을 바꿨다 (사용자 결정).** 본 모델 = 출력제어 이력 + 전력거래소 전날 공지(`kpx_notice`)를 입력으로 쓰는 모델(`outputs/`, 기본 실행). 가정: 사용자가 ① 전날까지의 출력제어 여부 ② 전날 공지를 안다. 공개 자료 모델(`outputs/public/`)은 하한으로만 쓴다. 본 숫자: 2025년 하반기 24/27·헛경보 26·PR-AUC 0.86, 2026년 60/70·헛경보 54·0.76, 매우 높음 70%·68%, 낮음 0%·4%. 근거와 사전 등록과의 구분은 [`MODEL_RESULTS.md`](MODEL_RESULTS.md) 15장, 발표용 숫자는 [`PRESENTATION_NOTES.md`](PRESENTATION_NOTES.md) 0장. **모델은 고정했고 더 고치지 않는다.** 아래 항목 중 "공개 자료 모델이 본 숫자"라고 적힌 부분은 이 결정 이전 기록이다. 시연 화면·그림·실시간 내일 예보는 모두 본 모델 기준으로 바꿨다.
+**★ 2026-11-12 밤: 본 모델을 바꿨다 (사용자 결정).** 본 모델 = 출력제어 이력 + 전력거래소 전날 전망(`kpx_notice`)을 입력으로 쓰는 모델(`outputs/`, 기본 실행). 가정: 출력제어를 하거나 지시받는 쪽은 ① 전날까지의 출력제어 여부 ② 전날 전망을 안다. 변형 둘: `posted`(전날까지 게시판에 올라온 전망만, 민감도 → `outputs/posted/`), `public`(두 정보 없음, 하한 → `outputs/public/`). 본 숫자: 2025년 하반기 24/27·헛경보 26·PR-AUC 0.86, 2026년 63/73·헛경보 56·0.74, 매우 높음 70%·68%, 낮음 0%·5%. 근거와 사전 등록과의 구분은 [`MODEL_RESULTS.md`](MODEL_RESULTS.md) 15장, 발표용 숫자는 [`PRESENTATION_NOTES.md`](PRESENTATION_NOTES.md) 0장. **모델은 고정했고 더 고치지 않는다.** 같은 날 밤 게시판 글 357건의 등록일을 전부 확인했다(전망 글 73건 중 51건만 전날까지 게시) + 10월 2·5·6일 실적 글 반영(2026년 73일). 10월 7일 이후는 아직 잠정 → 글이 더 올라오면 `data/raw/kpx_board/`에 새 목록을 넣고 전체를 다시 돌린다(세 변형, 한 번에 하나씩 돌릴 것: 두 개를 같이 돌리면 10배 느려진다). 아래 항목 중 "공개 자료 모델이 본 숫자"라고 적힌 부분은 이 결정 이전 기록이다.
 
 
 1. **발표의 본 숫자는 "공개 자료 모델": PR-AUC 0.59, 27일 중 23일(놓침 4일), 헛경보 36번, 위험도 "낮음" 44일 중 출력제어 0일.** 전력거래소 출력제어 실적이 1일~11주 늦게 공개되어 "최근 출력제어 이력"을 전날 17시에 공개 자료로 알 수 없기 때문이다(11-12 게시판 354개 확인, 팀 결정 D안). 지금까지의 모델(0.78, 25일, 31번, 낮음 68일 중 0일)은 "실시간 출력제어 정보가 있는 운영자라면"으로 함께 보여 준다. 실행: `PLANTIES_VARIANT=public python src/train.py` → `outputs/public/`. 자세한 내용은 [`MODEL_RESULTS.md`](MODEL_RESULTS.md) 11장. 예전 숫자(0.74 / 18번 등)는 쓰지 않는다.
@@ -116,7 +116,7 @@ python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분
 python src/check_forecast_tomorrow.py   # 실시간 계산이 학습 때와 같은지 확인 (인터넷 불필요)
 python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/live_days.csv → build_demo.py 다시
 
-# 하한 (공개 자료만, outputs/public/): 위 네 줄 앞에 PLANTIES_VARIANT=public 을 붙여 실행
+# 민감도·하한: 위 네 줄 앞에 PLANTIES_VARIANT=posted (→ outputs/posted/), PLANTIES_VARIANT=public (→ outputs/public/) 을 붙여 실행. 한 번에 하나씩
 python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```
 

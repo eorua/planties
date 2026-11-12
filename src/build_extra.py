@@ -49,6 +49,16 @@ def board():
     for c in ("start_h", "end_h", "grid", "supply"):
         out[c] = out.date.map(occ[c]) if c in occ else pd.NA
     out = out.rename(columns={"grid": "reason_grid", "supply": "reason_supply"})
+    # 게시판 글 목록 (번호·지역·종류·대상일·등록일, 2026-11-12 수집): 글이 언제 올라왔는지 확인용
+    lst = pd.read_csv(RAW / "kpx_board" / "kpx_board_list_20261112.csv")
+    lst = lst[lst.region == "육지"]
+    # notice_pre: 전망 글이 대상일 전날까지 올라온 날만 1. 당일·사후에 올라온 전망 글(73건 중 22건)은 전날에는 볼 수 없었다
+    pre = set(lst[(lst.kind == "전망") & (lst.post_date < lst.target_date)].target_date)
+    # 본문 수집(2026-11-05) 뒤에 올라온 실적 글: 날짜만 더한다 (시간·사유는 빈칸)
+    new = sorted(set(lst[(lst.kind == "실적") & (lst.target_date > out.date.max())].target_date))
+    out = pd.concat([out, pd.DataFrame({"date": new, "notice_forecast": 0, "occurred": 1})], ignore_index=True)
+    out["notice_pre"] = out.date.isin(pre).astype(int)
+    print(f"전망 글 {out.notice_forecast.sum()}일 중 전날까지 올라온 날 {out.notice_pre.sum()}일, 새 실적 글 {new}")
     out.to_csv(CLEAN / "kpx_board_daily.csv", index=False, encoding="utf-8-sig")
     print(f"kpx_board_daily: {len(out)}일, 발생 {out.occurred.sum()}일, 전망 공지 {out.notice_forecast.sum()}일, "
           f"{out.date.min()} ~ {out.date.max()}")

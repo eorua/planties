@@ -91,85 +91,85 @@
   "시험2 (6/14~10/31, 게시판)": {
    "N+C": {
     "n_days": 140,
-    "n_pos": 11,
-    "pr_auc": 0.326,
+    "n_pos": 14,
+    "pr_auc": 0.309,
     "pr_auc_ci95": [
-     0.141,
-     0.627
+     0.162,
+     0.556
     ],
     "roc_auc": 0.839,
-    "hits": 9,
-    "false_alarms": 28,
+    "hits": 12,
+    "false_alarms": 30,
     "misses": 2,
-    "precision": 0.243,
-    "recall": 0.818
+    "precision": 0.286,
+    "recall": 0.857
    },
    "N+S+C": {
     "n_days": 140,
-    "n_pos": 11,
-    "pr_auc": 0.422,
+    "n_pos": 14,
+    "pr_auc": 0.385,
     "pr_auc_ci95": [
-     0.155,
-     0.705
+     0.16,
+     0.633
     ],
-    "roc_auc": 0.835,
-    "hits": 6,
-    "false_alarms": 23,
+    "roc_auc": 0.826,
+    "hits": 9,
+    "false_alarms": 24,
     "misses": 5,
-    "precision": 0.207,
-    "recall": 0.545
+    "precision": 0.273,
+    "recall": 0.643
    },
    "N": {
     "n_days": 140,
-    "n_pos": 11,
-    "pr_auc": 0.347,
+    "n_pos": 14,
+    "pr_auc": 0.337,
     "pr_auc_ci95": [
-     0.126,
-     0.626
+     0.152,
+     0.592
     ],
-    "roc_auc": 0.81,
-    "hits": 8,
-    "false_alarms": 28,
+    "roc_auc": 0.813,
+    "hits": 11,
+    "false_alarms": 30,
     "misses": 3,
-    "precision": 0.222,
-    "recall": 0.727
+    "precision": 0.268,
+    "recall": 0.786
    },
    "N+S": {
     "n_days": 140,
-    "n_pos": 11,
-    "pr_auc": 0.395,
+    "n_pos": 14,
+    "pr_auc": 0.376,
     "pr_auc_ci95": [
-     0.136,
-     0.673
+     0.159,
+     0.617
     ],
-    "roc_auc": 0.8,
-    "hits": 8,
-    "false_alarms": 26,
+    "roc_auc": 0.805,
+    "hits": 11,
+    "false_alarms": 31,
     "misses": 3,
-    "precision": 0.235,
-    "recall": 0.727
+    "precision": 0.262,
+    "recall": 0.786
    },
    "규칙": {
     "n_days": 140,
-    "n_pos": 11,
-    "pr_auc": 0.199,
+    "n_pos": 14,
+    "pr_auc": 0.198,
     "pr_auc_ci95": [
-     0.083,
-     0.417
+     0.1,
+     0.359
     ],
-    "roc_auc": 0.784,
-    "hits": 7,
-    "false_alarms": 37,
+    "roc_auc": 0.76,
+    "hits": 10,
+    "false_alarms": 45,
     "misses": 4,
-    "precision": 0.159,
-    "recall": 0.636
+    "precision": 0.182,
+    "recall": 0.714
    },
    "전력거래소 전날 공지": {
     "n_days": 140,
-    "n_pos": 11,
+    "n_pos": 14,
     "hits": 0,
     "false_alarms": 0,
-    "misses": 11,
+    "misses": 14,
     "precision": 0.0,
     "recall": 0.0
    }
@@ -177,87 +177,87 @@
   "합계 (1/1~10/31)": {
    "N+C": {
     "n_days": 304,
-    "n_pos": 70,
-    "pr_auc": 0.757,
+    "n_pos": 73,
+    "pr_auc": 0.741,
     "pr_auc_ci95": [
-     0.665,
-     0.838
+     0.645,
+     0.828
     ],
-    "roc_auc": 0.879,
-    "hits": 60,
-    "false_alarms": 54,
+    "roc_auc": 0.874,
+    "hits": 63,
+    "false_alarms": 56,
     "misses": 10,
-    "precision": 0.526,
-    "recall": 0.857
+    "precision": 0.529,
+    "recall": 0.863
    },
    "N+S+C": {
     "n_days": 304,
-    "n_pos": 70,
-    "pr_auc": 0.753,
+    "n_pos": 73,
+    "pr_auc": 0.734,
     "pr_auc_ci95": [
-     0.659,
-     0.836
+     0.635,
+     0.817
     ],
-    "roc_auc": 0.871,
-    "hits": 53,
-    "false_alarms": 47,
+    "roc_auc": 0.864,
+    "hits": 56,
+    "false_alarms": 48,
     "misses": 17,
-    "precision": 0.53,
-    "recall": 0.757
+    "precision": 0.538,
+    "recall": 0.767
    },
    "N": {
     "n_days": 304,
-    "n_pos": 70,
-    "pr_auc": 0.752,
+    "n_pos": 73,
+    "pr_auc": 0.74,
     "pr_auc_ci95": [
-     0.659,
-     0.832
+     0.644,
+     0.822
     ],
-    "roc_auc": 0.873,
-    "hits": 61,
-    "false_alarms": 61,
+    "roc_auc": 0.87,
+    "hits": 64,
+    "false_alarms": 63,
     "misses": 9,
-    "precision": 0.5,
-    "recall": 0.871
+    "precision": 0.504,
+    "recall": 0.877
    },
    "N+S": {
     "n_days": 304,
-    "n_pos": 70,
-    "pr_auc": 0.742,
+    "n_pos": 73,
+    "pr_auc": 0.73,
     "pr_auc_ci95": [
-     0.647,
-     0.823
+     0.637,
+     0.812
     ],
-    "roc_auc": 0.848,
-    "hits": 54,
-    "false_alarms": 51,
+    "roc_auc": 0.845,
+    "hits": 57,
+    "false_alarms": 56,
     "misses": 16,
-    "precision": 0.514,
-    "recall": 0.771
+    "precision": 0.504,
+    "recall": 0.781
    },
    "규칙": {
     "n_days": 304,
-    "n_pos": 70,
-    "pr_auc": 0.539,
+    "n_pos": 73,
+    "pr_auc": 0.516,
     "pr_auc_ci95": [
-     0.439,
-     0.642
+     0.418,
+     0.622
     ],
-    "roc_auc": 0.834,
-    "hits": 61,
-    "false_alarms": 70,
+    "roc_auc": 0.818,
+    "hits": 64,
+    "false_alarms": 78,
     "misses": 9,
-    "precision": 0.466,
-    "recall": 0.871
+    "precision": 0.451,
+    "recall": 0.877
    },
    "전력거래소 전날 공지": {
     "n_days": 304,
-    "n_pos": 70,
+    "n_pos": 73,
     "hits": 28,
     "false_alarms": 1,
-    "misses": 42,
+    "misses": 45,
     "precision": 0.966,
-    "recall": 0.4
+    "recall": 0.384
    }
   }
  }

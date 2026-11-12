@@ -184,13 +184,17 @@ def history(days, pos):
 
 
 def notice(days):
-    """전력거래소 전날 전망 공지 (게시판 "출력제어 전망" 글이 그날을 대상으로 있으면 1).
+    """전력거래소 전망 공지 두 가지 (게시판 "출력제어 전망" 글, 등록일은 2026-11-12 확인).
 
-    전날 나오는 공개 글이라 사용자가 본다고 가정한다 (2026-11-12 추가, docs/MODEL_RESULTS.md 15장).
-    공지가 17시 이후에 올라오는 날은 예보 시각이 "전날 저녁, 공지 확인 후"가 된다.
+    - kpx_notice        : 그날을 대상으로 한 전망 글이 있으면 1 (언제 올라왔든). 본 모델이 쓴다.
+                          가정: 전망은 전날 기준으로 만들어지고(D-1 전망), 출력제어를 하거나 지시받는 쪽은 전날 그 내용을 안다.
+    - kpx_notice_posted : 전망 글이 대상일 **전날까지 게시판에 올라와 있던** 날만 1. 73건 중 51건.
+                          (12건은 당일, 10건은 사후에 올라왔다.) 민감도 확인용 변형 posted 가 쓴다.
     """
     b = pd.read_csv(CLEAN / "kpx_board_daily.csv")
-    return pd.DataFrame({"date": days, "kpx_notice": pd.Series(days).isin(b.date[b.notice_forecast == 1]).astype(int).values})
+    s = pd.Series(days)
+    return pd.DataFrame({"date": days, "kpx_notice": s.isin(b.date[b.notice_forecast == 1]).astype(int).values,
+                         "kpx_notice_posted": s.isin(b.date[b.notice_pre == 1]).astype(int).values})
 
 
 def main():

@@ -38,24 +38,25 @@ plt.rcParams["axes.unicode_minus"] = False
 
 ROOT = Path(__file__).resolve().parents[1]
 # 변형 (docs/MODEL_RESULTS.md 11·15장)
-#   full   : 본 모델 (2026-11-12 저녁부터). 사용자가 실제로 아는 두 정보를 쓴다고 가정한다.
-#            ① 전날까지의 출력제어 여부 (어제·최근 7/30/90일·마지막 후 경과일): 사업자·운영자는 당일에 안다
-#            ② 전력거래소 전날 전망 공지 (kpx_notice): 누구나 볼 수 있는 공개 글
+#   full   : 본 모델. 출력제어를 하거나 지시받는 쪽이 전날 아는 두 정보를 쓴다고 가정한다.
+#            ① 전날까지의 출력제어 여부 (어제·최근 7/30/90일·마지막 후 경과일)
+#            ② 전력거래소 전날 전망 (kpx_notice): 전망 공지가 있던 날. 게시판 글은 당일·사후에 올라오기도 하지만 전망 자체는 전날 기준이다
+#   posted : ②를 "전날까지 게시판에 실제로 올라와 있던 전망 글"(kpx_notice_posted)로 좁힌 민감도 확인
 #   public : 두 정보를 모두 쓰지 않음 = 아무것도 모를 때의 하한 (실적 글은 1일~11주 늦게 올라온다)
-#   실행: python src/train.py → outputs/   ·   PLANTIES_VARIANT=public python src/train.py → outputs/public/
+#   실행: python src/train.py → outputs/   ·   PLANTIES_VARIANT=posted|public python src/train.py → outputs/posted|public/
 VARIANT = os.environ.get("PLANTIES_VARIANT", "full")
-assert VARIANT in ("full", "public"), VARIANT
+assert VARIANT in ("full", "posted", "public"), VARIANT
 HISTORY = {"curt_lag1", "curt_cnt7", "curt_cnt30", "curt_cnt90", "days_since_curt"}
-ASSUMED = HISTORY | {"kpx_notice"}
-OUT = ROOT / "outputs" / "public" if VARIANT == "public" else ROOT / "outputs"
+NOTICE = {"kpx_notice", "kpx_notice_posted"}
+NOTICE_COL = "notice_pre" if VARIANT == "posted" else "notice_forecast"   # 화면·비교에 쓰는 게시판 열 (data/clean/kpx_board_daily.csv)
+OUT = ROOT / "outputs" if VARIANT == "full" else ROOT / "outputs" / VARIANT
 SEED = 0
 P = {"val": ("2025-01-01", "2025-06-30"), "test": ("2025-07-01", "2025-12-31")}
 META = {"date", "y", "label_source", "fc_n_areas", "fc_fallback"}
 # 특징 표에는 있지만 본 모델에는 넣지 않는 항목 (검증에서 효과 없음, docs/MODEL_RESULTS.md 7장)
 NOT_USED = {"fc_clear_share_d2", "fc_clear_delta", "fc_pop_delta", "fc_cool_deg", "fc_heat_deg", "dem_mid_lastsame",
             "sup_mid_lag1", "res_rate_mid_lag1"}  # 공급능력·예비율(EPSIS)은 2026년 시험용 실험 항목
-if VARIANT == "public":
-    NOT_USED = NOT_USED | ASSUMED
+NOT_USED = NOT_USED | {"full": {"kpx_notice_posted"}, "posted": {"kpx_notice"}, "public": HISTORY | NOTICE}[VARIANT]
 OOT_START = "2023-07-01"   # 경보 기준을 정하는 데 쓸 과거 예측을 이때부터 만들어 둔다
 THR_MONTHS, THR_MIN_POS = 12, 15
 
@@ -69,7 +70,7 @@ NAMES = {  # 그래프·문서용 한글 이름
     "sol_mid_lag1": "어제 한낮 태양광", "sol_mid_mean7": "최근 7일 한낮 태양광", "sol_share_lag1": "어제 태양광 비중",
     "nuc_lag1": "어제 원전 출력", "sol_cap_lag1": "태양광 설비용량", "curt_lag1": "어제 출력제어",
     "curt_cnt7": "최근 7일 출력제어", "curt_cnt30": "최근 30일 출력제어", "curt_cnt90": "최근 90일 출력제어",
-    "days_since_curt": "마지막 출력제어 후 경과일", "kpx_notice": "전력거래소 전날 공지",
+    "days_since_curt": "마지막 출력제어 후 경과일", "kpx_notice": "전력거래소 전날 전망", "kpx_notice_posted": "전력거래소 전망 (전날까지 게시)",
 }
 
 

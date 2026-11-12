@@ -1,0 +1,202 @@
+{
+ "made": "src/explain.py",
+ "check_vs_train_max_gap": 0.0,
+ "risk_levels": {
+  "rule": "높음 = 경보 기준(직전 12개월 F1 최대) 이상, 주의 = 직전 12개월 출력제어일의 90%가 이 값 이상이 되는 선 이상, 낮음 = 그 아래",
+  "val": {
+   "높음": {
+    "days": 76,
+    "curtailed": 39,
+    "rate": 0.513
+   },
+   "주의": {
+    "days": 78,
+    "curtailed": 12,
+    "rate": 0.154
+   },
+   "낮음": {
+    "days": 27,
+    "curtailed": 4,
+    "rate": 0.148
+   }
+  },
+  "test": {
+   "높음": {
+    "days": 50,
+    "curtailed": 25,
+    "rate": 0.5
+   },
+   "주의": {
+    "days": 70,
+    "curtailed": 2,
+    "rate": 0.029
+   },
+   "낮음": {
+    "days": 64,
+    "curtailed": 0,
+    "rate": 0.0
+   }
+  }
+ },
+ "risk_levels4": {
+  "rule": "매우 높음 = 직전 12개월 출력제어일의 절반이 이 값 이상이 되는 선 이상 (높음 선보다 낮으면 높음 선). 2026-11-12 시험 결과를 본 뒤 추가한 표시 방식. 선은 과거 자료로만 정한다",
+  "val": {
+   "매우 높음": {
+    "days": 65,
+    "curtailed": 36,
+    "rate": 0.554
+   },
+   "높음": {
+    "days": 11,
+    "curtailed": 3,
+    "rate": 0.273
+   },
+   "주의": {
+    "days": 78,
+    "curtailed": 12,
+    "rate": 0.154
+   },
+   "낮음": {
+    "days": 27,
+    "curtailed": 4,
+    "rate": 0.148
+   }
+  },
+  "test": {
+   "매우 높음": {
+    "days": 35,
+    "curtailed": 23,
+    "rate": 0.657
+   },
+   "높음": {
+    "days": 15,
+    "curtailed": 2,
+    "rate": 0.133
+   },
+   "주의": {
+    "days": 70,
+    "curtailed": 2,
+    "rate": 0.029
+   },
+   "낮음": {
+    "days": 64,
+    "curtailed": 0,
+    "rate": 0.0
+   }
+  }
+ },
+ "calibration": {
+  "rule": "확률 = 직전 12개월 예보 결과로 보정(단조 회귀)한 값. 2026-11-12 추가",
+  "val": [
+   {
+    "from": 0.0,
+    "to": 0.05,
+    "days": 24,
+    "curtailed": 1,
+    "forecast_mean": 0.034,
+    "actual_rate": 0.042
+   },
+   {
+    "from": 0.05,
+    "to": 0.2,
+    "days": 82,
+    "curtailed": 15,
+    "forecast_mean": 0.108,
+    "actual_rate": 0.183
+   },
+   {
+    "from": 0.2,
+    "to": 0.4,
+    "days": 60,
+    "curtailed": 30,
+    "forecast_mean": 0.311,
+    "actual_rate": 0.5
+   },
+   {
+    "from": 0.4,
+    "to": 1.0,
+    "days": 15,
+    "curtailed": 9,
+    "forecast_mean": 0.563,
+    "actual_rate": 0.6
+   }
+  ],
+  "test": [
+   {
+    "from": 0.0,
+    "to": 0.05,
+    "days": 11,
+    "curtailed": 0,
+    "forecast_mean": 0.05,
+    "actual_rate": 0.0
+   },
+   {
+    "from": 0.05,
+    "to": 0.2,
+    "days": 104,
+    "curtailed": 2,
+    "forecast_mean": 0.12,
+    "actual_rate": 0.019
+   },
+   {
+    "from": 0.2,
+    "to": 0.4,
+    "days": 30,
+    "curtailed": 3,
+    "forecast_mean": 0.285,
+    "actual_rate": 0.1
+   },
+   {
+    "from": 0.4,
+    "to": 1.0,
+    "days": 39,
+    "curtailed": 22,
+    "forecast_mean": 0.598,
+    "actual_rate": 0.564
+   }
+  ]
+ },
+ "kpx_compare": {
+  "period": [
+   "2024-10-01",
+   "2025-06-30"
+  ],
+  "days": 273,
+  "curtailed": 63,
+  "kpx_notice": {
+   "alerts": 32,
+   "hits": 26,
+   "false_alarms": 6,
+   "misses": 37,
+   "recall": 0.413,
+   "precision": 0.812
+  },
+  "model_alert": {
+   "alerts": 103,
+   "hits": 44,
+   "false_alarms": 59,
+   "misses": 19,
+   "recall": 0.698,
+   "precision": 0.427
+  },
+  "model_top_same_count": {
+   "alerts": 32,
+   "hits": 21,
+   "false_alarms": 11,
+   "misses": 42,
+   "recall": 0.333,
+   "precision": 0.656,
+   "note": "공지와 같은 수만큼, 확률이 높은 날부터 경보했다고 볼 때"
+  },
+  "model_pr_auc": 0.592,
+  "curtailed_without_notice_caught_by_model": 20,
+  "curtailed_without_notice": 37,
+  "both_alert": 28
+ },
+ "top_reason_counts_test_high": {
+  "쉬는 날": 25,
+  "최근 출력제어": 18,
+  "전력수요": 6,
+  "맑음 예보": 1
+ }
+}

@@ -111,21 +111,21 @@ footer{font-size:12.5px;color:var(--muted)}
     <div><b>__K25_LO__</b><span class="small muted">"낮음"인 날 중 실제 출력제어 (__K25_LO_N__)</span></div>
     <div><b>__K25_FA__번</b><span class="small muted">헛경보 ("높음" 이상인데 없던 날)</span></div>
   </div>
-  <div class="small muted">위험도별 실제 출력제어 비율: __K25_STAIR__. 가정 두 가지: ① 전날까지 출력제어가 있었는지 안다(사업자·운영자는 당일에 압니다) ② 전력거래소 전날 공지를 본다(누구나 볼 수 있는 공개 글). 두 정보 없이 공개 자료만 쓰면 __K25PUB_HIT__, 헛경보 __K25PUB_FA__번입니다.</div>
+  <div class="small muted">위험도별 실제 출력제어 비율: __K25_STAIR__. 가정: 출력제어를 하거나 지시받는 쪽은 ① 전날까지 출력제어가 있었는지 ② 전력거래소의 전날 전망을 안다. 전망 글이 전날까지 게시판에 올라온 날만 쓰면 __K25POST_HIT__, 헛경보 __K25POST_FA__번이고, 두 정보 없이 공개 자료만 쓰면 __K25PUB_HIT__, 헛경보 __K25PUB_FA__번입니다.</div>
 </section>
 
 <section class="panel" id="k26" aria-label="2026년 독립 시험 결과" hidden>
   <h2>이 모델의 성적 (2026년 1~10월 독립 시험)</h2>
   <div class="kpis">
     <div><b>__K26_SPRING__</b><span class="small muted">봄(3~5월) 출력제어 중 "높음" 이상으로 미리 알린 날</span></div>
-    <div><b>__K26_NONOTICE__</b><span class="small muted">전력거래소 전날 공지 없이 생긴 출력제어 중 미리 알린 날</span></div>
+    <div><b>__K26_NONOTICE__</b><span class="small muted">전력거래소 전망 공지 없이 생긴 출력제어 중 미리 알린 날</span></div>
     <div><b>__K26_VH__</b><span class="small muted">"매우 높음"인 날 중 실제 출력제어 (__K26_VH_N__)</span></div>
     <div><b>__K26_LO__</b><span class="small muted">"낮음"인 날 중 실제 출력제어 (__K26_LO_N__)</span></div>
   </div>
-  <div class="small muted">위험도별 실제 출력제어 비율: __K26_STAIR__. 헛경보("높음" 이상인데 없던 날)는 __K26_FA__번입니다. 2026년 시간별 태양광·원전 실적은 아직 공개되지 않아(2027년 예정) 그 입력을 빼고 예측했습니다. 결과를 보기 전에 계획을 공개한 시험(전날 공지 입력 없음)은 __K26_PREREG__이었고, 전날 공지 입력은 그 뒤에 더했습니다. 두 정보 없이 공개 자료만 쓰면 __K26PUB_HIT__, 헛경보 __K26PUB_FA__번입니다. 6/14 이후 정답은 전력거래소 게시판 실적이고, 10/2 이후 실적 글은 아직 올라오지 않아 잠정입니다(2026-11-12 확인).</div>
+  <div class="small muted">위험도별 실제 출력제어 비율: __K26_STAIR__. 헛경보("높음" 이상인데 없던 날)는 __K26_FA__번입니다. 2026년 시간별 태양광·원전 실적은 아직 공개되지 않아(2027년 예정) 그 입력을 빼고 예측했습니다. 결과를 보기 전에 계획을 공개한 시험(공지 입력 없음, 10월 실적 글 반영 전)은 __K26_PREREG__이었고, 전날 공지 입력은 그 뒤에 더했습니다. 전망 글이 전날까지 게시판에 올라온 날만 쓰면 __K26POST_HIT__, 헛경보 __K26POST_FA__번이고, 두 정보 없이 공개 자료만 쓰면 __K26PUB_HIT__, 헛경보 __K26PUB_FA__번입니다. 6/14 이후 정답은 전력거래소 게시판 실적이고, 10/7 이후 실적 글은 아직 올라오지 않아 잠정입니다(2026-11-12 밤 확인).</div>
 </section>
 
-<footer>이 모델은 사용자가 전날까지의 출력제어 여부와 전력거래소 전날 공지를 안다고 가정합니다. 확률과 "매우 높음" 단계, 전날 공지 입력은 2026-11-12에 더했습니다(시험 결과를 본 뒤). 모델의 예측 점수와 순위는 그대로이고, 확률 보정과 단계 선은 매달 그 전 12개월의 예보 결과로만 정합니다(그달의 실제 결과는 쓰지 않음). 원인은 입력 묶음 하나를 학습 자료의 중앙값으로 바꿨을 때 점수가 얼마나 내려가는지로 잰 값입니다(그날 예측에 쓴 모델 그대로). 모델이 무엇을 보고 판단했는지를 보여 줄 뿐, 실제 원인을 증명하지는 않습니다. 송전망 제약·원전 정비 일정처럼 공개되지 않은 정보는 모델이 알지 못합니다. 자료: 저장소 eorua/planties의 outputs/demo_days.csv (src/explain.py), demo_days_2026.csv (src/explain_2026.py).</footer>
+<footer>이 모델은 사용자가 전날까지의 출력제어 여부와 전력거래소의 전날 전망을 안다고 가정합니다(출력제어를 하거나 지시받는 쪽). 전망 글 73건 중 51건은 전날까지, 22건은 당일·사후에 게시판에 올라왔습니다. 확률과 "매우 높음" 단계, 전날 공지 입력은 2026-11-12에 더했습니다(시험 결과를 본 뒤). 모델의 예측 점수와 순위는 그대로이고, 확률 보정과 단계 선은 매달 그 전 12개월의 예보 결과로만 정합니다(그달의 실제 결과는 쓰지 않음). 원인은 입력 묶음 하나를 학습 자료의 중앙값으로 바꿨을 때 점수가 얼마나 내려가는지로 잰 값입니다(그날 예측에 쓴 모델 그대로). 모델이 무엇을 보고 판단했는지를 보여 줄 뿐, 실제 원인을 증명하지는 않습니다. 송전망 제약·원전 정비 일정처럼 공개되지 않은 정보는 모델이 알지 못합니다. 자료: 저장소 eorua/planties의 outputs/demo_days.csv (src/explain.py), demo_days_2026.csv (src/explain_2026.py).</footer>
 </div>
 
 <script>
@@ -170,11 +170,11 @@ function show(){
   $("todo").innerHTML=TODO[r.level].map(x=>"<li>"+x+"</li>").join("");
   $("mnote").hidden=r.period==="2025";$("mnote").textContent=r.period==="live"?"실시간 예보: "+r.issued+" 기준 기상청 예보와 전력수요로 계산했습니다. 최근 출력제어: "+(r.known||"")+" · 내일 전망 공지 "+(r.kpx_notice==1||r.kpx_notice==="1"?"있음":"없음")+" (학습 자료 ~"+r.train_until+").":"2026년 독립 시험 모델: 태양광·원전 입력 없이(2026년 미공개) 예측했습니다.";
   if(r.period==="live")$("when").textContent="예보 시각: "+r.issued;
-  $("kpx").innerHTML=r.period==="live"?"":'<span class="muted">전력거래소 전날 전망 공지:</span> '+(r.kpx_notice?"있었음":"없었음");
+  $("kpx").innerHTML=r.period==="live"?"":'<span class="muted">전력거래소 전날 전망:</span> '+(r.kpx_notice?"있었음":"없었음");
   $("reveal").hidden=reveal||r.period==="live";$("res").hidden=!(reveal||r.period==="live");
   if(r.period==="live"){$("res").innerHTML='<span class="muted">아직 일어나지 않은 날입니다. 다음 날 전력거래소 게시판 실적으로 확인합니다.</span>';return}
   const src=r.label==="공식"?"전력거래소 공식 실적":"전력거래소 게시판 실적";
-  $("res").innerHTML=(r.y?'<span class="yes">실제로 출력제어가 있었습니다</span>'+(r.board_hours?' · '+r.board_hours:'')+(r.board_reason?' · 게시판 사유: '+r.board_reason+' 제약':''):(r.label.includes("잠정")?'<span class="no">게시판에 출력제어 실적 글이 아직 없습니다</span>':'<span class="no">실제로 출력제어가 없었습니다</span>'))+'<div class="small muted">정답 출처: '+src+(r.label.includes("잠정")?' (10/2 이후 실적 글 미공개, 잠정)':'')+'</div>';
+  $("res").innerHTML=(r.y?'<span class="yes">실제로 출력제어가 있었습니다</span>'+(r.board_hours?' · '+r.board_hours:'')+(r.board_reason?' · 게시판 사유: '+r.board_reason+' 제약':''):(r.label.includes("잠정")?'<span class="no">게시판에 출력제어 실적 글이 아직 없습니다</span>':'<span class="no">실제로 출력제어가 없었습니다</span>'))+'<div class="small muted">정답 출처: '+src+(r.label.includes("잠정")?' (10/7 이후 실적 글 미공개, 잠정)':'')+'</div>';
 }
 $("prev").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);cal()};
 $("next").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);cal()};

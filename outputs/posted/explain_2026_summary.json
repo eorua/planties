@@ -1,0 +1,236 @@
+{
+ "made": "src/explain_2026.py",
+ "model": "N+C (test_2026.py 주 모델)",
+ "check_vs_test_2026_max_gap": 0.0,
+ "시험1 (1/1~6/13)": {
+  "높음": {
+   "days": 68,
+   "curtailed": 48,
+   "rate": 0.706
+  },
+  "주의": {
+   "days": 65,
+   "curtailed": 10,
+   "rate": 0.154
+  },
+  "낮음": {
+   "days": 31,
+   "curtailed": 1,
+   "rate": 0.032
+  }
+ },
+ "risk_levels4": {
+  "시험1 (1/1~6/13)": {
+   "매우 높음": {
+    "days": 56,
+    "curtailed": 43,
+    "rate": 0.768
+   },
+   "높음": {
+    "days": 12,
+    "curtailed": 5,
+    "rate": 0.417
+   },
+   "주의": {
+    "days": 65,
+    "curtailed": 10,
+    "rate": 0.154
+   },
+   "낮음": {
+    "days": 31,
+    "curtailed": 1,
+    "rate": 0.032
+   }
+  },
+  "봄 (3~5월)": {
+   "매우 높음": {
+    "days": 40,
+    "curtailed": 35,
+    "rate": 0.875
+   },
+   "높음": {
+    "days": 8,
+    "curtailed": 5,
+    "rate": 0.625
+   },
+   "주의": {
+    "days": 34,
+    "curtailed": 8,
+    "rate": 0.235
+   },
+   "낮음": {
+    "days": 10,
+    "curtailed": 0,
+    "rate": 0.0
+   }
+  },
+  "합계 (1/1~10/31)": {
+   "매우 높음": {
+    "days": 78,
+    "curtailed": 50,
+    "rate": 0.641
+   },
+   "높음": {
+    "days": 28,
+    "curtailed": 9,
+    "rate": 0.321
+   },
+   "주의": {
+    "days": 88,
+    "curtailed": 11,
+    "rate": 0.125
+   },
+   "낮음": {
+    "days": 110,
+    "curtailed": 3,
+    "rate": 0.027
+   }
+  }
+ },
+ "calibration": {
+  "시험1 (1/1~6/13)": [
+   {
+    "from": 0.0,
+    "to": 0.05,
+    "days": 5,
+    "curtailed": 0,
+    "forecast_mean": 0.01,
+    "actual_rate": 0.0
+   },
+   {
+    "from": 0.05,
+    "to": 0.2,
+    "days": 52,
+    "curtailed": 3,
+    "forecast_mean": 0.148,
+    "actual_rate": 0.058
+   },
+   {
+    "from": 0.2,
+    "to": 0.4,
+    "days": 42,
+    "curtailed": 8,
+    "forecast_mean": 0.249,
+    "actual_rate": 0.19
+   },
+   {
+    "from": 0.4,
+    "to": 1.0,
+    "days": 65,
+    "curtailed": 48,
+    "forecast_mean": 0.637,
+    "actual_rate": 0.738
+   }
+  ],
+  "봄 (3~5월)": [
+   {
+    "from": 0.0,
+    "to": 0.05,
+    "days": 3,
+    "curtailed": 0,
+    "forecast_mean": 0.016,
+    "actual_rate": 0.0
+   },
+   {
+    "from": 0.05,
+    "to": 0.2,
+    "days": 20,
+    "curtailed": 2,
+    "forecast_mean": 0.141,
+    "actual_rate": 0.1
+   },
+   {
+    "from": 0.2,
+    "to": 0.4,
+    "days": 21,
+    "curtailed": 6,
+    "forecast_mean": 0.227,
+    "actual_rate": 0.286
+   },
+   {
+    "from": 0.4,
+    "to": 1.0,
+    "days": 48,
+    "curtailed": 40,
+    "forecast_mean": 0.623,
+    "actual_rate": 0.833
+   }
+  ],
+  "합계 (1/1~10/31)": [
+   {
+    "from": 0.0,
+    "to": 0.05,
+    "days": 61,
+    "curtailed": 0,
+    "forecast_mean": 0.014,
+    "actual_rate": 0.0
+   },
+   {
+    "from": 0.05,
+    "to": 0.2,
+    "days": 79,
+    "curtailed": 5,
+    "forecast_mean": 0.138,
+    "actual_rate": 0.063
+   },
+   {
+    "from": 0.2,
+    "to": 0.4,
+    "days": 61,
+    "curtailed": 9,
+    "forecast_mean": 0.248,
+    "actual_rate": 0.148
+   },
+   {
+    "from": 0.4,
+    "to": 1.0,
+    "days": 103,
+    "curtailed": 59,
+    "forecast_mean": 0.646,
+    "actual_rate": 0.573
+   }
+  ]
+ },
+ "봄 (3~5월)": {
+  "높음": {
+   "days": 48,
+   "curtailed": 40,
+   "rate": 0.833
+  },
+  "주의": {
+   "days": 34,
+   "curtailed": 8,
+   "rate": 0.235
+  },
+  "낮음": {
+   "days": 10,
+   "curtailed": 0,
+   "rate": 0.0
+  }
+ },
+ "합계 (1/1~10/31)": {
+  "높음": {
+   "days": 106,
+   "curtailed": 59,
+   "rate": 0.557
+  },
+  "주의": {
+   "days": 88,
+   "curtailed": 11,
+   "rate": 0.125
+  },
+  "낮음": {
+   "days": 110,
+   "curtailed": 3,
+   "rate": 0.027
+  }
+ },
+ "top_reason_counts_high": {
+  "최근 출력제어": 70,
+  "전력수요": 16,
+  "쉬는 날": 8,
+  "맑음 예보": 7,
+  "전력거래소 전날 전망": 4,
+  "가을": 1
+ }
+}

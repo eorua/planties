@@ -7,7 +7,7 @@
 - 시연 방식: 2025년의 실제 날짜를 골라 "그 전날 17시에 알 수 있던 정보만으로" 예측을 재현한다.
 - 정답 자료: 전력거래소 출력제어 실적 (육지 출력제어 발생일 2023년 2일 → 2024년 27일 → 2025년 82일)
 
-현재 결과: 2025년 하반기 시험(출력제어 27일)에서 24일을 전날 알림(헛경보 26번), 위험도 "매우 높음"인 날의 70%에 실제 출력제어, "낮음" 64일 중 0일, PR-AUC 0.86 (무작위 0.15). 2026년 1~10월(70일)은 60일, "매우 높음" 68%, PR-AUC 0.76. **가정: 사용자가 전날까지의 출력제어 여부와 전력거래소 전날 공지를 안다.** 두 정보 없이 공개 자료만 쓰면 23/27, 65/70(헛경보 36·103번)으로 내려간다. 자세히: [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) 15장 · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
+현재 결과: 2025년 하반기 시험(출력제어 27일)에서 24일을 전날 알림(헛경보 26번), 위험도 "매우 높음"인 날의 70%에 실제 출력제어, "낮음" 64일 중 0일, PR-AUC 0.86 (무작위 0.15). 2026년 1~10월(73일)은 63일, "매우 높음" 68%, PR-AUC 0.74. **가정: 출력제어를 하거나 지시받는 쪽은 전날까지의 출력제어 여부와 전력거래소의 전날 전망을 안다.** 전날까지 게시판에 올라온 전망만 쓰면 25/27·59/73, 두 정보 없이 공개 자료만 쓰면 23/27·67/73(헛경보 36·101번). 자세히: [docs/MODEL_RESULTS.md](docs/MODEL_RESULTS.md) 15장 · 답을 미리 본 입력이 없는지 점검한 결과는 [docs/LEAKAGE_AUDIT.md](docs/LEAKAGE_AUDIT.md)
 
 처음 보는 팀원은 **[인수인계 문서(docs/HANDOVER.md)](docs/HANDOVER.md)**부터 읽는다. 어떤 자료가 있고 없는지는 [자료 현황(docs/DATA_STATUS.md)](docs/DATA_STATUS.md).
 
@@ -54,7 +54,7 @@ python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분
 python src/check_forecast_tomorrow.py   # 실시간 계산이 학습 때와 같은지 확인 (인터넷 불필요)
 python src/forecast_tomorrow.py         # 14시 15분 이후 실행 → outputs/live_days.csv → build_demo.py 다시
 
-# 하한 (공개 자료만, outputs/public/): 위 네 줄 앞에 PLANTIES_VARIANT=public 을 붙여 실행
+# 민감도·하한: 위 네 줄 앞에 PLANTIES_VARIANT=posted (→ outputs/posted/), PLANTIES_VARIANT=public (→ outputs/public/) 을 붙여 실행. 한 번에 하나씩
 python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```
 

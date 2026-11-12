@@ -1,0 +1,264 @@
+{
+ "plan": "docs/TEST_2026_PLAN.md",
+ "primary": "N+C",
+ "results": {
+  "시험1 (1/1~6/13, 공식)": {
+   "N+C": {
+    "n_days": 164,
+    "n_pos": 59,
+    "pr_auc": 0.841,
+    "pr_auc_ci95": [
+     0.761,
+     0.913
+    ],
+    "roc_auc": 0.885,
+    "hits": 48,
+    "false_alarms": 20,
+    "misses": 11,
+    "precision": 0.706,
+    "recall": 0.814
+   },
+   "N+S+C": {
+    "n_days": 164,
+    "n_pos": 59,
+    "pr_auc": 0.835,
+    "pr_auc_ci95": [
+     0.757,
+     0.906
+    ],
+    "roc_auc": 0.874,
+    "hits": 49,
+    "false_alarms": 29,
+    "misses": 10,
+    "precision": 0.628,
+    "recall": 0.831
+   },
+   "N": {
+    "n_days": 164,
+    "n_pos": 59,
+    "pr_auc": 0.827,
+    "pr_auc_ci95": [
+     0.746,
+     0.901
+    ],
+    "roc_auc": 0.869,
+    "hits": 47,
+    "false_alarms": 26,
+    "misses": 12,
+    "precision": 0.644,
+    "recall": 0.797
+   },
+   "N+S": {
+    "n_days": 164,
+    "n_pos": 59,
+    "pr_auc": 0.812,
+    "pr_auc_ci95": [
+     0.731,
+     0.887
+    ],
+    "roc_auc": 0.853,
+    "hits": 49,
+    "false_alarms": 32,
+    "misses": 10,
+    "precision": 0.605,
+    "recall": 0.831
+   },
+   "규칙": {
+    "n_days": 164,
+    "n_pos": 59,
+    "pr_auc": 0.692,
+    "pr_auc_ci95": [
+     0.589,
+     0.791
+    ],
+    "roc_auc": 0.84,
+    "hits": 54,
+    "false_alarms": 33,
+    "misses": 5,
+    "precision": 0.621,
+    "recall": 0.915
+   },
+   "전력거래소 전날 공지": {
+    "n_days": 164,
+    "n_pos": 59,
+    "hits": 18,
+    "false_alarms": 1,
+    "misses": 41,
+    "precision": 0.947,
+    "recall": 0.305
+   }
+  },
+  "시험2 (6/14~10/31, 게시판)": {
+   "N+C": {
+    "n_days": 140,
+    "n_pos": 14,
+    "pr_auc": 0.306,
+    "pr_auc_ci95": [
+     0.165,
+     0.567
+    ],
+    "roc_auc": 0.833,
+    "hits": 11,
+    "false_alarms": 27,
+    "misses": 3,
+    "precision": 0.289,
+    "recall": 0.786
+   },
+   "N+S+C": {
+    "n_days": 140,
+    "n_pos": 14,
+    "pr_auc": 0.325,
+    "pr_auc_ci95": [
+     0.172,
+     0.603
+    ],
+    "roc_auc": 0.841,
+    "hits": 9,
+    "false_alarms": 23,
+    "misses": 5,
+    "precision": 0.281,
+    "recall": 0.643
+   },
+   "N": {
+    "n_days": 140,
+    "n_pos": 14,
+    "pr_auc": 0.366,
+    "pr_auc_ci95": [
+     0.179,
+     0.617
+    ],
+    "roc_auc": 0.832,
+    "hits": 12,
+    "false_alarms": 36,
+    "misses": 2,
+    "precision": 0.25,
+    "recall": 0.857
+   },
+   "N+S": {
+    "n_days": 140,
+    "n_pos": 14,
+    "pr_auc": 0.39,
+    "pr_auc_ci95": [
+     0.17,
+     0.634
+    ],
+    "roc_auc": 0.831,
+    "hits": 11,
+    "false_alarms": 27,
+    "misses": 3,
+    "precision": 0.289,
+    "recall": 0.786
+   },
+   "규칙": {
+    "n_days": 140,
+    "n_pos": 14,
+    "pr_auc": 0.198,
+    "pr_auc_ci95": [
+     0.1,
+     0.359
+    ],
+    "roc_auc": 0.76,
+    "hits": 10,
+    "false_alarms": 45,
+    "misses": 4,
+    "precision": 0.182,
+    "recall": 0.714
+   },
+   "전력거래소 전날 공지": {
+    "n_days": 140,
+    "n_pos": 14,
+    "hits": 0,
+    "false_alarms": 0,
+    "misses": 14,
+    "precision": 0.0,
+    "recall": 0.0
+   }
+  },
+  "합계 (1/1~10/31)": {
+   "N+C": {
+    "n_days": 304,
+    "n_pos": 73,
+    "pr_auc": 0.694,
+    "pr_auc_ci95": [
+     0.584,
+     0.785
+    ],
+    "roc_auc": 0.868,
+    "hits": 59,
+    "false_alarms": 47,
+    "misses": 14,
+    "precision": 0.557,
+    "recall": 0.808
+   },
+   "N+S+C": {
+    "n_days": 304,
+    "n_pos": 73,
+    "pr_auc": 0.704,
+    "pr_auc_ci95": [
+     0.604,
+     0.797
+    ],
+    "roc_auc": 0.867,
+    "hits": 58,
+    "false_alarms": 52,
+    "misses": 15,
+    "precision": 0.527,
+    "recall": 0.795
+   },
+   "N": {
+    "n_days": 304,
+    "n_pos": 73,
+    "pr_auc": 0.698,
+    "pr_auc_ci95": [
+     0.604,
+     0.793
+    ],
+    "roc_auc": 0.857,
+    "hits": 59,
+    "false_alarms": 62,
+    "misses": 14,
+    "precision": 0.488,
+    "recall": 0.808
+   },
+   "N+S": {
+    "n_days": 304,
+    "n_pos": 73,
+    "pr_auc": 0.698,
+    "pr_auc_ci95": [
+     0.605,
+     0.786
+    ],
+    "roc_auc": 0.849,
+    "hits": 60,
+    "false_alarms": 59,
+    "misses": 13,
+    "precision": 0.504,
+    "recall": 0.822
+   },
+   "규칙": {
+    "n_days": 304,
+    "n_pos": 73,
+    "pr_auc": 0.516,
+    "pr_auc_ci95": [
+     0.418,
+     0.622
+    ],
+    "roc_auc": 0.818,
+    "hits": 64,
+    "false_alarms": 78,
+    "misses": 9,
+    "precision": 0.451,
+    "recall": 0.877
+   },
+   "전력거래소 전날 공지": {
+    "n_days": 304,
+    "n_pos": 73,
+    "hits": 18,
+    "false_alarms": 1,
+    "misses": 55,
+    "precision": 0.947,
+    "recall": 0.247
+   }
+  }
+ }
+}

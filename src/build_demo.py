@@ -47,8 +47,10 @@ K["K26_SPRING"] = f"{int((al26 & sp).sum())} / {int((sp & (d26.y == 1)).sum())}�
 nn = (d26.kpx_notice == 0) & (d26.y == 1)
 K["K26_NONOTICE"] = f"{int((al26 & nn).sum())} / {int(nn.sum())}일"
 tpl = (ROOT / "demo" / "template.html").read_text(encoding="utf-8")
-for tag, f, a in (("K25PUB", "demo_days.csv", "2025-07-01"), ("K26PUB", "demo_days_2026.csv", "2026-01-01")):   # 공개 자료만 쓴 하한
-    x = pd.read_csv(PUB / f)
+for tag, f, a, folder in (("K25PUB", "demo_days.csv", "2025-07-01", PUB), ("K26PUB", "demo_days_2026.csv", "2026-01-01", PUB),
+                          ("K25POST", "demo_days.csv", "2025-07-01", OUT / "posted"),
+                          ("K26POST", "demo_days_2026.csv", "2026-01-01", OUT / "posted")):   # 하한(공개 자료만), 민감도(게시된 전망만)
+    x = pd.read_csv(folder / f)
     x = x[x.date >= a]
     al = x.level.isin(["높음", "매우 높음"])
     K[f"{tag}_HIT"] = f"{int((al & (x.y == 1)).sum())} / {int(x.y.sum())}일"

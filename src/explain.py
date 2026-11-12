@@ -51,7 +51,7 @@ GROUPS = {
     "어제 태양광": ["sol_mid_lag1", "sol_mid_mean7", "sol_share_lag1"],
     "태양광 설비": ["sol_cap_lag1"],   # 해마다 늘어나는 추세 (그날의 원인이라기보다 배경)
     "원전": ["nuc_lag1"],
-    "전력거래소 공지": ["kpx_notice"],
+    "전력거래소 공지": ["kpx_notice", "kpx_notice_posted"],
 }
 DOW = "월화수목금토일"
 
@@ -211,7 +211,8 @@ def reason_text(g, r, hol):
     if g == "태양광 설비":
         return f"태양광 설비 증가 (시장 설비 {r.sol_cap_lag1:.1f}GW)" if pd.notna(r.sol_cap_lag1) else "태양광 설비"
     if g == "전력거래소 공지":
-        return "전력거래소 전날 공지 (있음)" if r.get("kpx_notice", 0) == 1 else "전력거래소 전날 공지 (없음)"
+        on = r.get("kpx_notice_posted" if T.VARIANT == "posted" else "kpx_notice", 0) == 1
+        return "전력거래소 전날 전망 (있음)" if on else "전력거래소 전날 전망 (없음)"
     if g == "원전":
         return f"원전 (어제 1~16시 평균 {r.nuc_lag1:.1f}GW)" if pd.notna(r.nuc_lag1) else "원전 (자료 없음)"
     return g
@@ -247,7 +248,7 @@ def main():
     board = pd.read_csv(ROOT / "data" / "clean" / "kpx_board_daily.csv").set_index("date")
     idx = df.index[(df.date >= KPX[0]) & (df.date <= KPX[1])]
     y = df.y[idx].values
-    notice = df.date[idx].map(board["notice_forecast"]).fillna(0).astype(int).values
+    notice = df.date[idx].map(board[T.NOTICE_COL]).fillna(0).astype(int).values
     model = (p[idx].values >= hi[idx].values).astype(int)
 
     def pr(a):
@@ -287,7 +288,7 @@ def main():
                      "up": " | ".join(f"{reason_text(g, r, hol)}:{a[g]:+.3f}" for g in up),
                      "down": " | ".join(f"{reason_text(g, r, hol)}:{a[g]:+.3f}" for g in down),
                      "trend": f"{reason_text('태양광 설비', r, hol)}:{a['태양광 설비']:+.3f}",
-                     "kpx_notice": int(board["notice_forecast"].get(r.date, 0)),
+                     "kpx_notice": int(board[T.NOTICE_COL].get(r.date, 0)),
                      "board_reason": ("전력망" if board["reason_grid"].get(r.date, 0) == 1 else "")
                      + ("·수급" if board["reason_supply"].get(r.date, 0) == 1 else ""),
                      "board_hours": (f"{int(board['start_h'][r.date])}~{int(board['end_h'][r.date])}시"

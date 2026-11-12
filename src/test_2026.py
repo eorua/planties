@@ -76,7 +76,7 @@ def main():
             report["results"].setdefault(pname, {})[name] = r
             rows.append({"기간": pname, "모델": name, **r})
         # 전력거래소 전날 전망 공지: 예/아니오
-        notice = df.date[idx].map(board["notice_forecast"]).fillna(0).astype(int).values
+        notice = df.date[idx].map(board[T.NOTICE_COL]).fillna(0).astype(int).values
         hits, fa = int((notice & y).sum()), int((notice & (1 - y)).sum())
         r = {"n_days": int(len(y)), "n_pos": int(y.sum()), "hits": hits, "false_alarms": fa,
              "misses": int(y.sum() - hits), "precision": round(hits / max(hits + fa, 1), 3),
@@ -92,7 +92,7 @@ def main():
     for name in scores:
         pred[f"p_{name}"] = scores[name][idx].round(4).values
         pred[f"alert_{name}"] = (scores[name][idx].values >= thrs[name][idx].values).astype(int)
-    pred["kpx_notice"] = pred.date.map(board["notice_forecast"]).fillna(0).astype(int)
+    pred["kpx_notice"] = pred.date.map(board[T.NOTICE_COL]).fillna(0).astype(int)
     pred.to_csv(OUT / "test_2026_predictions.csv", index=False, encoding="utf-8-sig")
     chart(df, idx, scores[PRIMARY], thrs[PRIMARY], pred)
     pd.set_option("display.width", 200)

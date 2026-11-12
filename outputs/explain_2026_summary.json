@@ -66,24 +66,24 @@
   },
   "합계 (1/1~10/31)": {
    "매우 높음": {
-    "days": 75,
-    "curtailed": 51,
-    "rate": 0.68
+    "days": 78,
+    "curtailed": 53,
+    "rate": 0.679
    },
    "높음": {
-    "days": 39,
-    "curtailed": 9,
-    "rate": 0.231
+    "days": 41,
+    "curtailed": 10,
+    "rate": 0.244
    },
    "주의": {
-    "days": 76,
+    "days": 74,
     "curtailed": 5,
-    "rate": 0.066
+    "rate": 0.068
    },
    "낮음": {
-    "days": 114,
+    "days": 111,
     "curtailed": 5,
-    "rate": 0.044
+    "rate": 0.045
    }
   }
  },
@@ -160,34 +160,34 @@
    {
     "from": 0.0,
     "to": 0.05,
-    "days": 79,
+    "days": 76,
     "curtailed": 2,
     "forecast_mean": 0.019,
-    "actual_rate": 0.025
+    "actual_rate": 0.026
    },
    {
     "from": 0.05,
     "to": 0.2,
-    "days": 63,
+    "days": 59,
     "curtailed": 5,
-    "forecast_mean": 0.12,
-    "actual_rate": 0.079
+    "forecast_mean": 0.121,
+    "actual_rate": 0.085
    },
    {
     "from": 0.2,
     "to": 0.4,
-    "days": 54,
+    "days": 58,
     "curtailed": 6,
-    "forecast_mean": 0.242,
-    "actual_rate": 0.111
+    "forecast_mean": 0.25,
+    "actual_rate": 0.103
    },
    {
     "from": 0.4,
     "to": 1.0,
-    "days": 108,
-    "curtailed": 57,
-    "forecast_mean": 0.644,
-    "actual_rate": 0.528
+    "days": 111,
+    "curtailed": 60,
+    "forecast_mean": 0.649,
+    "actual_rate": 0.541
    }
   ]
  },
@@ -210,26 +210,27 @@
  },
  "합계 (1/1~10/31)": {
   "높음": {
-   "days": 114,
-   "curtailed": 60,
-   "rate": 0.526
+   "days": 119,
+   "curtailed": 63,
+   "rate": 0.529
   },
   "주의": {
-   "days": 76,
+   "days": 74,
    "curtailed": 5,
-   "rate": 0.066
+   "rate": 0.068
   },
   "낮음": {
-   "days": 114,
+   "days": 111,
    "curtailed": 5,
-   "rate": 0.044
+   "rate": 0.045
   }
  },
  "top_reason_counts_high": {
-  "최근 출력제어": 60,
-  "전력수요": 22,
-  "전력거래소 전날 공지": 21,
-  "쉬는 날": 9,
-  "맑음 예보": 2
+  "최근 출력제어": 65,
+  "전력거래소 전날 전망": 21,
+  "전력수요": 20,
+  "쉬는 날": 10,
+  "맑음 예보": 2,
+  "가을": 1
  }
 }
