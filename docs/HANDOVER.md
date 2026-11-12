@@ -106,6 +106,7 @@ PLANTIES_VARIANT=public python src/explain.py        # 위험도·원인·전력
 PLANTIES_VARIANT=public python src/test_2026.py      # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
 PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인 (시연용, 약 20초)
 python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
+python src/make_figures.py     # 발표용 그림 6장 outputs/figures/ (연도별 막대, 구조도, 달력 2장, 공지 비교, 시험 설계)
 python src/record_demo.py      # 시연 백업 영상 demo/backup_demo.mp4 (1분 32초, 자막 포함)
 
 # 실시간 "내일 예보" (인터넷·기상청 인증키 필요, 자세히: docs/LIVE_FORECAST.md)
