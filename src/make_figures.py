@@ -2,7 +2,8 @@
 
 1 yearly_curtailment.png   연도별 육지 출력제어 발생일
 2 pipeline.png             전체 구조도
-3 risk_levels.png          위험도(높음·주의·낮음)별 실제 출력제어 비율, 2025 하반기와 2026년
+3 risk_levels.png          위험도 4단계별 실제 출력제어 비율, 2025 하반기와 2026년
+  calibration.png          예보한 확률 구간별 실제 출력제어 비율
 4 notice_vs_model.png      2026년 출력제어 70일: 전력거래소 공지 / 모델만 / 둘 다 놓침
 5 test_design.png          시험 설계 타임라인
 
@@ -26,7 +27,7 @@ plt.rcParams["font.family"] = "Noto Sans CJK KR"
 plt.rcParams["axes.unicode_minus"] = False
 INK, MUTED, LINE, BG = "#152033", "#5d6879", "#dde3ec", "#ffffff"
 ACCENT, ACCENT_SOFT, GRAY = "#1d5fc4", "#a9c4ee", "#c3cad6"
-LV = {"높음": "#f3b2a9", "주의": "#f7dc94", "낮음": "#bfe3cf"}       # 시연 화면과 같은 뜻의 색
+LV = {"매우 높음": "#e8887a", "높음": "#f6c9b6", "주의": "#f7dc94", "낮음": "#bfe3cf"}       # 시연 화면과 같은 뜻의 색
 LV_INK = {"높음": "#d23b2a", "주의": "#b77700", "낮음": "#1d8152"}
 
 
@@ -97,14 +98,14 @@ def pipeline():
 # ---------- 3. 위험도별 실제 발생 비율 ----------
 def levels():
     import json
-    s25 = json.loads((PUB / "explain_summary.json").read_text(encoding="utf-8"))["risk_levels"]["test"]
-    s26 = json.loads((PUB / "explain_2026_summary.json").read_text(encoding="utf-8"))["합계 (1/1~10/31)"]
+    s25 = json.loads((PUB / "explain_summary.json").read_text(encoding="utf-8"))["risk_levels4"]["test"]
+    s26 = json.loads((PUB / "explain_2026_summary.json").read_text(encoding="utf-8"))["risk_levels4"]["합계 (1/1~10/31)"]
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.4), sharey=True)
     for ax, s, title in [(axes[0], s25, "2025년 하반기 시험"), (axes[1], s26, "2026년 독립 시험 (1~10월)")]:
         tot_d = sum(v["days"] for v in s.values())
         tot_c = sum(v["curtailed"] for v in s.values())
         base = tot_c / tot_d
-        names = ["높음", "주의", "낮음"]
+        names = ["매우 높음", "높음", "주의", "낮음"]
         rates = [s[k]["curtailed"] / max(s[k]["days"], 1) for k in names]
         bars = ax.bar([f"위험 {k}" for k in names], rates, width=0.55, color=[LV[k] for k in names])
         for b_, k, r in zip(bars, names, rates):
@@ -112,25 +113,57 @@ def levels():
                     fontweight="bold", color=INK)
             ax.text(b_.get_x() + b_.get_width() / 2, r + 0.075, f"{s[k]['days']}일 중 {s[k]['curtailed']}일", ha="center",
                     va="bottom", fontsize=9.5, color=MUTED)
-        ax.set_ylim(0, 0.56)
+        ax.set_ylim(0, 0.72)
         ax.set_yticks([])
         clean(ax)
         ax.tick_params(axis="x", labelsize=12, colors=INK)
         ax.set_title(f"{title}  ·  전체 평균 {base:.0%} ({tot_d}일 중 {tot_c}일)", fontsize=11.5, color=INK, loc="left", pad=10)
-    fig.suptitle("위험도를 높게 낸 날일수록 실제로 출력제어가 많았다", fontsize=15, fontweight="bold", color=INK, x=0.065,
+    fig.suptitle("위험도가 한 단계 오를 때마다 실제 출력제어 비율도 올랐다", fontsize=15, fontweight="bold", color=INK, x=0.065,
                  ha="left", y=1.03)
     fig.text(0.065, -0.04, "막대 = 그 위험도로 예보한 날 중 실제로 출력제어가 있던 날의 비율. 공개 자료 모델, 전날 17시 기준, 미리 보지 않은 기간. "
-             "2026년 10월 정답은 잠정.", fontsize=8.5, color=MUTED)
+             "2026년 10월 정답은 잠정. 단계 선은 매달 그 전 12개월 예보 결과로만 정한다.", fontsize=8.5, color=MUTED)
     fig.subplots_adjust(left=0.065, right=0.97, wspace=0.08)
     save(fig, "risk_levels.png")
+
+
+# ---------- 3-2. 예보 확률 대 실제 ----------
+def calibration():
+    import json
+    c25 = json.loads((PUB / "explain_summary.json").read_text(encoding="utf-8"))["calibration"]["test"]
+    c26 = json.loads((PUB / "explain_2026_summary.json").read_text(encoding="utf-8"))["calibration"]["합계 (1/1~10/31)"]
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.4), sharey=True)
+    for ax, c, title in [(axes[0], c25, "2025년 하반기 시험"), (axes[1], c26, "2026년 독립 시험 (1~10월)")]:
+        labs = [("5% 이하" if r["to"] <= 0.05 else f"{r['from']:.0%}~{r['to']:.0%}" if r["to"] < 1 else f"{r['from']:.0%} 이상") for r in c]
+        xs = range(len(c))
+        bars = ax.bar(xs, [r["actual_rate"] for r in c], width=0.55, color=ACCENT)
+        ax.plot(xs, [r["forecast_mean"] for r in c], "o", ms=9, mfc=BG, mec=INK, mew=1.8, zorder=3)
+        for x, r in zip(xs, c):
+            top = max(r["actual_rate"], r["forecast_mean"])
+            ax.text(x, top + 0.05, f"실제 {r['actual_rate']:.0%}", ha="center", va="bottom", fontsize=14, fontweight="bold", color=INK)
+            ax.text(x, top + 0.135, f"예보 평균 {r['forecast_mean']:.0%}", ha="center", va="bottom", fontsize=9, color=MUTED)
+            ax.text(x, -0.105, f"{r['days']}일 중 {r['curtailed']}일", ha="center", va="top", fontsize=8.5, color=MUTED)
+        ax.set_xticks(list(xs))
+        ax.set_xticklabels(labs)
+        ax.set_ylim(0, 0.85)
+        ax.set_yticks([])
+        clean(ax)
+        ax.tick_params(axis="x", labelsize=11, colors=INK)
+        ax.set_title(title, fontsize=11.5, color=INK, loc="left", pad=10)
+    fig.suptitle("모델이 예보한 확률과 실제로 일어난 비율", fontsize=15, fontweight="bold", color=INK, x=0.065, ha="left", y=1.08)
+    fig.text(0.065, 0.965, "막대 = 실제 출력제어 비율      ○ = 그 구간에서 모델이 예보한 확률의 평균", fontsize=10, color=INK)
+    fig.text(0.065, -0.1, "○가 막대 위에 있으면 모델이 실제보다 높게 예보한 것이다. 확률은 매달 그 전 12개월 예보 결과로만 보정한다. "
+             "확률이 60% 이상으로 나온 날은 7~11일뿐이라 40% 이상으로 묶었다. 2026년 10월 정답은 잠정.", fontsize=8.5, color=MUTED)
+    fig.subplots_adjust(left=0.065, right=0.97, wspace=0.08, top=0.84)
+    save(fig, "calibration.png")
 
 
 # ---------- 4. 공지와 비교 ----------
 def notice(d26):
     y = d26[d26.y == 1]
+    al = y.level.isin(["높음", "매우 높음"])
     a = int((y.kpx_notice == 1).sum())
-    b = int(((y.kpx_notice == 0) & (y.level == "높음")).sum())
-    c = int(((y.kpx_notice == 0) & (y.level != "높음")).sum())
+    b = int(((y.kpx_notice == 0) & al).sum())
+    c = int(((y.kpx_notice == 0) & ~al).sum())
     tot = a + b + c
     fig, ax = plt.subplots(figsize=(10, 3.4))
     ax.set_xlim(0, tot)
@@ -145,9 +178,10 @@ def notice(d26):
         ax.text(x + v / 2, -0.32, small, ha="center", va="top", fontsize=10.5 if v > 6 else 9, color=INK if v > 6 else MUTED)
         x += v
     ax.text(0, 1.42, f"2026년 출력제어 {tot}일, 누가 전날 알렸나", fontsize=15, fontweight="bold", color=INK)
-    hit_n = int(((y.kpx_notice == 1) & (y.level == "높음")).sum())
-    ax.text(0, -1.3, f"2026-01-01 ~ 10-31, 공개 자료 모델의 '높음' 경보 기준. 공지가 있던 {a}일 중 {hit_n}일은 모델도 알렸다. "
-            "공지는 낸 날의 97%가 맞았고, 모델은 헛경보가 더 많다(103번).", fontsize=8.5, color=MUTED)
+    hit_n = int(((y.kpx_notice == 1) & al).sum())
+    fa = int((d26.level.isin(["높음", "매우 높음"]) & (d26.y == 0)).sum())
+    ax.text(0, -1.3, f"2026-01-01 ~ 10-31, 공개 자료 모델이 '높음' 이상으로 예보한 날 기준. 공지가 있던 {a}일 중 {hit_n}일은 모델도 알렸다. "
+            f"공지는 낸 날의 97%가 맞았고, 모델은 헛경보가 더 많다({fa}번).", fontsize=8.5, color=MUTED)
     save(fig, "notice_vs_model.png")
 
 
@@ -183,5 +217,6 @@ if __name__ == "__main__":
     yearly()
     pipeline()
     levels()
+    calibration()
     notice(d26)
     design()

@@ -211,10 +211,12 @@ def predict(row, issued):
     r = pd.Series(row)
     up = [g for g, v in a.items() if v > 0.005][:3]
     down = [g for g, v in a.sort_values().items() if v < -0.005][:2]
-    hi, wa = live["thr_high"], live["thr_watch"]
+    vh, hi, wa = live["thr_vhigh"], live["thr_high"], live["thr_watch"]
+    cal = live["calibration"]   # 직전 12개월 예보 결과로 보정한 확률 (src/explain_2026.py 가 만든다)
+    prob = float(np.interp(np.log(p + 1e-6), cal["x_log_score"], cal["prob"]))
     return {"date": row["date"], "dow": X.DOW[pd.Timestamp(row["date"]).dayofweek], "holiday": hol.get(row["date"], ""),
-            "y": "", "p": round(p, 4), "thr_high": hi, "thr_watch": wa,
-            "level": "높음" if p >= hi else "주의" if p >= wa else "낮음",
+            "y": "", "p": round(p, 4), "prob": round(prob, 3), "thr_vhigh": vh, "thr_high": hi, "thr_watch": wa,
+            "level": X.level4(p, vh, hi, wa),
             "up": " | ".join(f"{X.reason_text(g, r, hol)}:{a[g]:+.3f}" for g in up),
             "down": " | ".join(f"{X.reason_text(g, r, hol)}:{a[g]:+.3f}" for g in down),
             "trend": "", "kpx_notice": "", "board_reason": "", "board_hours": "",
@@ -265,8 +267,9 @@ def main():
     new = pd.concat([old[old.get("date", pd.Series(dtype=str)) != res["date"]] if len(old) else old,
                      pd.DataFrame([res])]).sort_values("date")
     new.to_csv(path, index=False, encoding="utf-8-sig")
-    print(f"\n{res['date']} ({res['dow']}) 위험 {res['level']}  점수 {res['p']:.3f} "
-          f"(주의 {res['thr_watch']} · 높음 {res['thr_high']} 이상)")
+    pct = "5% 미만" if res["prob"] < 0.05 else f"약 {round(res['prob'] * 10) * 10}%"
+    print(f"\n{res['date']} ({res['dow']}) 출력제어 확률 {pct} · 위험 {res['level']}  (모델 점수 {res['p']:.3f}, "
+          f"주의 {res['thr_watch']} · 높음 {res['thr_high']} · 매우 높음 {res['thr_vhigh']} 이상)")
     print("  올린 원인:", res["up"] or "뚜렷한 원인 없음")
     print("  낮춘 원인:", res["down"] or "없음")
     print(f"→ {path.relative_to(ROOT)} 저장. 시연 화면에 넣으려면: python src/build_demo.py")

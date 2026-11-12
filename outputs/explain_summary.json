@@ -38,6 +38,124 @@
    }
   }
  },
+ "risk_levels4": {
+  "rule": "매우 높음 = 직전 12개월 출력제어일의 절반이 이 값 이상이 되는 선 이상 (높음 선보다 낮으면 높음 선). 2026-11-12 시험 결과를 본 뒤 추가한 표시 방식. 선은 과거 자료로만 정한다",
+  "val": {
+   "매우 높음": {
+    "days": 64,
+    "curtailed": 36,
+    "rate": 0.562
+   },
+   "높음": {
+    "days": 13,
+    "curtailed": 4,
+    "rate": 0.308
+   },
+   "주의": {
+    "days": 79,
+    "curtailed": 14,
+    "rate": 0.177
+   },
+   "낮음": {
+    "days": 25,
+    "curtailed": 1,
+    "rate": 0.04
+   }
+  },
+  "test": {
+   "매우 높음": {
+    "days": 34,
+    "curtailed": 23,
+    "rate": 0.676
+   },
+   "높음": {
+    "days": 22,
+    "curtailed": 2,
+    "rate": 0.091
+   },
+   "주의": {
+    "days": 60,
+    "curtailed": 2,
+    "rate": 0.033
+   },
+   "낮음": {
+    "days": 68,
+    "curtailed": 0,
+    "rate": 0.0
+   }
+  }
+ },
+ "calibration": {
+  "rule": "확률 = 직전 12개월 예보 결과로 보정(단조 회귀)한 값. 2026-11-12 추가",
+  "val": [
+   {
+    "from": 0.0,
+    "to": 0.05,
+    "days": 24,
+    "curtailed": 1,
+    "forecast_mean": 0.034,
+    "actual_rate": 0.042
+   },
+   {
+    "from": 0.05,
+    "to": 0.2,
+    "days": 79,
+    "curtailed": 12,
+    "forecast_mean": 0.106,
+    "actual_rate": 0.152
+   },
+   {
+    "from": 0.2,
+    "to": 0.4,
+    "days": 63,
+    "curtailed": 31,
+    "forecast_mean": 0.303,
+    "actual_rate": 0.492
+   },
+   {
+    "from": 0.4,
+    "to": 1.0,
+    "days": 15,
+    "curtailed": 11,
+    "forecast_mean": 0.563,
+    "actual_rate": 0.733
+   }
+  ],
+  "test": [
+   {
+    "from": 0.0,
+    "to": 0.05,
+    "days": 16,
+    "curtailed": 0,
+    "forecast_mean": 0.05,
+    "actual_rate": 0.0
+   },
+   {
+    "from": 0.05,
+    "to": 0.2,
+    "days": 100,
+    "curtailed": 2,
+    "forecast_mean": 0.127,
+    "actual_rate": 0.02
+   },
+   {
+    "from": 0.2,
+    "to": 0.4,
+    "days": 23,
+    "curtailed": 1,
+    "forecast_mean": 0.288,
+    "actual_rate": 0.043
+   },
+   {
+    "from": 0.4,
+    "to": 1.0,
+    "days": 45,
+    "curtailed": 24,
+    "forecast_mean": 0.575,
+    "actual_rate": 0.533
+   }
+  ]
+ },
  "kpx_compare": {
   "period": [
    "2024-10-01",

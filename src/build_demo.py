@@ -21,8 +21,33 @@ if (OUT / "live_days.csv").exists():   # src/forecast_tomorrow.py 가 만든 실
 d = pd.concat(parts).fillna("")
 for c in ("p", "thr_high", "thr_watch"):
     d[c] = d[c].astype(float)
+for c in ("prob", "thr_vhigh"):
+    d[c] = d[c].astype(float)
 rows = d.to_dict(orient="records")
+
+
+def kpis(x, s4):
+    """성적 칸 숫자: 결과 파일에서 계산한다 (손으로 적지 않는다)."""
+    al = x.level.isin(["높음", "매우 높음"])
+    pct = lambda v: f"{v['curtailed'] / max(v['days'], 1):.0%}"
+    return {"HIT": f"{int((al & (x.y == 1)).sum())} / {int(x.y.sum())}일", "FA": str(int((al & (x.y == 0)).sum())),
+            "VH": pct(s4["매우 높음"]), "VH_N": f"{s4['매우 높음']['days']}일 중 {s4['매우 높음']['curtailed']}일",
+            "LO": pct(s4["낮음"]), "LO_N": f"{s4['낮음']['days']}일 중 {s4['낮음']['curtailed']}일",
+            "STAIR": " / ".join(f"{k} {pct(v)}" for k, v in s4.items())}
+
+
+s25 = json.loads((OUT / "explain_summary.json").read_text(encoding="utf-8"))["risk_levels4"]["test"]
+s26 = json.loads((OUT / "explain_2026_summary.json").read_text(encoding="utf-8"))["risk_levels4"]["합계 (1/1~10/31)"]
+K = {f"K25_{k}": v for k, v in kpis(d25, s25).items()} | {f"K26_{k}": v for k, v in kpis(d26, s26).items()}
+al26 = d26.level.isin(["높음", "매우 높음"]) & (d26.y == 1)
+sp = (d26.date >= "2026-03-01") & (d26.date <= "2026-05-31")
+K["K26_SPRING"] = f"{int((al26 & sp).sum())} / {int((sp & (d26.y == 1)).sum())}일"
+nn = (d26.kpx_notice == 0) & (d26.y == 1)
+K["K26_NONOTICE"] = f"{int((al26 & nn).sum())} / {int(nn.sum())}일"
 tpl = (ROOT / "demo" / "template.html").read_text(encoding="utf-8")
+for k in sorted(K, key=len, reverse=True):   # 긴 이름부터 (K25_VH_N 이 K25_VH 보다 먼저)
+    tpl = tpl.replace(f"__{k}__", K[k])
+assert "__K2" not in tpl, "채워지지 않은 성적 칸이 있다"
 html = tpl.replace("__DATA__", json.dumps(rows, ensure_ascii=False, separators=(",", ":")))
 head = '<!doctype html>\n<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
 (ROOT / "demo" / "index.html").write_text(head + html.replace("<style>", "</head><body>\n<style>", 1) + "\n</body></html>\n", encoding="utf-8")

@@ -69,6 +69,8 @@ def main():
 
     hi = X.rolling(df, p, DEMO[0], DEMO[1], T.best_threshold)
     wa = np.minimum(X.rolling(df, p, DEMO[0], DEMO[1], X.watch_threshold), hi)
+    vh = np.maximum(X.rolling(df, p, DEMO[0], DEMO[1], X.vhigh_threshold), hi)
+    prob = X.rolling_calibrate(df, p, DEMO[0], DEMO[1])
     alert = (p[hi.index] >= hi).astype(int).values
     diff = int((alert != ref["alert_N+C"].values).sum())
     assert diff == 0, f"test_2026.py 와 경보가 {diff}일 다르다"
@@ -78,13 +80,14 @@ def main():
     rows = []
     for i in hi.index:
         r = df.loc[i]
-        lv = "높음" if p[i] >= hi[i] else "주의" if p[i] >= wa[i] else "낮음"
+        lv = X.level4(p[i], vh[i], hi[i], wa[i])
         a = attr.loc[i].dropna().sort_values(ascending=False)
         up = [g for g, v in a.items() if v > 0.005][:3]
         down = [g for g, v in a.sort_values().items() if v < -0.005][:2]
         src = r.label_source if "label_source" in df.columns else ""
         rows.append({"date": r.date, "dow": X.DOW[pd.Timestamp(r.date).dayofweek], "holiday": hol.get(r.date, ""),
-                     "y": int(r.y), "p": round(float(p[i]), 4), "thr_high": round(float(hi[i]), 4),
+                     "y": int(r.y), "p": round(float(p[i]), 4), "prob": round(float(prob[i]), 3),
+                     "thr_vhigh": round(float(vh[i]), 4), "thr_high": round(float(hi[i]), 4),
                      "thr_watch": round(float(wa[i]), 4), "level": lv,
                      "up": " | ".join(f"{X.reason_text(g, r, hol)}:{a[g]:+.3f}" for g in up),
                      "down": " | ".join(f"{X.reason_text(g, r, hol)}:{a[g]:+.3f}" for g in down),
@@ -105,7 +108,9 @@ def main():
                          "합계 (1/1~10/31)": DEMO}.items():
         k = df.index[(df.date >= a) & (df.date <= b)]
         summ[name] = X.level_table(df, k, p, hi, wa)
-    hs = demo[demo.level == "높음"]
+        summ.setdefault("risk_levels4", {})[name] = X.level_table4(df, k, p, vh, hi, wa)
+        summ.setdefault("calibration", {})[name] = X.calibration_table(df, k, prob)
+    hs = demo[demo.level.isin(["높음", "매우 높음"])]
     summ["top_reason_counts_high"] = hs.up.str.split(" \\(|:").str[0].value_counts().to_dict()
     (OUT / "explain_2026_summary.json").write_text(json.dumps(summ, ensure_ascii=False, indent=1), encoding="utf-8")
 
@@ -120,10 +125,15 @@ def main():
         k += 3
     hi_n = float(T.best_threshold(df.y[w].values, p[w].values))
     wa_n = min(float(X.watch_threshold(df.y[w].values, p[w].values)), hi_n)
+    vh_n = max(float(X.vhigh_threshold(df.y[w].values, p[w].values)), hi_n)
+    iso = X.fit_calibration(df.y[w].values, p[w].values)
     (OUT / "live_thresholds.json").write_text(json.dumps({
         "made": "src/explain_2026.py", "model": "N+C", "features": feats, "from_month": nxt.strftime("%Y-%m"),
         "window": [df.date[w].min(), df.date[w].max()], "window_curtailed_days": int(df.y[w].sum()),
-        "thr_high": round(hi_n, 4), "thr_watch": round(wa_n, 4),
+        "thr_vhigh": round(vh_n, 4), "thr_high": round(hi_n, 4), "thr_watch": round(wa_n, 4),
+        "calibration": {"x_log_score": [round(float(v), 6) for v in iso.x],
+                        "prob": [round(float(v), 4) for v in iso.prob],
+                        "how": "prob = interp(log(score + 1e-6), x_log_score, prob), 범위 밖은 양 끝값"},
         "note": "10월 2일 이후 정답은 게시판 실적 미공개로 잠정 (2026-11-12 확인)"}, ensure_ascii=False, indent=1),
         encoding="utf-8")
     print(json.dumps(summ, ensure_ascii=False, indent=1))
