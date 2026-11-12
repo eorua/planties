@@ -7,6 +7,7 @@
 - `src/check_forecast_tomorrow.py`: 과거 자료를 API 응답 모양으로 바꿔 실시간 계산과 특징 표를 비교 → 44일 × 26항목 일치 (수요 0.1MW 반올림까지 맞춤)
 - `src/explain_2026.py`: 실시간용 경보 선 저장 (outputs/public/live_thresholds.json: 2025-11 ~ 2026-10 예측 기준 높음 0.102, 주의 0.026)
 - 시연 화면: 실시간 예보가 있으면 "내일 예보 (실시간)" 단추, 예보 시각·학습 기간 안내, 결과 칸은 "아직 일어나지 않은 날"
+- **처음부터 다시 만들기 점검 통과**: 깃허브에서 새로 받은 저장소로 README 순서를 끝까지 실행(두 변형, 약 35분) → 정리본·특징 표·모든 결과 파일·시연 화면이 저장소와 한 글자도 다르지 않음. 다른 것은 build_report.json(원본 지문 목록) 하나로, EPSIS·2026년 예보 원본을 넣은 뒤 build_clean.py 를 다시 돌리지 않아 목록이 옛것이었다 → 다시 만들어 넣음
 - requirements.txt 에 requests, .gitignore 에 data/live/·secrets_kma_key.txt. 사용법 docs/LIVE_FORECAST.md
 
 ## 2026-11-12 (시연 화면에 2026년 추가)
