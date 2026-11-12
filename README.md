@@ -35,18 +35,21 @@ demo/                시연 화면 (index.html 하나, 서버 없이 열림)
 Python 3.11 이상. `pip install -r requirements.txt` (pandas, numpy, scikit-learn, matplotlib). 그래프 한글 글꼴은 Noto Sans CJK KR.
 
 ```bash
-python src/build_clean.py      # 전력·기상 관측 raw → clean (검증 17개)
-python src/build_forecast.py   # 기상 예보 raw → clean (검증 489개)
+python src/build_clean.py      # 전력·기상 관측 raw → clean
+python src/build_forecast.py   # 기상 예보 raw → clean (검증 658개)
 python src/build_extra.py      # EPSIS 실시간 수급(시간별), 게시판(날짜별) 정리본
-python src/build_features.py   # clean → 특징 표 (data/features)
-python src/train.py            # 실시간 정보 모델 평가 (outputs/, 약 2분)
-PLANTIES_VARIANT=public python src/train.py          # 공개 자료 모델 = 발표 본 숫자 (outputs/public/)
-cd src && PLANTIES_VARIANT=public python explain.py   # 공개 자료 모델의 위험도·원인·공지 비교 (시연 화면용)
-python src/test_2026.py        # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 2026년 예보를 받은 뒤 실행)
-python src/explain.py          # 위험도 3단계·원인 설명·전력거래소 공지 비교 (outputs/demo_days.csv)
-python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림)
+python src/build_features.py   # clean → 특징 표 (data/features, 1,400일)
 python src/manifest.py write   # 지문 기록 (build 직후에만)
-python src/manifest.py verify  # 쓰기 전 매번 확인 → "문제 0개"
+
+# 공개 자료 모델 = 발표 본 숫자, 시연 화면 (outputs/public/)
+PLANTIES_VARIANT=public python src/train.py          # 2025년 평가 (약 2분)
+PLANTIES_VARIANT=public python src/explain.py        # 위험도·원인·전력거래소 공지 비교 (2025년)
+PLANTIES_VARIANT=public python src/test_2026.py      # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
+PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인 (시연용, 약 20초)
+python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
+
+# 실시간 정보 모델 (비교용, outputs/): 위 네 줄을 PLANTIES_VARIANT 없이 실행
+python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```
 
 ## 데이터 다루는 규칙

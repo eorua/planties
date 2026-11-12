@@ -18,6 +18,7 @@
   --hi:#ff7a69; --hi-bg:#4a2320; --wa:#f1b545; --wa-bg:#46391a; --lo:#58c98f; --lo-bg:#1c3b2b;
   --accent:#78acff; --bar:#78acff; --bar-neg:#56627a; color-scheme:dark }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;
   padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
@@ -39,6 +40,8 @@ button.primary{background:var(--accent);border-color:var(--accent);color:#fff;fo
 .cal button.lv-높음{background:var(--hi-bg)} .cal button.lv-주의{background:var(--wa-bg)} .cal button.lv-낮음{background:var(--lo-bg)}
 .cal button.sel{border-color:var(--accent)}
 .cal button.act::after{content:"";position:absolute;right:4px;top:4px;width:6px;height:6px;border-radius:50%;background:var(--ink)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}.seg button{font-size:13px;padding:6px 4px}.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.note{font-size:13px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 10px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px;color:var(--muted)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
@@ -65,11 +68,12 @@ footer{font-size:12.5px;color:var(--muted)}
 <header>
   <div class="small muted">팀 플랜티즈 · 2026 안양대 AI+X 경진대회 시연</div>
   <h1>내일 육지에서 출력제어가 있을까?</h1>
-  <div class="small muted">2025년 날짜를 고르면, 그 전날 17시에 공개된 정보만으로 본 모델이 낸 예보를 그대로 보여 줍니다.</div>
+  <div class="small muted">시험 기간(2025년 7~12월, 2026년 1~10월)의 날짜를 고르면, 그 전날 17시에 공개된 정보만으로 모델이 낸 예보를 그대로 보여 줍니다. 모두 미리 보지 않고 낸 예측입니다.</div>
 </header>
 
 <div class="grid">
   <section class="panel" aria-label="날짜 고르기">
+    <div class="seg" role="group" aria-label="시험 기간"><button id="go25">2025년 하반기 시험</button><button id="go26">2026년 독립 시험</button></div>
     <div class="mnav"><button id="prev" aria-label="이전 달">◀</button><h2 id="mtitle"></h2><button id="next" aria-label="다음 달">▶</button></div>
     <div class="cal" id="cal"></div>
     <div class="legend"><span><i style="background:var(--hi-bg)"></i>높음 (경보)</span><span><i style="background:var(--wa-bg)"></i>주의</span><span><i style="background:var(--lo-bg)"></i>낮음</span><span id="actlg" hidden>● 실제 출력제어</span></div>
@@ -86,6 +90,7 @@ footer{font-size:12.5px;color:var(--muted)}
     <div><h2>위험을 올린 원인</h2><div class="reasons" id="up"></div></div>
     <div id="downbox"><h2>위험을 낮춘 원인</h2><div class="reasons" id="down"></div></div>
     <div class="small muted" id="trend"></div>
+    <div class="note" id="mnote" hidden></div>
     <div><h2>이렇게 대비하세요</h2><ul id="todo"></ul></div>
     <div class="small" id="kpx"></div>
     <div class="result">
@@ -95,7 +100,7 @@ footer{font-size:12.5px;color:var(--muted)}
   </section>
 </div>
 
-<section class="panel" aria-label="2025년 하반기 시험 결과">
+<section class="panel" id="k25" aria-label="2025년 하반기 시험 결과">
   <h2>이 모델의 성적 (2025년 7~12월, 미리 보지 않고 예측, 공개 자료만)</h2>
   <div class="kpis">
     <div><b>23 / 27일</b><span class="small muted">"높음"으로 미리 알린 출력제어</span></div>
@@ -106,13 +111,25 @@ footer{font-size:12.5px;color:var(--muted)}
   <div class="small muted">이 화면은 공개 자료만 쓰는 모델입니다. 전력거래소 출력제어 실적은 며칠~몇 주 늦게 공개되어 전날 17시에는 알 수 없기 때문입니다. 실시간 출력제어 정보가 있는 운영자라면 PR-AUC 0.78, 27일 중 25일까지 올라갑니다.</div>
 </section>
 
-<footer>원인은 입력 묶음 하나를 학습 자료의 중앙값으로 바꿨을 때 점수가 얼마나 내려가는지로 잰 값입니다(그날 예측에 쓴 모델 그대로). 모델이 무엇을 보고 판단했는지를 보여 줄 뿐, 실제 원인을 증명하지는 않습니다. 송전망 제약·원전 정비 일정처럼 공개되지 않은 정보는 모델이 알지 못합니다. 자료: 저장소 eorua/planties의 outputs/demo_days.csv (src/explain.py).</footer>
+<section class="panel" id="k26" aria-label="2026년 독립 시험 결과" hidden>
+  <h2>이 모델의 성적 (2026년 1~10월 독립 시험, 결과를 보기 전에 계획 공개, 공개 자료만)</h2>
+  <div class="kpis">
+    <div><b>46 / 48일</b><span class="small muted">봄(3~5월) 출력제어 중 "높음"으로 미리 알린 날</span></div>
+    <div><b>38 / 42일</b><span class="small muted">전력거래소 전날 공지 없이 생긴 출력제어 중 "높음"으로 알린 날</span></div>
+    <div><b>1일</b><span class="small muted">"낮음"이었는데 출력제어가 난 날 (72일 중)</span></div>
+    <div><b>103번</b><span class="small muted">헛경보 (여름·가을에 많음)</span></div>
+  </div>
+  <div class="small muted">2026년 시간별 태양광·원전 실적은 아직 공개되지 않아(2027년 예정) 그 입력을 빼고 예측했습니다. PR-AUC 0.50 (무작위 0.23, 간단한 규칙 0.49): 공개 자료만으로는 순위 정확도가 간단한 규칙과 비슷합니다. 9~10월에는 헛경보가 많았습니다. 6/14 이후 정답은 전력거래소 게시판 실적이고, 10/2 이후 실적 글은 아직 올라오지 않아 잠정입니다(2026-11-12 확인).</div>
+</section>
+
+<footer>원인은 입력 묶음 하나를 학습 자료의 중앙값으로 바꿨을 때 점수가 얼마나 내려가는지로 잰 값입니다(그날 예측에 쓴 모델 그대로). 모델이 무엇을 보고 판단했는지를 보여 줄 뿐, 실제 원인을 증명하지는 않습니다. 송전망 제약·원전 정비 일정처럼 공개되지 않은 정보는 모델이 알지 못합니다. 자료: 저장소 eorua/planties의 outputs/public/demo_days.csv (src/explain.py), demo_days_2026.csv (src/explain_2026.py).</footer>
 </div>
 
 <script>
 const D=__DATA__;
 const byDate={};D.forEach(r=>byDate[r.date]=r);
 let cur=new Date(2025,10,1), sel="2025-11-02", reveal=false;
+const MIN=new Date(2025,6,1), MAX=new Date(2026,9,1);
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,"0");
 const TODO={"높음":["정비·점검을 이날 한낮(10~17시)에 배치","ESS는 한낮에 충전할 수 있게 오전까지 비워 두기","전력거래소 게시판의 출력제어 공지 확인"],
@@ -129,7 +146,8 @@ function cal(){
     h+='<button class="'+cls+'" data-d="'+k+'" aria-label="'+k+(r?" 위험도 "+r.level:"")+'">'+d+"</button>"}
   $("cal").innerHTML=h;
   $("cal").querySelectorAll("button").forEach(b=>b.onclick=()=>{sel=b.dataset.d;reveal=false;cal();show()});
-  $("prev").disabled=(m===0);$("next").disabled=(m===11);$("actlg").hidden=!$("showact").checked;
+  $("prev").disabled=(cur<=MIN);$("next").disabled=(cur>=MAX);
+  const p26=cur.getFullYear()===2026;$("go25").className=p26?"":"on";$("go26").className=p26?"on":"";$("k25").hidden=p26;$("k26").hidden=!p26;$("actlg").hidden=!$("showact").checked;
 }
 function rows(el,list,neg){const mx=Math.max(0.05,...list.map(x=>Math.abs(x[1])));
   el.innerHTML=list.map(([t,v])=>'<span>'+t+'</span><span class="b'+(neg?" neg":"")+'" style="width:'+(100*Math.abs(v)/mx).toFixed(0)+'%"></span><span class="num small muted">'+(v>0?"+":"")+v.toFixed(2)+"</span>").join("")||'<span class="muted small">뚜렷한 원인 없음</span>'}
@@ -144,13 +162,17 @@ function show(){
   rows($("up"),parse(r.up),false);const dn=parse(r.down);$("downbox").hidden=!dn.length;rows($("down"),dn,true);
   const tr=parse(r.trend)[0];$("trend").textContent=tr?"배경: "+tr[0]+" — 해마다 늘어나는 추세라 그날의 원인과 따로 표시 ("+(tr[1]>0?"+":"")+tr[1].toFixed(2)+")":"";
   $("todo").innerHTML=TODO[r.level].map(x=>"<li>"+x+"</li>").join("");
+  $("mnote").hidden=r.period!=="2026";$("mnote").textContent="2026년 독립 시험 모델: 태양광·원전 입력 없이(2026년 미공개) 예측했습니다.";
   $("kpx").innerHTML='<span class="muted">전력거래소 전날 전망 공지:</span> '+(r.kpx_notice?"있었음":"없었음");
   $("reveal").hidden=reveal;$("res").hidden=!reveal;
-  $("res").innerHTML=r.y?'<span class="yes">실제로 출력제어가 있었습니다</span>'+(r.board_hours?' · '+r.board_hours:'')+(r.board_reason?' · 게시판 사유: '+r.board_reason+' 제약':''):'<span class="no">실제로 출력제어가 없었습니다</span>';
+  const src=r.label==="공식"?"전력거래소 공식 실적":"전력거래소 게시판 실적";
+  $("res").innerHTML=(r.y?'<span class="yes">실제로 출력제어가 있었습니다</span>'+(r.board_hours?' · '+r.board_hours:'')+(r.board_reason?' · 게시판 사유: '+r.board_reason+' 제약':''):(r.label.includes("잠정")?'<span class="no">게시판에 출력제어 실적 글이 아직 없습니다</span>':'<span class="no">실제로 출력제어가 없었습니다</span>'))+'<div class="small muted">정답 출처: '+src+(r.label.includes("잠정")?' (10/2 이후 실적 글 미공개, 잠정)':'')+'</div>';
 }
 $("prev").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);cal()};
 $("next").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);cal()};
 $("reveal").onclick=()=>{reveal=true;show()};
 $("showact").onchange=cal;
+$("go25").onclick=()=>{cur=new Date(2025,10,1);sel="2025-11-02";reveal=false;cal();show()};
+$("go26").onclick=()=>{cur=new Date(2026,4,1);sel="2026-05-05";reveal=false;cal();show()};
 cal();show();
 </script>

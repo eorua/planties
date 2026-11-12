@@ -1,0 +1,62 @@
+{
+ "made": "src/explain_2026.py",
+ "model": "N+C (test_2026.py 주 모델)",
+ "check_vs_test_2026_max_gap": 0.0,
+ "시험1 (1/1~6/13)": {
+  "높음": {
+   "days": 84,
+   "curtailed": 52,
+   "rate": 0.619
+  },
+  "주의": {
+   "days": 56,
+   "curtailed": 7,
+   "rate": 0.125
+  },
+  "낮음": {
+   "days": 24,
+   "curtailed": 0,
+   "rate": 0.0
+  }
+ },
+ "봄 (3~5월)": {
+  "높음": {
+   "days": 57,
+   "curtailed": 44,
+   "rate": 0.772
+  },
+  "주의": {
+   "days": 23,
+   "curtailed": 4,
+   "rate": 0.174
+  },
+  "낮음": {
+   "days": 12,
+   "curtailed": 0,
+   "rate": 0.0
+  }
+ },
+ "합계 (1/1~10/31)": {
+  "높음": {
+   "days": 127,
+   "curtailed": 60,
+   "rate": 0.472
+  },
+  "주의": {
+   "days": 68,
+   "curtailed": 8,
+   "rate": 0.118
+  },
+  "낮음": {
+   "days": 109,
+   "curtailed": 2,
+   "rate": 0.018
+  }
+ },
+ "top_reason_counts_high": {
+  "최근 출력제어": 81,
+  "전력수요": 22,
+  "맑음 예보": 14,
+  "쉬는 날": 10
+ }
+}

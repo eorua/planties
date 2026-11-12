@@ -36,6 +36,17 @@
 - **생성형 AI 사용 도구와 범위를 예선 PPT 8장과 본선 PPT에 적을 것** (Claude로 데이터 수집·정리 코드 작성, 모델 코드 작성, 문서 작성 보조)
 - 출처 없이 남의 코드·저작물을 쓰면 수상 취소 가능
 
+대회 페이지(https://cs-ayu.github.io/#prelim)에서 11-12 다시 확인한 것
+- **예선은 서면 심사(100점)다.** 발표 없이 PPT만 보고 채점하므로 장 안의 글만으로 이해되게 쓴다. 장마다 관련 심사 항목은 템플릿에 적혀 있다
+- 예선 필수 내용: 대상과 문제, 해결 아이디어, AI 활용 방법, 사용 데이터, 구현 계획과 역할 분담 (8장에 생성형 AI 사용 범위·기존 작품 활용 여부)
+- 본선 PPT 필수 내용: 문제 정의, 구현 결과, AI 활용 방법, 검증 결과, 한계, **AI 도구·외부 API 활용 내역**
+- 본선 README: 실행 방법, 데이터·모델 출처와 이용 조건
+- 수상 최소 요건 5가지: 대상과 문제 정의, 작동하는 프로토타입, 핵심 기능에 AI, 간단한 검증(예시 10건 이상 또는 시나리오별 동작), 허용된 데이터만
+- 동점이면 프로토타입 완성도 → AI 활용의 적절성 순. 기존 작업이 있으면 새로 만든 부분과 나눠 적는다 (우리는 없음)
+- 시연은 팀 노트북 (발표 전 연결 점검 시간 있음). 시연 실패 시 백업 영상, 반영은 심사위원 판단
+- 성능은 실제로 시험한 데이터와 조건 안에서만 말한다 (과장 금지). 유료 API·장비 지원 없음
+- 수상: 최우수 1팀 30만원, 우수 3팀 각 15만원. 수상작 게시 12.11. 문의: 컴퓨터공학과 031-463-1347
+
 ## 3. 이미 정한 것
 
 | 결정 | 내용 | 이유 |
@@ -83,15 +94,21 @@
 ## 5. 다시 만들기
 
 ```bash
-python src/build_clean.py      # 전력·기상 관측 원본 → 정리본 (검증 17개)
-python src/build_forecast.py   # 기상 예보 원본 → 정리본 (검증 489개)
-python src/build_extra.py      # EPSIS 시간별, 게시판 날짜별 정리본
-python src/build_features.py   # 특징 표 (1,400일 × 45열)
-python src/train.py            # 본 모델 평가·그래프 (outputs/, 약 1분 40초)
-python src/manifest.py verify  # 파일이 바뀌지 않았는지 확인 → "검사 139개, 문제 0개"
-python src/explain.py          # 위험도 3단계, 원인 설명, 전력거래소 공지 비교 (약 30초)
-python src/build_demo.py       # 시연 화면 demo/index.html
-python src/test_2026.py        # 2026년 독립 시험 (예보를 받은 뒤에만 돌아간다)
+python src/build_clean.py      # 전력·기상 관측 raw → clean
+python src/build_forecast.py   # 기상 예보 raw → clean (검증 658개)
+python src/build_extra.py      # EPSIS 실시간 수급(시간별), 게시판(날짜별) 정리본
+python src/build_features.py   # clean → 특징 표 (data/features, 1,400일)
+python src/manifest.py write   # 지문 기록 (build 직후에만)
+
+# 공개 자료 모델 = 발표 본 숫자, 시연 화면 (outputs/public/)
+PLANTIES_VARIANT=public python src/train.py          # 2025년 평가 (약 2분)
+PLANTIES_VARIANT=public python src/explain.py        # 위험도·원인·전력거래소 공지 비교 (2025년)
+PLANTIES_VARIANT=public python src/test_2026.py      # 2026년 독립 시험 (계획: docs/TEST_2026_PLAN.md, 약 5분)
+PLANTIES_VARIANT=public python src/explain_2026.py   # 2026년 위험도·원인 (시연용, 약 20초)
+python src/build_demo.py       # 시연 화면 demo/index.html (브라우저로 바로 열림, 인터넷 불필요)
+
+# 실시간 정보 모델 (비교용, outputs/): 위 네 줄을 PLANTIES_VARIANT 없이 실행
+python src/manifest.py verify  # 원본·정리본이 바뀌지 않았는지 확인 → "문제 0개"
 ```
 
 **원본(data/raw)과 정리본(data/clean)은 손으로 고치지 않는다.** 엑셀로 열어 저장만 해도 지문이 바뀌어 `verify`에서 걸린다. 바꿀 게 있으면 코드를 고치고 다시 실행한 뒤 CHANGELOG에 적는다.

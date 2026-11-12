@@ -1,0 +1,67 @@
+{
+ "made": "src/explain_2026.py",
+ "model": "N+C (test_2026.py 주 모델)",
+ "check_vs_test_2026_max_gap": 0.0,
+ "시험1 (1/1~6/13)": {
+  "높음": {
+   "days": 110,
+   "curtailed": 57,
+   "rate": 0.518
+  },
+  "주의": {
+   "days": 45,
+   "curtailed": 1,
+   "rate": 0.022
+  },
+  "낮음": {
+   "days": 9,
+   "curtailed": 1,
+   "rate": 0.111
+  }
+ },
+ "봄 (3~5월)": {
+  "높음": {
+   "days": 72,
+   "curtailed": 46,
+   "rate": 0.639
+  },
+  "주의": {
+   "days": 17,
+   "curtailed": 1,
+   "rate": 0.059
+  },
+  "낮음": {
+   "days": 3,
+   "curtailed": 1,
+   "rate": 0.333
+  }
+ },
+ "합계 (1/1~10/31)": {
+  "높음": {
+   "days": 168,
+   "curtailed": 65,
+   "rate": 0.387
+  },
+  "주의": {
+   "days": 64,
+   "curtailed": 4,
+   "rate": 0.062
+  },
+  "낮음": {
+   "days": 72,
+   "curtailed": 1,
+   "rate": 0.014
+  }
+ },
+ "top_reason_counts_high": {
+  "전력수요": 114,
+  "맑음 예보": 28,
+  "최고기온 예보": 10,
+  "쉬는 날": 7,
+  "": 3,
+  "봄": 2,
+  "여름": 2,
+  "평일": 1,
+  "강수확률 예보": 1
+ }
+}
