@@ -57,9 +57,16 @@ for tag, f, a, folder in (("K25PUB", "demo_days.csv", "2025-07-01", PUB), ("K26P
     K[f"{tag}_FA"] = str(int((al & (x.y == 0)).sum()))
 pre = json.loads((OUT / "prereg_2026" / "test_2026.json").read_text(encoding="utf-8"))["results"]["합계 (1/1~10/31)"]["N+C"]
 K["K26_PREREG"] = f"{pre['hits']} / {pre['n_pos']}일, 헛경보 {pre['false_alarms']}번"
+# 그림용 자료: 위험도 4단계별 실제 비율, 시간별 전력수요 (EPSIS 실시간 수급의 시간 평균, GW)
+K["K25_LVJSON"] = json.dumps(s25, ensure_ascii=False)
+K["K26_LVJSON"] = json.dumps(s26, ensure_ascii=False)
+ep = pd.read_csv(ROOT / "data" / "clean" / "epsis_hourly.csv")
+ep = ep[(ep.date >= "2025-05-25") & (ep.date <= "2026-10-31")]
+load = {k: [round(v / 1000, 1) for v in g.sort_values("hour").load_mw] for k, g in ep.groupby("date") if len(g) == 24 and g.load_mw.notna().all()}
 for k in sorted(K, key=len, reverse=True):   # 긴 이름부터 (K25_VH_N 이 K25_VH 보다 먼저)
     tpl = tpl.replace(f"__{k}__", K[k])
 assert "__K2" not in tpl, "채워지지 않은 성적 칸이 있다"
+tpl = tpl.replace("__LOAD__", json.dumps(load, separators=(",", ":")))
 html = tpl.replace("__DATA__", json.dumps(rows, ensure_ascii=False, separators=(",", ":")))
 head = '<!doctype html>\n<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
 (ROOT / "demo" / "index.html").write_text(head + html.replace("<style>", "</head><body>\n<style>", 1) + "\n</body></html>\n", encoding="utf-8")

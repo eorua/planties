@@ -64,6 +64,19 @@ ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
 .kpis div{display:flex;flex-direction:column}
 .kpis b{font-family:var(--mono);font-size:20px}
 footer{font-size:12.5px;color:var(--muted)}
+.chart{display:flex;flex-direction:column;gap:4px}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart text{font-family:var(--sans);font-size:11px;fill:var(--muted)}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .lab{font-size:12px;font-weight:600}
+.chart rect.day:hover{opacity:.75}
+.cap{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.cap i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px}
+.cap i.dot{width:8px;height:8px;border-radius:50%;vertical-align:0}
+.stairs{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 12px;align-items:center;font-size:14px}
+.stairs .tr{height:18px;background:var(--bg);border-radius:4px}
+.stairs .tr span{display:block;height:100%;border-radius:4px;min-width:3px}
+details summary{cursor:pointer;font-size:13px;color:var(--muted)}
 </style>
 
 <div class="wrap">
@@ -88,8 +101,14 @@ footer{font-size:12.5px;color:var(--muted)}
       <div><span class="muted small">내일 출력제어 확률</span><div class="prob num" id="prob"></div></div>
       <div class="meter" id="meter"></div>
       <div class="scale"><span>0%</span><span>50%</span><span>100%</span></div>
-      <div class="small muted">비 올 확률처럼 읽습니다. 지난 12개월 동안 모델 점수가 이 정도였던 날 중 실제로 출력제어가 있던 비율이고, 10% 단위로 보여 줍니다. 70%를 넘는 날은 "70% 이상"으로 묶습니다. <span id="thr"></span></div>
+      <div class="small muted">비 올 확률처럼 읽습니다. 지난 12개월 동안 점수가 비슷했던 날 중 실제로 출력제어가 있던 비율입니다.</div>
+      <details><summary>계산 근거</summary><div class="small muted">10% 단위로 보여 주고, 70%를 넘는 날은 "70% 이상"으로 묶습니다. <span id="thr"></span></div></details>
     </div>
+    <div class="chart"><h2>최근 30일 예보와 실제</h2><div id="tl"></div>
+      <div class="cap"><span>막대: 그날 전날 낸 확률 (색 = 위험도)</span><span><i class="dot" style="background:var(--ink)"></i>실제 출력제어가 있던 날</span><span id="tlnote"></span></div></div>
+    <div class="chart"><h2>전력수요: 한낮에 얼마나 꺼지나</h2><div id="ld"></div>
+      <div class="cap" id="ldcap"></div>
+      <div class="small muted">한낮 수요가 평소보다 깊이 꺼질수록 전기가 남아 출력제어 위험이 커집니다. 지붕 태양광이 만든 전기만큼 수요가 줄어 보이기 때문입니다.</div></div>
     <div><h2>위험을 올린 원인</h2><div class="reasons" id="up"></div></div>
     <div id="downbox"><h2>위험을 낮춘 원인</h2><div class="reasons" id="down"></div></div>
     <div class="small muted" id="trend"></div>
@@ -111,7 +130,8 @@ footer{font-size:12.5px;color:var(--muted)}
     <div><b>__K25_LO__</b><span class="small muted">"낮음"인 날 중 실제 출력제어 (__K25_LO_N__)</span></div>
     <div><b>__K25_FA__번</b><span class="small muted">헛경보 ("높음" 이상인데 없던 날)</span></div>
   </div>
-  <div class="small muted">위험도별 실제 출력제어 비율: __K25_STAIR__. 가정: 출력제어를 하거나 지시받는 쪽은 ① 전날까지 출력제어가 있었는지 ② 전력거래소의 전날 전망을 안다. 전망 글이 전날까지 게시판에 올라온 날만 쓰면 __K25POST_HIT__, 헛경보 __K25POST_FA__번이고, 두 정보 없이 공개 자료만 쓰면 __K25PUB_HIT__, 헛경보 __K25PUB_FA__번입니다.</div>
+  <div><h2>위험도별 실제 출력제어 비율</h2></div><div class="stairs" id="st25"></div>
+  <div class="small muted">가정: 출력제어를 하거나 지시받는 쪽은 ① 전날까지 출력제어가 있었는지 ② 전력거래소의 전날 전망을 안다. 전망 글이 전날까지 게시판에 올라온 날만 쓰면 __K25POST_HIT__, 헛경보 __K25POST_FA__번이고, 두 정보 없이 공개 자료만 쓰면 __K25PUB_HIT__, 헛경보 __K25PUB_FA__번입니다.</div>
 </section>
 
 <section class="panel" id="k26" aria-label="2026년 독립 시험 결과" hidden>
@@ -122,7 +142,8 @@ footer{font-size:12.5px;color:var(--muted)}
     <div><b>__K26_VH__</b><span class="small muted">"매우 높음"인 날 중 실제 출력제어 (__K26_VH_N__)</span></div>
     <div><b>__K26_LO__</b><span class="small muted">"낮음"인 날 중 실제 출력제어 (__K26_LO_N__)</span></div>
   </div>
-  <div class="small muted">위험도별 실제 출력제어 비율: __K26_STAIR__. 헛경보("높음" 이상인데 없던 날)는 __K26_FA__번입니다. 2026년 시간별 태양광·원전 실적은 아직 공개되지 않아(2027년 예정) 그 입력을 빼고 예측했습니다. 결과를 보기 전에 계획을 공개한 시험(공지 입력 없음, 10월 실적 글 반영 전)은 __K26_PREREG__이었고, 전날 공지 입력은 그 뒤에 더했습니다. 전망 글이 전날까지 게시판에 올라온 날만 쓰면 __K26POST_HIT__, 헛경보 __K26POST_FA__번이고, 두 정보 없이 공개 자료만 쓰면 __K26PUB_HIT__, 헛경보 __K26PUB_FA__번입니다. 6/14 이후 정답은 전력거래소 게시판 실적이고, 10/7 이후 실적 글은 아직 올라오지 않아 잠정입니다(2026-11-12 밤 확인).</div>
+  <div><h2>위험도별 실제 출력제어 비율</h2></div><div class="stairs" id="st26"></div>
+  <div class="small muted">헛경보("높음" 이상인데 없던 날)는 __K26_FA__번입니다. 2026년 시간별 태양광·원전 실적은 아직 공개되지 않아(2027년 예정) 그 입력을 빼고 예측했습니다. 결과를 보기 전에 계획을 공개한 시험(공지 입력 없음, 10월 실적 글 반영 전)은 __K26_PREREG__이었고, 전날 공지 입력은 그 뒤에 더했습니다. 전망 글이 전날까지 게시판에 올라온 날만 쓰면 __K26POST_HIT__, 헛경보 __K26POST_FA__번이고, 두 정보 없이 공개 자료만 쓰면 __K26PUB_HIT__, 헛경보 __K26PUB_FA__번입니다. 6/14 이후 정답은 전력거래소 게시판 실적이고, 10/7 이후 실적 글은 아직 올라오지 않아 잠정입니다(2026-11-12 밤 확인).</div>
 </section>
 
 <footer>이 모델은 사용자가 전날까지의 출력제어 여부와 전력거래소의 전날 전망을 안다고 가정합니다(출력제어를 하거나 지시받는 쪽). 전망 글 73건 중 51건은 전날까지, 22건은 당일·사후에 게시판에 올라왔습니다. 확률과 "매우 높음" 단계, 전날 공지 입력은 2026-11-12에 더했습니다(시험 결과를 본 뒤). 모델의 예측 점수와 순위는 그대로이고, 확률 보정과 단계 선은 매달 그 전 12개월의 예보 결과로만 정합니다(그달의 실제 결과는 쓰지 않음). 원인은 입력 묶음 하나를 학습 자료의 중앙값으로 바꿨을 때 점수가 얼마나 내려가는지로 잰 값입니다(그날 예측에 쓴 모델 그대로). 모델이 무엇을 보고 판단했는지를 보여 줄 뿐, 실제 원인을 증명하지는 않습니다. 송전망 제약·원전 정비 일정처럼 공개되지 않은 정보는 모델이 알지 못합니다. 자료: 저장소 eorua/planties의 outputs/demo_days.csv (src/explain.py), demo_days_2026.csv (src/explain_2026.py).</footer>
@@ -131,6 +152,48 @@ footer{font-size:12.5px;color:var(--muted)}
 <script>
 const D=__DATA__;
 const byDate={};D.forEach(r=>byDate[r.date]=r);
+const LOAD=__LOAD__, LV4={k25:__K25_LVJSON__,k26:__K26_LVJSON__};
+const LVC={"매우 높음":"var(--vh)","높음":"var(--hi)","주의":"var(--wa)","낮음":"var(--lo)"};
+const iso=t=>t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate());
+const shift=(s,n)=>{const t=new Date(s+"T00:00:00");t.setDate(t.getDate()+n);return iso(t)};
+function stairs(id,s){$(id).innerHTML=Object.entries(s).map(([k,v])=>{const r=v.days?v.curtailed/v.days:0;
+  return '<span>'+k+'</span><span class="tr"><span style="width:'+(100*r).toFixed(1)+'%;background:'+LVC[k]+'"></span></span><span class="num"><b>'+Math.round(100*r)+'%</b> <span class="small muted">'+v.days+'일 중 '+v.curtailed+'일</span></span>'}).join("")}
+function timeline(){
+  const W=640,H=170,L=30,R=6,T=14,B=22,n=30,bw=(W-L-R)/n,ph=H-T-B;let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="최근 30일 확률과 실제 출력제어">';
+  [0,.5,1].forEach(v=>{const y=T+ph*(1-v);s+='<line class="ax" x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-5)+'" y="'+(y+4)+'" text-anchor="end">'+(v*100)+'%</text>'});
+  let miss=0;
+  for(let i=0;i<n;i++){const k=shift(sel,i-n+1),r=byDate[k],x=L+i*bw,last=i===n-1;
+    if(!r||r.period==="live"&&!last){miss++;continue}
+    const h=Math.max(2,ph*Math.min(1,r.prob)),known=!last||reveal;
+    s+='<rect class="day" x="'+(x+1).toFixed(1)+'" y="'+(T+ph-h).toFixed(1)+'" width="'+(bw-2).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="2" fill="'+LVC[r.level]+'"'+(last?' stroke="var(--ink)" stroke-width="2"':'')+'><title>'+k+' ('+r.dow+') · 확률 '+Math.round(r.prob*100)+'% · '+r.level+(known&&r.period!=="live"?(r.y?' · 실제 출력제어 있음':' · 없음'):'')+'</title></rect>';
+    if(known&&r.y==1)s+='<circle cx="'+(x+bw/2).toFixed(1)+'" cy="'+(T+ph-h-6).toFixed(1)+'" r="3.5" fill="var(--ink)" stroke="var(--panel)" stroke-width="1.5"/>';
+    if(last||i%7===1)s+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-6)+'" text-anchor="'+(last?"end":"middle")+'"'+(last?' class="lab" style="fill:var(--ink)"':'')+'>'+(+k.slice(5,7))+'/'+(+k.slice(8))+(last?" 예보일":"")+'</text>'}
+  $("tl").innerHTML=s+"</svg>";
+  $("tlnote").textContent=(byDate[sel].period!=="live"&&!reveal?"예보일의 실제 결과는 아래 단추를 누르면 표시됩니다. ":"")+(miss?"시험 기간 밖의 날은 비워 둡니다.":"");
+}
+function loadchart(){
+  const y0=shift(sel,-1),a=LOAD[y0],act=reveal?LOAD[sel]:null,r=byDate[sel];
+  let av=null,c=0;for(let i=2;i<=29;i++){const v=LOAD[shift(sel,-i)];if(v){av=av?av.map((x,j)=>x+v[j]):v.slice();c++}}
+  if(av)av=av.map(x=>x/c);
+  if(!a){$("ld").innerHTML='<span class="muted small">이 날짜의 시간별 수요 자료가 없습니다.</span>';$("ldcap").innerHTML="";return}
+  const all=[a,av,act].filter(Boolean).flat(),lo=Math.floor(Math.min(...all)/5)*5,hi=Math.ceil(Math.max(...all)/5)*5;
+  const W=640,H=190,L=34,R=64,T=10,B=22,X=h=>L+(W-L-R)*(h-1)/23,Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  const path=v=>v.map((x,i)=>(i?"L":"M")+X(i+1).toFixed(1)+" "+Y(x).toFixed(1)).join("");
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="시간별 전력수요">';
+  let bh=[10,17];if(act&&r.y&&r.board_hours){const m=r.board_hours.match(/(\d+)~(\d+)/);if(m)bh=[+m[1],+m[2]]}
+  s+='<rect x="'+X(bh[0])+'" y="'+T+'" width="'+(X(bh[1])-X(bh[0]))+'" height="'+(H-T-B)+'" fill="'+(act&&r.y?"var(--vh-bg)":"var(--wa-bg)")+'" opacity=".55"/><text x="'+((X(bh[0])+X(bh[1]))/2)+'" y="'+(T+12)+'" text-anchor="middle">'+(act&&r.y?"실제 출력제어 "+bh[0]+"~"+bh[1]+"시":"한낮 10~17시")+'</text>';
+  for(let v=lo;v<=hi;v+=(hi-lo)>20?10:5){s+='<line class="ax" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text x="'+(L-5)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+v+'</text>'}
+  [1,6,12,18,24].forEach(h=>s+='<text x="'+X(h)+'" y="'+(H-6)+'" text-anchor="middle">'+h+'시</text>');
+  s+='<text x="'+L+'" y="'+(T-1)+'" text-anchor="start">GW</text>';
+  const ends=[];
+  if(av){s+='<path d="'+path(av)+'" fill="none" stroke="var(--bar-neg)" stroke-width="2" stroke-dasharray="4 3"/>';ends.push([av[23],"4주 평균","var(--muted)"])}
+  s+='<path d="'+path(a)+'" fill="none" stroke="var(--bar)" stroke-width="2.5" stroke-linejoin="round"/>';ends.push([a[23],"전날","var(--bar)"]);
+  if(act){s+='<path d="'+path(act)+'" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>';ends.push([act[23],"예보일 실제","var(--ink)"])}
+  ends.sort((p,q)=>q[0]-p[0]);let py=-99;ends.forEach(e=>{let y=Math.max(Y(e[0])+4,py+13);py=y;s+='<text class="lab" x="'+(W-R+5)+'" y="'+y.toFixed(1)+'" style="fill:'+e[2]+'">'+e[1]+'</text>'});
+  $("ld").innerHTML=s+"</svg>";
+  const mid=v=>v.slice(9,17).reduce((x,y)=>x+y,0)/8,d=av?mid(a)-mid(av):null;
+  $("ldcap").innerHTML='<span><i style="background:var(--bar)"></i>전날 ('+y0.slice(5).replace("-","/")+') 수요</span>'+(av?'<span><i style="background:var(--bar-neg)"></i>그 전 4주 평균</span>':'')+(act?'<span><i style="background:var(--ink)"></i>예보일 실제 수요</span>':'')+(d!==null?'<span>전날 한낮 수요는 4주 평균보다 <b style="color:var(--ink)">'+(d<0?Math.abs(d).toFixed(1)+"GW 낮음":d.toFixed(1)+"GW 높음")+'</b></span>':'');
+}
 let cur=new Date(2025,10,1), sel="2025-11-02", reveal=false;
 const LIVE=D.filter(r=>r.period==="live");const lastLive=LIVE.length?LIVE[LIVE.length-1].date:null;
 const MIN=new Date(2025,6,1), MAX=lastLive?new Date(+lastLive.slice(0,4),+lastLive.slice(5,7)-1,1):new Date(2026,9,1);
@@ -165,6 +228,7 @@ function show(){
   $("prob").textContent=pct;
   $("thr").textContent="(모델 점수 "+r.p.toFixed(3)+" · 주의 "+r.thr_watch.toFixed(3)+" · 높음 "+r.thr_high.toFixed(3)+" · 매우 높음 "+r.thr_vhigh.toFixed(3)+" 이상)";
   $("meter").innerHTML='<span class="mk" style="left:'+Math.min(100,Math.max(0,100*pr)).toFixed(1)+'%"></span>';
+  timeline();loadchart();
   rows($("up"),parse(r.up),false);const dn=parse(r.down);$("downbox").hidden=!dn.length;rows($("down"),dn,true);
   const tr=parse(r.trend)[0];$("trend").textContent=tr?"배경: "+tr[0]+" — 해마다 늘어나는 추세라 그날의 원인과 따로 표시 ("+(tr[1]>0?"+":"")+tr[1].toFixed(2)+")":"";
   $("todo").innerHTML=TODO[r.level].map(x=>"<li>"+x+"</li>").join("");
@@ -184,5 +248,6 @@ $("go25").onclick=()=>{cur=new Date(2025,10,1);sel="2025-11-02";reveal=false;cal
 $("golive").onclick=()=>{sel=lastLive;cur=new Date(+sel.slice(0,4),+sel.slice(5,7)-1,1);reveal=false;cal();show()};
 $("go26").onclick=()=>{cur=new Date(2026,4,1);sel="2026-05-05";reveal=false;cal();show()};
 $("golive").hidden=!lastLive;
+stairs("st25",LV4.k25);stairs("st26",LV4.k26);
 cal();show();
 </script>
