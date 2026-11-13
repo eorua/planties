@@ -21,7 +21,7 @@
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;
   padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 header{display:flex;flex-direction:column;gap:4px}
 h1{margin:0;font-size:clamp(21px,3.4vw,28px);line-height:1.3;text-wrap:balance}
 h2{margin:0;font-size:16px}
@@ -64,7 +64,23 @@ ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
 .kpis div{display:flex;flex-direction:column}
 .kpis b{font-family:var(--mono);font-size:20px}
 footer{font-size:12.5px;color:var(--muted)}
-.chart{display:flex;flex-direction:column;gap:4px}
+.bar{flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;border-bottom:1px solid var(--ink);padding-bottom:8px}
+.bar .ttl{font-weight:700;font-size:16px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:16px 40px;align-items:end}
+@media (max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}}
+.heroL{display:flex;flex-direction:column;gap:8px;min-width:0}
+.hero h1{font-size:clamp(30px,5.2vw,56px);line-height:1.15;letter-spacing:-.02em}
+.scale4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;max-width:560px;align-items:start;margin-top:6px}
+.scale4 div{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.scale4 i{display:block;height:9px}
+.scale4 .on{margin-top:-5px;font-size:18px;font-weight:700;line-height:1.3}
+.scale4 .on i{height:14px}
+.prep{border-left:3px solid var(--ink);padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.chartbox{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:12px}
+.chead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px}
+.chead h2{font-size:18px}
+.chart{display:flex;flex-direction:column;gap:4px;overflow-x:auto}
+.chart svg{min-width:760px}
 .chart svg{width:100%;height:auto;display:block;overflow:visible}
 .chart text{font-family:var(--sans);font-size:11px;fill:var(--muted)}
 .chart .ax{stroke:var(--line);stroke-width:1}
@@ -80,11 +96,25 @@ details summary{cursor:pointer;font-size:13px;color:var(--muted)}
 </style>
 
 <div class="wrap">
-<header>
-  <div class="small muted">팀 플랜티즈 · 2026 안양대 AI+X 경진대회 시연</div>
-  <h1>내일 육지에서 출력제어가 있을까?</h1>
-  <div class="small muted">시험 기간(2025년 7~12월, 2026년 1~10월)의 날짜를 고르면, 그 전날 알 수 있던 정보만으로 모델이 낸 예보를 그대로 보여 줍니다. 모두 미리 보지 않고 낸 예측입니다.</div>
+<header class="bar">
+  <span class="ttl">육지 재생에너지 출력제어 예보</span>
+  <span class="small muted"><span id="when"></span> · 팀 플랜티즈 · 2026 안양대 AI+X 경진대회</span>
 </header>
+
+<section class="hero">
+  <div class="heroL">
+    <div class="muted" id="d"></div>
+    <h1>출력제어 확률 <span id="prob"></span></h1>
+    <div class="scale4" id="lv"></div>
+  </div>
+  <div class="prep"><b class="small">대비</b><ul id="todo"></ul></div>
+</section>
+
+<section class="chartbox">
+  <div class="chead"><h2>지난 2주의 한낮 전력수요와 실제 출력제어</h2><span class="small muted">선 왼쪽은 실제, 오른쪽은 예보</span></div>
+  <div class="chart" id="ch"></div>
+  <div class="small muted" id="chcap"></div>
+</section>
 
 <div class="grid">
   <section class="panel" aria-label="날짜 고르기">
@@ -96,25 +126,12 @@ details summary{cursor:pointer;font-size:13px;color:var(--muted)}
   </section>
 
   <section class="panel" aria-live="polite">
-    <div class="top"><div><div class="date" id="d"></div><div class="small muted" id="when"></div></div><span class="pill" id="lv"></span></div>
-    <div class="score">
-      <div><span class="muted small">내일 출력제어 확률</span><div class="prob num" id="prob"></div></div>
-      <div class="meter" id="meter"></div>
-      <div class="scale"><span>0%</span><span>50%</span><span>100%</span></div>
-      <div class="small muted">비 올 확률처럼 읽습니다. 지난 12개월 동안 점수가 비슷했던 날 중 실제로 출력제어가 있던 비율입니다.</div>
-      <details><summary>계산 근거</summary><div class="small muted">10% 단위로 보여 주고, 70%를 넘는 날은 "70% 이상"으로 묶습니다. <span id="thr"></span></div></details>
-    </div>
-    <div class="chart"><h2>최근 30일 예보와 실제</h2><div id="tl"></div>
-      <div class="cap"><span>막대: 그날 전날 낸 확률 (색 = 위험도)</span><span><i class="dot" style="background:var(--ink)"></i>실제 출력제어가 있던 날</span><span id="tlnote"></span></div></div>
-    <div class="chart"><h2>전날까지의 전력수요 (예보에 쓴 값)</h2><div id="ld"></div>
-      <div class="cap" id="ldcap"></div>
-      <div class="small muted">예보를 내는 전날 17시까지 공개된 수요입니다. 한낮 수요가 평소보다 깊이 꺼질수록 전기가 남아 출력제어 위험이 커집니다. 지붕 태양광이 만든 전기만큼 수요가 줄어 보이기 때문입니다.</div></div>
     <div><h2>위험을 올린 원인</h2><div class="reasons" id="up"></div></div>
     <div id="downbox"><h2>위험을 낮춘 원인</h2><div class="reasons" id="down"></div></div>
     <div class="small muted" id="trend"></div>
     <div class="note" id="mnote" hidden></div>
-    <div><h2>이렇게 대비하세요</h2><ul id="todo"></ul></div>
     <div class="small" id="kpx"></div>
+    <details><summary>확률 계산 근거</summary><div class="small muted">비 올 확률처럼 읽습니다. 지난 12개월 동안 점수가 비슷했던 날 중 실제로 출력제어가 있던 비율이고, 10% 단위로 보여 줍니다. 70%를 넘는 날은 "70% 이상"으로 묶습니다. <span id="thr"></span></div></details>
     <div class="result">
       <button class="primary" id="reveal">실제 결과 보기</button>
       <div id="res" hidden></div>
@@ -158,41 +175,47 @@ const iso=t=>t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate());
 const shift=(s,n)=>{const t=new Date(s+"T00:00:00");t.setDate(t.getDate()+n);return iso(t)};
 function stairs(id,s){$(id).innerHTML=Object.entries(s).map(([k,v])=>{const r=v.days?v.curtailed/v.days:0;
   return '<span>'+k+'</span><span class="tr"><span style="width:'+(100*r).toFixed(1)+'%;background:'+LVC[k]+'"></span></span><span class="num"><b>'+Math.round(100*r)+'%</b> <span class="small muted">'+v.days+'일 중 '+v.curtailed+'일</span></span>'}).join("")}
-function timeline(){
-  const W=640,H=170,L=30,R=6,T=14,B=22,n=30,bw=(W-L-R)/n,ph=H-T-B;let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="최근 30일 확률과 실제 출력제어">';
-  [0,.5,1].forEach(v=>{const y=T+ph*(1-v);s+='<line class="ax" x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-5)+'" y="'+(y+4)+'" text-anchor="end">'+(v*100)+'%</text>'});
-  let miss=0;
-  for(let i=0;i<n;i++){const k=shift(sel,i-n+1),r=byDate[k],x=L+i*bw,last=i===n-1;
-    if(!r||r.period==="live"&&!last){miss++;continue}
-    const h=Math.max(2,ph*Math.min(1,r.prob)),known=!last||reveal;
-    s+='<rect class="day" x="'+(x+1).toFixed(1)+'" y="'+(T+ph-h).toFixed(1)+'" width="'+(bw-2).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="2" fill="'+LVC[r.level]+'"'+(last?' stroke="var(--ink)" stroke-width="2"':'')+'><title>'+k+' ('+r.dow+') · 확률 '+Math.round(r.prob*100)+'% · '+r.level+(known&&r.period!=="live"?(r.y?' · 실제 출력제어 있음':' · 없음'):'')+'</title></rect>';
-    if(known&&r.y==1)s+='<circle cx="'+(x+bw/2).toFixed(1)+'" cy="'+(T+ph-h-6).toFixed(1)+'" r="3.5" fill="var(--ink)" stroke="var(--panel)" stroke-width="1.5"/>';
-    if(last||i%7===1)s+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-6)+'" text-anchor="'+(last?"end":"middle")+'"'+(last?' class="lab" style="fill:var(--ink)"':'')+'>'+(+k.slice(5,7))+'/'+(+k.slice(8))+(last?" 예보일":"")+'</text>'}
-  $("tl").innerHTML=s+"</svg>";
-  $("tlnote").textContent=(byDate[sel].period!=="live"&&!reveal?"예보일의 실제 결과는 아래 단추를 누르면 표시됩니다. ":"")+(miss?"시험 기간 밖의 날은 비워 둡니다.":"");
-}
-function loadchart(){
-  const y0=shift(sel,-1),a=LOAD[y0]&&LOAD[y0].slice(0,17),act=reveal?LOAD[sel]:null,r=byDate[sel];
-  let av=null,c=0;for(let i=2;i<=29;i++){const v=LOAD[shift(sel,-i)];if(v){av=av?av.map((x,j)=>x+v[j]):v.slice();c++}}
-  if(av)av=av.map(x=>x/c);
-  if(!a){$("ld").innerHTML='<span class="muted small">이 날짜의 시간별 수요 자료가 없습니다.</span>';$("ldcap").innerHTML="";return}
-  const all=[a,av,act].filter(Boolean).flat(),lo=Math.floor(Math.min(...all)/5)*5,hi=Math.ceil(Math.max(...all)/5)*5;
-  const W=640,H=190,L=34,R=64,T=10,B=22,X=h=>L+(W-L-R)*(h-1)/23,Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
-  const path=v=>v.map((x,i)=>(i?"L":"M")+X(i+1).toFixed(1)+" "+Y(x).toFixed(1)).join("");
-  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="시간별 전력수요">';
-  let bh=[10,17];if(act&&r.y&&r.board_hours){const m=r.board_hours.match(/(\d+)~(\d+)/);if(m)bh=[+m[1],+m[2]]}
-  s+='<rect x="'+X(bh[0])+'" y="'+T+'" width="'+(X(bh[1])-X(bh[0]))+'" height="'+(H-T-B)+'" fill="'+(act&&r.y?"var(--vh-bg)":"var(--wa-bg)")+'" opacity=".55"/><text x="'+((X(bh[0])+X(bh[1]))/2)+'" y="'+(T+12)+'" text-anchor="middle">'+(act&&r.y?"실제 출력제어 "+bh[0]+"~"+bh[1]+"시 (사후 확인)":"한낮 10~17시")+'</text>';
-  for(let v=lo;v<=hi;v+=(hi-lo)>20?10:5){s+='<line class="ax" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text x="'+(L-5)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+v+'</text>'}
-  [1,6,12,18,24].forEach(h=>s+='<text x="'+X(h)+'" y="'+(H-6)+'" text-anchor="middle">'+h+'시</text>');
-  s+='<text x="'+L+'" y="'+(T-1)+'" text-anchor="start">GW</text>';
-  const ends=[];
-  if(av){s+='<path d="'+path(av)+'" fill="none" stroke="var(--bar-neg)" stroke-width="2" stroke-dasharray="4 3"/>';ends.push([av[23],"4주 평균","var(--muted)"])}
-  s+='<path d="'+path(a)+'" fill="none" stroke="var(--bar)" stroke-width="2.5" stroke-linejoin="round"/><circle cx="'+X(17)+'" cy="'+Y(a[16])+'" r="4" fill="var(--bar)" stroke="var(--panel)" stroke-width="2"/><text class="lab" x="'+(X(17)+8)+'" y="'+(Y(a[16])+(av&&av[16]>a[16]?16:-8))+'" style="fill:var(--bar)">전날 17시까지</text>';
-  if(act){s+='<path d="'+path(act)+'" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>';ends.push([act[23],"사후 확인","var(--ink)"])}
-  ends.sort((p,q)=>q[0]-p[0]);let py=-99;ends.forEach(e=>{let y=Math.max(Y(e[0])+4,py+13);py=y;s+='<text class="lab" x="'+(W-R+5)+'" y="'+y.toFixed(1)+'" style="fill:'+e[2]+'">'+e[1]+'</text>'});
-  $("ld").innerHTML=s+"</svg>";
-  const mid=v=>v.slice(9,17).reduce((x,y)=>x+y,0)/8,d=av?mid(a)-mid(av):null;
-  $("ldcap").innerHTML='<span><i style="background:var(--bar)"></i>전날 ('+y0.slice(5).replace("-","/")+') 수요, 17시까지</span>'+(av?'<span><i style="background:var(--bar-neg)"></i>그 전 4주 평균</span>':'')+(act?'<span><i style="background:var(--ink)"></i>예보일 실제 수요 (사후 확인, 예보에 쓰지 않음)</span>':'')+(d!==null?'<span>전날 한낮 수요는 4주 평균보다 <b style="color:var(--ink)">'+(d<0?Math.abs(d).toFixed(1)+"GW 낮음":d.toFixed(1)+"GW 높음")+'</b></span>':'');
+const ACT=__ACT__;
+const LVT={"매우 높음":"var(--vh)","높음":"var(--hi)","주의":"var(--wa)","낮음":"var(--lo)"},LVB={"매우 높음":"var(--vh-bg)","높음":"var(--hi-bg)","주의":"var(--wa-bg)","낮음":"var(--lo-bg)"};
+const DOWS="일월화수목금토";
+function chart(){
+  const r=byDate[sel],days=[];for(let i=14;i>=1;i--)days.push(shift(sel,-i));
+  const mid=k=>{const v=LOAD[k];return v?(v[10]+v[11]+v[12]+v[13])/4:null};
+  const vals=days.map(mid),ok=vals.filter(v=>v!==null);
+  if(ok.length<5){$("ch").innerHTML='<span class="muted small">이 날짜 앞 2주의 전력수요 자료가 없습니다.</span>';$("chcap").textContent="";return}
+  const lo=Math.floor(Math.min(...ok)/5)*5,hi=Math.max(lo+10,Math.ceil(Math.max(...ok)/5)*5),avg=ok.reduce((a,b)=>a+b,0)/ok.length;
+  const W=1200,H=392,L=104,TW=212,R=8,cw=(W-L-TW-R)/14,top=78,bot=250,sy=304,X=i=>L+cw*i+cw/2,Y=v=>top+(bot-top)*(hi-v)/(hi-lo),TX=L+14*cw,TC=TX+TW/2;
+  const off=k=>{const d=new Date(k+"T00:00:00").getDay();return d===0||d===6||!!(ACT[k]&&ACT[k][2])||!!(byDate[k]&&byDate[k].holiday)};
+  const md=k=>(+k.slice(5,7))+"/"+(+k.slice(8)),tx=(x,y,s,o)=>'<text x="'+x+'" y="'+y+'" '+(o||'')+'>'+s+'</text>';
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="지난 2주의 한낮 전력수요와 실제 출력제어, 그리고 내일 예보">';
+  days.forEach((k,i)=>{if(off(k))s+='<rect x="'+(L+cw*i)+'" y="20" width="'+cw+'" height="'+(H-44)+'" fill="var(--muted)" opacity=".12"/>'});
+  s+='<rect x="'+TX+'" y="20" width="'+TW+'" height="'+(H-44)+'" fill="'+LVB[r.level]+'" opacity=".6"/>';
+  s+=tx(L-8,48,"날짜",'text-anchor="end"')+tx(L-8,top+4,hi.toFixed(1),'text-anchor="end"')+tx(L-8,bot+4,lo.toFixed(1),'text-anchor="end"')+tx(L-8,(top+bot)/2+4,"한낮 수요 (GW)",'text-anchor="end" class="lab" style="fill:var(--ink)"')+tx(L-8,sy+25,"출력제어",'text-anchor="end" class="lab" style="fill:var(--ink)"');
+  s+='<line class="ax" x1="'+L+'" x2="'+TX+'" y1="'+top+'" y2="'+top+'"/><line class="ax" x1="'+L+'" x2="'+TX+'" y1="'+bot+'" y2="'+bot+'"/>';
+  const pts=vals.map((v,i)=>v===null?null:[X(i),Y(v)]).filter(Boolean),ya=Y(avg);
+  s+='<clipPath id="below"><rect x="'+L+'" y="'+ya+'" width="'+(TX-L)+'" height="'+(bot+30-ya)+'"/></clipPath>';
+  s+='<path clip-path="url(#below)" d="M'+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L")+' L'+pts[pts.length-1][0]+' '+ya+' L'+pts[0][0]+' '+ya+' Z" fill="var(--vh)" opacity=".18"/>';
+  s+='<line x1="'+L+'" x2="'+TX+'" y1="'+ya+'" y2="'+ya+'" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 4"/>'+tx(TX-6,ya-6,"2주 평균 "+avg.toFixed(1),'text-anchor="end" class="lab" style="fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:4px"');
+  s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(sy-10)+'" y2="'+(sy-10)+'" stroke="var(--ink)"/>';
+  s+='<path d="M'+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L")+'" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linejoin="round"/>';
+  let nc=0,noff=0;
+  days.forEach((k,i)=>{const a=ACT[k],x=X(i),o=off(k),c=a&&a[0]===1,un=!a||(a[3]&&!c),last=i===13;
+    s+=tx(x,44,(i===0||k.slice(8)==="01")?md(k):+k.slice(8),'text-anchor="middle"'+(o?' style="fill:var(--vh)"':''))+tx(x,62,DOWS[new Date(k+"T00:00:00").getDay()]+(last?" · 오늘":""),'text-anchor="middle"'+(o?' class="lab" style="fill:var(--vh)"':''));
+    if(vals[i]!==null){const y=Y(vals[i]);s+=c?'<circle cx="'+x+'" cy="'+y+'" r="7" fill="var(--vh)" stroke="var(--panel)" stroke-width="2"/>'+tx(x,y>ya?y+23:y-13,vals[i].toFixed(1),'text-anchor="middle" class="lab" style="fill:var(--vh)"'):'<circle cx="'+x+'" cy="'+y+'" r="3.5" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5"/>'}
+    if(c){nc++;if(o)noff++;s+='<rect x="'+(x-cw/2+4)+'" y="'+sy+'" width="'+(cw-8)+'" height="38" fill="var(--vh)"/>'+tx(x,sy+24,a[1]||"있음",'text-anchor="middle" class="lab" style="fill:#fff"')}
+    else s+=tx(x,sy+24,un?"미확인":"없음",'text-anchor="middle"')});
+  s+='<line x1="'+TX+'" x2="'+TX+'" y1="20" y2="'+(H-24)+'" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 4"/>'+tx(TX-8,H-8,"여기까지 실제",'text-anchor="end"')+tx(TX+8,H-8,"여기부터 예보",'class="lab" style="fill:'+LVT[r.level]+'"');
+  s+=tx(TC,44,md(sel),'text-anchor="middle" style="fill:'+LVT[r.level]+';font-size:13px"')+tx(TC,62,DOWS[new Date(sel+"T00:00:00").getDay()]+" · 내일"+(r.holiday?" ("+r.holiday+")":""),'text-anchor="middle" class="lab" style="fill:'+LVT[r.level]+';font-size:13px"');
+  const pr=r.prob,num=pr<0.05?"5%":pr>=0.65?"70%":(Math.round(pr*10)*10)+"%",sub=pr<0.05?"미만":pr>=0.65?"이상":"안팎";
+  s+=tx(TC,138,num,'text-anchor="middle" style="fill:'+LVT[r.level]+';font-size:58px;font-weight:700"')+tx(TC,166,sub,'text-anchor="middle" style="fill:'+LVT[r.level]+';font-size:18px;font-weight:700"');
+  s+='<line x1="'+(TX+24)+'" x2="'+(TX+TW-24)+'" y1="184" y2="184" stroke="'+LVT[r.level]+'" opacity=".4"/>';
+  const why=parse(r.up).slice(0,3).map(x=>x[0].split(" (")[0]);
+  (why.length?why:["뚜렷한 원인 없음"]).forEach((w,i)=>s+=tx(TC,208+i*22,w,'text-anchor="middle" style="fill:var(--ink);font-size:13px"'));
+  if(reveal&&r.period!=="live"){const pv=r.label&&r.label.includes("잠정")&&!r.y;
+    s+=r.y?'<rect x="'+(TX+12)+'" y="'+sy+'" width="'+(TW-24)+'" height="38" fill="var(--vh)"/>'+tx(TC,sy+24,"실제 있음"+(r.board_hours?" · "+r.board_hours:""),'text-anchor="middle" class="lab" style="fill:#fff;font-size:13px"'):'<rect x="'+(TX+12)+'" y="'+sy+'" width="'+(TW-24)+'" height="38" fill="var(--panel)" stroke="var(--muted)"/>'+tx(TC,sy+24,pv?"실적 미확인":"실제 없음",'text-anchor="middle" class="lab" style="fill:var(--ink);font-size:13px"')}
+  else s+='<rect x="'+(TX+12)+'" y="'+sy+'" width="'+(TW-24)+'" height="38" fill="none" stroke="'+LVT[r.level]+'" stroke-width="2" stroke-dasharray="5 3"/>'+tx(TC,sy+24,"위험 "+r.level,'text-anchor="middle" class="lab" style="fill:'+LVT[r.level]+';font-size:13px"');
+  $("ch").innerHTML=s+"</svg>";
+  $("chcap").textContent=(nc?"지난 2주 동안 출력제어는 "+nc+"일 있었고, 그중 "+noff+"일이 쉬는 날(회색 띠)이었습니다.":"지난 2주 동안 출력제어는 없었습니다. 회색 띠는 쉬는 날입니다.")+" 빨간 점과 블록이 실제 출력제어가 있던 날이고, 붉게 칠한 곳은 수요가 2주 평균보다 낮았던 구간입니다. 한낮 수요는 11~14시 평균입니다.";
 }
 let cur=new Date(2025,10,1), sel="2025-11-02", reveal=false;
 const LIVE=D.filter(r=>r.period==="live");const lastLive=LIVE.length?LIVE[LIVE.length-1].date:null;
@@ -203,7 +226,7 @@ const TODO={"매우 높음":["정비·점검을 이날 한낮(10~17시)에 배�
             "높음":["전력거래소 게시판의 출력제어 공지 확인","ESS 충전 여유를 남겨 두기","정비 일정 후보일로 두기"],
             "주의":["전력거래소 게시판 공지를 확인","정비 일정 후보일로 두기"],
             "낮음":["평소대로 운전"]};
-function parse(s){return (s||"").split(" | ").filter(Boolean).map(x=>{const i=x.lastIndexOf(":");return [x.slice(0,i),parseFloat(x.slice(i+1))]})}
+function parse(s){return (s||"").replace(/어제/g,"오늘").split(" | ").filter(Boolean).map(x=>{const i=x.lastIndexOf(":");return [x.slice(0,i),parseFloat(x.slice(i+1))]})}
 function cal(){
   const y=cur.getFullYear(),m=cur.getMonth();$("mtitle").textContent=y+"년 "+(m+1)+"월";
   const first=(new Date(y,m,1).getDay()+6)%7, n=new Date(y,m+1,0).getDate();
@@ -221,19 +244,18 @@ function rows(el,list,neg){const mx=Math.max(0.05,...list.map(x=>Math.abs(x[1]))
   el.innerHTML=list.map(([t,v])=>'<span>'+t+'</span><span class="b'+(neg?" neg":"")+'" style="width:'+(100*Math.abs(v)/mx).toFixed(0)+'%"></span><span class="num small muted">'+(v>0?"+":"")+v.toFixed(2)+"</span>").join("")||'<span class="muted small">뚜렷한 원인 없음</span>'}
 function show(){
   const r=byDate[sel];if(!r)return;const dt=new Date(sel+"T00:00:00");
-  $("d").textContent=sel+" ("+r.dow+")"+(r.holiday?" · "+r.holiday:"");
-  const pv=new Date(dt.getTime()-864e5);$("when").textContent="예보 시각: "+pv.getFullYear()+"-"+pad(pv.getMonth()+1)+"-"+pad(pv.getDate())+" 17:00";
-  $("lv").className="pill "+r.level.replace(" ","");$("lv").textContent="위험 "+r.level;
+  $("d").textContent="내일, "+(+sel.slice(0,4))+"년 "+(+sel.slice(5,7))+"월 "+(+sel.slice(8))+"일 "+r.dow+"요일"+(r.holiday?" · "+r.holiday:"");
+  const pv=new Date(dt.getTime()-864e5);$("when").textContent=pv.getFullYear()+"-"+pad(pv.getMonth()+1)+"-"+pad(pv.getDate())+" 17시 발표";
+  $("lv").innerHTML=["낮음","주의","높음","매우 높음"].map(k=>'<div'+(k===r.level?' class="on" style="color:'+LVT[k]+'"':'')+'><i style="background:'+(k===r.level?LVT[k]:LVB[k])+'"></i>'+k+'</div>').join("");
   const pr=r.prob, pct=pr<0.05?"5% 미만":pr>=0.65?"70% 이상":"약 "+(Math.round(pr*10)*10)+"%";
-  $("prob").textContent=pct;
+  $("prob").textContent=pct;$("prob").style.color=LVT[r.level];
   $("thr").textContent="(모델 점수 "+r.p.toFixed(3)+" · 주의 "+r.thr_watch.toFixed(3)+" · 높음 "+r.thr_high.toFixed(3)+" · 매우 높음 "+r.thr_vhigh.toFixed(3)+" 이상)";
-  $("meter").innerHTML='<span class="mk" style="left:'+Math.min(100,Math.max(0,100*pr)).toFixed(1)+'%"></span>';
-  timeline();loadchart();
+  chart();
   rows($("up"),parse(r.up),false);const dn=parse(r.down);$("downbox").hidden=!dn.length;rows($("down"),dn,true);
   const tr=parse(r.trend)[0];$("trend").textContent=tr?"배경: "+tr[0]+" — 해마다 늘어나는 추세라 그날의 원인과 따로 표시 ("+(tr[1]>0?"+":"")+tr[1].toFixed(2)+")":"";
   $("todo").innerHTML=TODO[r.level].map(x=>"<li>"+x+"</li>").join("");
   $("mnote").hidden=r.period==="2025";$("mnote").textContent=r.period==="live"?"실시간 예보: "+r.issued+" 기준 기상청 예보와 전력수요로 계산했습니다. 최근 출력제어: "+(r.known||"")+" · 내일 전망 공지 "+(r.kpx_notice==1||r.kpx_notice==="1"?"있음":"없음")+" (학습 자료 ~"+r.train_until+").":"2026년 독립 시험 모델: 태양광·원전 입력 없이(2026년 미공개) 예측했습니다.";
-  if(r.period==="live")$("when").textContent="예보 시각: "+r.issued;
+  if(r.period==="live")$("when").textContent=r.issued+" 발표";
   $("kpx").innerHTML=r.period==="live"?"":'<span class="muted">전력거래소 전날 전망:</span> '+(r.kpx_notice?"있었음":"없었음");
   $("reveal").hidden=reveal||r.period==="live";$("res").hidden=!(reveal||r.period==="live");
   if(r.period==="live"){$("res").innerHTML='<span class="muted">아직 일어나지 않은 날입니다. 다음 날 전력거래소 게시판 실적으로 확인합니다.</span>';return}

@@ -63,9 +63,20 @@ K["K26_LVJSON"] = json.dumps(s26, ensure_ascii=False)
 ep = pd.read_csv(ROOT / "data" / "clean" / "epsis_hourly.csv")
 ep = ep[(ep.date >= "2025-05-25") & (ep.date <= "2026-10-31")]
 load = {k: [round(v / 1000, 1) for v in g.sort_values("hour").load_mw] for k, g in ep.groupby("date") if len(g) == 24 and g.load_mw.notna().all()}
+# 지난 날들의 실제 출력제어 (그림용): 정답 y, 게시판에 적힌 시간대, 공휴일 이름, 잠정 여부
+ft = pd.read_csv(ROOT / "data" / "features" / "daily_features.csv", usecols=["date", "y"])
+bd = pd.read_csv(ROOT / "data" / "clean" / "kpx_board_daily.csv").set_index("date")
+hol = pd.read_csv(ROOT / "data" / "manual" / "holidays_kr.csv").set_index("date")["name"].to_dict()
+act = {}
+for r in ft[ft.date >= "2025-06-01"].itertuples():
+    h = ""
+    if r.date in bd.index and pd.notna(bd.start_h.get(r.date)):
+        h = f"{int(bd.start_h[r.date])}~{int(bd.end_h[r.date])}시"
+    act[r.date] = [int(r.y), h, hol.get(r.date, ""), int(r.date > "2026-10-06")]
 for k in sorted(K, key=len, reverse=True):   # 긴 이름부터 (K25_VH_N 이 K25_VH 보다 먼저)
     tpl = tpl.replace(f"__{k}__", K[k])
 assert "__K2" not in tpl, "채워지지 않은 성적 칸이 있다"
+tpl = tpl.replace("__ACT__", json.dumps(act, ensure_ascii=False, separators=(",", ":")))
 tpl = tpl.replace("__LOAD__", json.dumps(load, separators=(",", ":")))
 html = tpl.replace("__DATA__", json.dumps(rows, ensure_ascii=False, separators=(",", ":")))
 head = '<!doctype html>\n<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
