@@ -192,17 +192,13 @@ function chart(){
   s+='<rect x="'+TX+'" y="20" width="'+TW+'" height="'+(H-44)+'" fill="'+LVB[r.level]+'" opacity=".6"/>';
   s+=tx(L-8,48,"날짜",'text-anchor="end"')+tx(L-8,top+4,hi.toFixed(1),'text-anchor="end"')+tx(L-8,bot+4,lo.toFixed(1),'text-anchor="end"')+tx(L-8,(top+bot)/2+4,"한낮 수요 (GW)",'text-anchor="end" class="lab" style="fill:var(--ink)"')+tx(L-8,sy+25,"출력제어",'text-anchor="end" class="lab" style="fill:var(--ink)"');
   s+='<line class="ax" x1="'+L+'" x2="'+TX+'" y1="'+top+'" y2="'+top+'"/><line class="ax" x1="'+L+'" x2="'+TX+'" y1="'+bot+'" y2="'+bot+'"/>';
-  const wk=vals.filter((v,i)=>v!==null&&!off(days[i])),ref=wk.length?Math.min(...wk):avg,refName=wk.length?"평일 최저 ":"2주 평균 ";
-  const pts=vals.map((v,i)=>v===null?null:[X(i),Y(v)]).filter(Boolean),ya=Y(ref);
-  s+='<clipPath id="below"><rect x="'+L+'" y="'+ya+'" width="'+(TX-L)+'" height="'+(bot+30-ya)+'"/></clipPath>';
-  s+='<path clip-path="url(#below)" d="M'+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L")+' L'+pts[pts.length-1][0]+' '+ya+' L'+pts[0][0]+' '+ya+' Z" fill="var(--vh)" opacity=".18"/>';
-  s+='<line x1="'+L+'" x2="'+TX+'" y1="'+ya+'" y2="'+ya+'" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 4"/>'+tx(TX-6,ya-6,refName+ref.toFixed(1),'text-anchor="end" class="lab" style="fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:4px"');
+  const pts=vals.map((v,i)=>v===null?null:[X(i),Y(v)]).filter(Boolean);
   s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(sy-10)+'" y2="'+(sy-10)+'" stroke="var(--ink)"/>';
   s+='<path d="M'+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L")+'" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linejoin="round"/>';
   let nc=0,noff=0;
   days.forEach((k,i)=>{const a=ACT[k],x=X(i),o=off(k),c=a&&a[0]===1,un=!a||(a[3]&&!c),last=i===13;
     s+=tx(x,44,(i===0||k.slice(8)==="01")?md(k):+k.slice(8),'text-anchor="middle"'+(o?' style="fill:var(--vh)"':''))+tx(x,62,DOWS[new Date(k+"T00:00:00").getDay()]+(last?" · 오늘":""),'text-anchor="middle"'+(o?' class="lab" style="fill:var(--vh)"':''));
-    if(vals[i]!==null){const y=Y(vals[i]);s+=c?'<circle cx="'+x+'" cy="'+y+'" r="7" fill="var(--vh)" stroke="var(--panel)" stroke-width="2"/>'+tx(x,y>ya?y+23:y-13,vals[i].toFixed(1),'text-anchor="middle" class="lab" style="fill:var(--vh)"'):'<circle cx="'+x+'" cy="'+y+'" r="3.5" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5"/>'}
+    if(vals[i]!==null){const y=Y(vals[i]);s+=c?'<circle cx="'+x+'" cy="'+y+'" r="7" fill="var(--vh)" stroke="var(--panel)" stroke-width="2"/>'+tx(x,y+23,vals[i].toFixed(1),'text-anchor="middle" class="lab" style="fill:var(--vh)"'):'<circle cx="'+x+'" cy="'+y+'" r="3.5" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5"/>'}
     if(c){nc++;if(o)noff++;s+='<rect x="'+(x-cw/2+4)+'" y="'+sy+'" width="'+(cw-8)+'" height="38" fill="var(--vh)"/>'+tx(x,sy+24,a[1]||"있음",'text-anchor="middle" class="lab" style="fill:#fff"')}
     else s+=tx(x,sy+24,un?"미확인":"없음",'text-anchor="middle"')});
   s+='<line x1="'+TX+'" x2="'+TX+'" y1="20" y2="'+(H-24)+'" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 4"/>'+tx(TX-8,H-8,"여기까지 실제",'text-anchor="end"')+tx(TX+8,H-8,"여기부터 예보",'class="lab" style="fill:'+LVT[r.level]+'"');
@@ -216,7 +212,7 @@ function chart(){
     s+=r.y?'<rect x="'+(TX+12)+'" y="'+sy+'" width="'+(TW-24)+'" height="38" fill="var(--vh)"/>'+tx(TC,sy+24,"실제 있음"+(r.board_hours?" · "+r.board_hours:""),'text-anchor="middle" class="lab" style="fill:#fff;font-size:13px"'):'<rect x="'+(TX+12)+'" y="'+sy+'" width="'+(TW-24)+'" height="38" fill="var(--panel)" stroke="var(--muted)"/>'+tx(TC,sy+24,pv?"실적 미확인":"실제 없음",'text-anchor="middle" class="lab" style="fill:var(--ink);font-size:13px"')}
   else s+='<rect x="'+(TX+12)+'" y="'+sy+'" width="'+(TW-24)+'" height="38" fill="none" stroke="'+LVT[r.level]+'" stroke-width="2" stroke-dasharray="5 3"/>'+tx(TC,sy+24,"위험 "+r.level,'text-anchor="middle" class="lab" style="fill:'+LVT[r.level]+';font-size:13px"');
   $("ch").innerHTML=s+"</svg>";
-  $("chcap").textContent=(nc?"지난 2주 동안 출력제어는 "+nc+"일 있었고, 그중 "+noff+"일이 쉬는 날(회색 띠)이었습니다.":"지난 2주 동안 출력제어는 없었습니다. 회색 띠는 쉬는 날입니다.")+" 빨간 점과 블록이 실제 출력제어가 있던 날이고, 붉게 칠한 곳은 수요가 평일 최저보다도 낮았던 구간입니다. 한낮 수요는 11~14시 평균입니다.";
+  $("chcap").textContent=(nc?"지난 2주 동안 출력제어는 "+nc+"일 있었고, 그중 "+noff+"일이 쉬는 날(회색 띠)이었습니다.":"지난 2주 동안 출력제어는 없었습니다. 회색 띠는 쉬는 날입니다.")+" 빨간 점과 블록이 실제 출력제어가 있던 날입니다. 한낮 수요는 11~14시 평균입니다.";
 }
 let cur=new Date(2025,10,1), sel="2025-11-02", reveal=false;
 const LIVE=D.filter(r=>r.period==="live");const lastLive=LIVE.length?LIVE[LIVE.length-1].date:null;
