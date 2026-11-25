@@ -40,6 +40,20 @@ python src/build_demo.py                 # 시연 화면에 반영 → demo/inde
 - 받은 원본은 `data/live/`에 저장된다 (깃허브에는 안 올라감)
 - 어제 17시 발표분(예보 변화 항목용)은 전날 실행해 둔 저장본을 쓰고, 없으면 API로 다시 받는다. 못 받으면 그 항목만 빈칸
 
+## 매일 자동 실행 (윈도우 노트북)
+
+저장소 맨 위의 `run_daily_forecast.bat`이 내일 예보와 시연 화면 갱신을 한 번에 한다. 결과는 `outputs/live_days.csv`에 쌓이고, 실행 기록은 `outputs/live_log.txt`(깃에 안 올라감)에 남는다.
+
+작업 스케줄러에 매일 17시 30분으로 등록 (명령 프롬프트에서 한 번, 경로는 각자 저장소 위치로):
+
+```
+schtasks /Create /SC DAILY /ST 17:30 /TN planties_forecast /TR "\"C:\Users\admin\Downloads\benefit-radar\planties\run_daily_forecast.bat\""
+```
+
+- 그 시각에 노트북이 켜져 있어야 한다. 꺼져 있던 날은 켠 뒤 `run_daily_forecast.bat`을 직접 두 번 눌러 실행한다(17시 15분 이후).
+- 쌓인 기록을 팀과 나누려면 `git add outputs/live_days.csv demo/index.html` 후 커밋·푸시.
+- 지우려면 `schtasks /Delete /TN planties_forecast /F`.
+
 ## 학습 때와 같은 계산인지 확인 (인터넷 불필요)
 
 ```bash

@@ -10,3 +10,4 @@ secrets*
 Thumbs.db
 data/live/
 secrets_kma_key.txt
+outputs/live_log.txt
