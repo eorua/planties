@@ -1088,6 +1088,10 @@
       "sha256": "dba785af3e3735e0c059dd796e443fccb7961c022ab34afbbec895afe82ad710",
       "bytes": 719
     },
+    "data/raw/kpx_board/kpx_board_list_20261112.csv": {
+      "sha256": "ce292cf0bbf8da8b0818dff33db260f7589d80e26b5f68340dada35b3514bcc7",
+      "bytes": 11057
+    },
     "data/raw/kpx_board/kpx_board_scraped_20261105.csv": {
       "sha256": "8419347feb6bbcba3852a7c8722027efe77eeb104811fb86e15b6975dc0ba146",
       "bytes": 11990
