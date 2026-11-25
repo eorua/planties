@@ -66,24 +66,24 @@
   },
   "합계 (1/1~10/31)": {
    "매우 높음": {
-    "days": 78,
-    "curtailed": 53,
-    "rate": 0.679
+    "days": 86,
+    "curtailed": 58,
+    "rate": 0.674
    },
    "높음": {
-    "days": 41,
-    "curtailed": 10,
-    "rate": 0.244
+    "days": 42,
+    "curtailed": 11,
+    "rate": 0.262
    },
    "주의": {
-    "days": 74,
-    "curtailed": 5,
-    "rate": 0.068
+    "days": 69,
+    "curtailed": 8,
+    "rate": 0.116
    },
    "낮음": {
-    "days": 111,
+    "days": 107,
     "curtailed": 5,
-    "rate": 0.045
+    "rate": 0.047
    }
   }
  },
@@ -160,34 +160,34 @@
    {
     "from": 0.0,
     "to": 0.05,
-    "days": 76,
+    "days": 74,
     "curtailed": 2,
-    "forecast_mean": 0.019,
-    "actual_rate": 0.026
+    "forecast_mean": 0.018,
+    "actual_rate": 0.027
    },
    {
     "from": 0.05,
     "to": 0.2,
-    "days": 59,
-    "curtailed": 5,
-    "forecast_mean": 0.121,
-    "actual_rate": 0.085
+    "days": 56,
+    "curtailed": 7,
+    "forecast_mean": 0.122,
+    "actual_rate": 0.125
    },
    {
     "from": 0.2,
     "to": 0.4,
-    "days": 58,
-    "curtailed": 6,
+    "days": 55,
+    "curtailed": 7,
     "forecast_mean": 0.25,
-    "actual_rate": 0.103
+    "actual_rate": 0.127
    },
    {
     "from": 0.4,
     "to": 1.0,
-    "days": 111,
-    "curtailed": 60,
-    "forecast_mean": 0.649,
-    "actual_rate": 0.541
+    "days": 119,
+    "curtailed": 66,
+    "forecast_mean": 0.651,
+    "actual_rate": 0.555
    }
   ]
  },
@@ -210,27 +210,26 @@
  },
  "합계 (1/1~10/31)": {
   "높음": {
-   "days": 119,
-   "curtailed": 63,
-   "rate": 0.529
+   "days": 128,
+   "curtailed": 69,
+   "rate": 0.539
   },
   "주의": {
-   "days": 74,
-   "curtailed": 5,
-   "rate": 0.068
+   "days": 69,
+   "curtailed": 8,
+   "rate": 0.116
   },
   "낮음": {
-   "days": 111,
+   "days": 107,
    "curtailed": 5,
-   "rate": 0.045
+   "rate": 0.047
   }
  },
  "top_reason_counts_high": {
-  "최근 출력제어": 65,
+  "최근 출력제어": 78,
   "전력거래소 전날 전망": 21,
-  "전력수요": 20,
+  "전력수요": 17,
   "쉬는 날": 10,
-  "맑음 예보": 2,
-  "가을": 1
+  "맑음 예보": 2
  }
 }

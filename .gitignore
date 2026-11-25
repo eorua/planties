@@ -11,3 +11,4 @@ Thumbs.db
 data/live/
 secrets_kma_key.txt
 outputs/live_log.txt
+outputs/live_days.csv

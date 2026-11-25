@@ -40,19 +40,16 @@ python src/build_demo.py                 # 시연 화면에 반영 → demo/inde
 - 받은 원본은 `data/live/`에 저장된다 (깃허브에는 안 올라감)
 - 어제 17시 발표분(예보 변화 항목용)은 전날 실행해 둔 저장본을 쓰고, 없으면 API로 다시 받는다. 못 받으면 그 항목만 빈칸
 
-## 매일 자동 실행 (윈도우 노트북)
+## 매일 자동 실행 (팀 노트북, 2026-11-19부터 돌고 있음)
 
-저장소 맨 위의 `run_daily_forecast.bat`이 내일 예보와 시연 화면 갱신을 한 번에 한다. 결과는 `outputs/live_days.csv`에 쌓이고, 실행 기록은 `outputs/live_log.txt`(깃에 안 올라감)에 남는다.
+팀 노트북의 저장소 맨 위 `run_live_forecast.bat`이 윈도우 작업 스케줄러로 **매일 17시 20분**에 돈다(기상청 17시 발표분 사용). 하는 일: 깃 최신화 → 내일 예보 → 시연 화면 갱신. 같은 내용의 사본이 저장소의 `scripts/run_live_forecast.bat`에 있다.
 
-작업 스케줄러에 매일 17시 30분으로 등록 (명령 프롬프트에서 한 번, 경로는 각자 저장소 위치로):
+- 기록은 노트북의 `outputs/live_days.csv`에 쌓이고(깃에 안 올림), 실행 기록은 `outputs/live_log.txt`.
+- 저장소에는 그 기록을 옮긴 `outputs/live_record.csv`를 올린다. `build_demo.py`는 두 파일을 합쳐 시연 화면의 "내일 예보 (실시간)"에 넣는다(같은 날짜는 그 컴퓨터의 `live_days.csv`가 우선).
+- `build_demo.py`가 날마다 `demo/index.html`을 다시 쓰기 때문에, 스크립트는 깃 최신화 전에 그 파일을 저장소 상태로 되돌린다(2026-11-25 추가. 그 전에는 11-25에 깃 최신화가 막혔다).
+- 노트북이 꺼져 있던 날은 켠 뒤 `run_live_forecast.bat`을 두 번 눌러 직접 실행한다(17시 15분 이후).
 
-```
-schtasks /Create /SC DAILY /ST 17:30 /TN planties_forecast /TR "\"C:\Users\admin\Downloads\benefit-radar\planties\run_daily_forecast.bat\""
-```
-
-- 그 시각에 노트북이 켜져 있어야 한다. 꺼져 있던 날은 켠 뒤 `run_daily_forecast.bat`을 직접 두 번 눌러 실행한다(17시 15분 이후).
-- 쌓인 기록을 팀과 나누려면 `git add outputs/live_days.csv demo/index.html` 후 커밋·푸시.
-- 지우려면 `schtasks /Delete /TN planties_forecast /F`.
+지금까지 기록 (2026-11-25 기준, 내일 예보 7일): 11-20 낮음, 11-21 낮음, **11-22(일) 높음(약 35%)**, 11-23 낮음, 11-24 낮음, 11-25 낮음, 11-26 낮음. 실제 결과는 게시판 실적 글이 올라오는 대로 맞춰 본다(글은 보통 1~3주 늦게 올라온다).
 
 ## 학습 때와 같은 계산인지 확인 (인터넷 불필요)
 

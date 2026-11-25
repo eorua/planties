@@ -66,24 +66,24 @@
   },
   "합계 (1/1~10/31)": {
    "매우 높음": {
-    "days": 78,
-    "curtailed": 50,
-    "rate": 0.641
+    "days": 86,
+    "curtailed": 55,
+    "rate": 0.64
    },
    "높음": {
-    "days": 28,
-    "curtailed": 9,
-    "rate": 0.321
+    "days": 30,
+    "curtailed": 10,
+    "rate": 0.333
    },
    "주의": {
-    "days": 88,
-    "curtailed": 11,
-    "rate": 0.125
+    "days": 83,
+    "curtailed": 14,
+    "rate": 0.169
    },
    "낮음": {
-    "days": 110,
+    "days": 105,
     "curtailed": 3,
-    "rate": 0.027
+    "rate": 0.029
    }
   }
  },
@@ -160,7 +160,7 @@
    {
     "from": 0.0,
     "to": 0.05,
-    "days": 61,
+    "days": 59,
     "curtailed": 0,
     "forecast_mean": 0.014,
     "actual_rate": 0.0
@@ -168,26 +168,26 @@
    {
     "from": 0.05,
     "to": 0.2,
-    "days": 79,
+    "days": 75,
     "curtailed": 5,
-    "forecast_mean": 0.138,
-    "actual_rate": 0.063
+    "forecast_mean": 0.139,
+    "actual_rate": 0.067
    },
    {
     "from": 0.2,
     "to": 0.4,
-    "days": 61,
-    "curtailed": 9,
-    "forecast_mean": 0.248,
-    "actual_rate": 0.148
+    "days": 57,
+    "curtailed": 12,
+    "forecast_mean": 0.249,
+    "actual_rate": 0.211
    },
    {
     "from": 0.4,
     "to": 1.0,
-    "days": 103,
-    "curtailed": 59,
-    "forecast_mean": 0.646,
-    "actual_rate": 0.573
+    "days": 113,
+    "curtailed": 65,
+    "forecast_mean": 0.645,
+    "actual_rate": 0.575
    }
   ]
  },
@@ -210,26 +210,26 @@
  },
  "합계 (1/1~10/31)": {
   "높음": {
-   "days": 106,
-   "curtailed": 59,
-   "rate": 0.557
+   "days": 116,
+   "curtailed": 65,
+   "rate": 0.56
   },
   "주의": {
-   "days": 88,
-   "curtailed": 11,
-   "rate": 0.125
+   "days": 83,
+   "curtailed": 14,
+   "rate": 0.169
   },
   "낮음": {
-   "days": 110,
+   "days": 105,
    "curtailed": 3,
-   "rate": 0.027
+   "rate": 0.029
   }
  },
  "top_reason_counts_high": {
-  "최근 출력제어": 70,
-  "전력수요": 16,
+  "최근 출력제어": 81,
+  "전력수요": 14,
+  "맑음 예보": 8,
   "쉬는 날": 8,
-  "맑음 예보": 7,
   "전력거래소 전날 전망": 4,
   "가을": 1
  }

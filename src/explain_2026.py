@@ -5,7 +5,7 @@
 - 위험도·원인 계산은 src/explain.py 와 같은 규칙 (높음 = 경보 기준, 주의 = 직전 12개월 출력제어일 90% 선).
 - 기본은 공개 자료 변형 (PLANTIES_VARIANT=public, 시연에 쓰는 것). 결과: outputs/public/demo_days_2026.csv
 
-2026-06-14 이후 정답은 게시판 실적이고, 10월 7일 이후 실적 글은 2026-11-12 밤 현재 아직 올라오지 않았다 (잠정).
+2026-06-14 이후 정답은 게시판 실적이다. 10월 실적 글은 2026-11-25에 다시 확인해 10월 31일까지 모두 반영했다 (369번 글까지).
 """
 import json
 
@@ -19,7 +19,7 @@ import train as T
 OUT = T.OUT
 START, END = "2023-07-01", "2026-10-31"
 DEMO = ("2026-01-01", "2026-10-31")
-LABEL_FINAL_UNTIL = "2026-10-06"   # 게시판에 실적 글이 올라온 마지막 사건일 (2026-11-12 확인)
+LABEL_FINAL_UNTIL = "2026-10-31"   # 시험 끝날까지 게시판 실적 반영 완료 (2026-11-25 확인, 마지막 글은 11월 7일 실적)
 
 # explain.GROUPS 에 2026년 모델의 새 항목(E.NEW)을 같은 뜻의 묶음으로 더한다
 GROUPS = {g: list(c) for g, c in X.GROUPS.items()}
@@ -134,7 +134,7 @@ def main():
         "calibration": {"x_log_score": [round(float(v), 6) for v in iso.x],
                         "prob": [round(float(v), 4) for v in iso.prob],
                         "how": "prob = interp(log(score + 1e-6), x_log_score, prob), 범위 밖은 양 끝값"},
-        "note": "10월 7일 이후 정답은 게시판 실적 미공개로 잠정 (2026-11-12 밤 확인)"}, ensure_ascii=False, indent=1),
+        "note": "10월 정답은 2026-11-25 게시판 확인으로 확정 (10월 31일까지)"}, ensure_ascii=False, indent=1),
         encoding="utf-8")
     print(json.dumps(summ, ensure_ascii=False, indent=1))
 

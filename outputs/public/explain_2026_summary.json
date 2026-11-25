@@ -67,18 +67,18 @@
   "합계 (1/1~10/31)": {
    "매우 높음": {
     "days": 120,
-    "curtailed": 56,
-    "rate": 0.467
+    "curtailed": 61,
+    "rate": 0.508
    },
    "높음": {
     "days": 48,
-    "curtailed": 11,
-    "rate": 0.229
+    "curtailed": 13,
+    "rate": 0.271
    },
    "주의": {
     "days": 64,
-    "curtailed": 5,
-    "rate": 0.078
+    "curtailed": 7,
+    "rate": 0.109
    },
    "낮음": {
     "days": 72,
@@ -161,25 +161,25 @@
     "from": 0.05,
     "to": 0.2,
     "days": 97,
-    "curtailed": 5,
+    "curtailed": 6,
     "forecast_mean": 0.105,
-    "actual_rate": 0.052
+    "actual_rate": 0.062
    },
    {
     "from": 0.2,
     "to": 0.4,
     "days": 77,
-    "curtailed": 19,
+    "curtailed": 22,
     "forecast_mean": 0.318,
-    "actual_rate": 0.247
+    "actual_rate": 0.286
    },
    {
     "from": 0.4,
     "to": 1.0,
     "days": 113,
-    "curtailed": 49,
+    "curtailed": 54,
     "forecast_mean": 0.538,
-    "actual_rate": 0.434
+    "actual_rate": 0.478
    }
   ]
  },
@@ -203,13 +203,13 @@
  "합계 (1/1~10/31)": {
   "높음": {
    "days": 168,
-   "curtailed": 67,
-   "rate": 0.399
+   "curtailed": 74,
+   "rate": 0.44
   },
   "주의": {
    "days": 64,
-   "curtailed": 5,
-   "rate": 0.078
+   "curtailed": 7,
+   "rate": 0.109
   },
   "낮음": {
    "days": 72,

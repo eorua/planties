@@ -18,8 +18,11 @@ d25 = pd.read_csv(OUT / "demo_days.csv")
 d25 = d25[d25.date >= "2025-07-01"].assign(period="2025", label="공식")
 d26 = pd.read_csv(OUT / "demo_days_2026.csv").drop(columns="label_source").assign(period="2026")
 parts = [d25, d26]
-if (OUT / "live_days.csv").exists():   # src/forecast_tomorrow.py 가 만든 실시간 예보
-    parts.append(pd.read_csv(OUT / "live_days.csv", dtype=str).assign(period="live"))
+# 실시간 예보 기록: live_record.csv = 저장소에 올린 기록(팀 노트북에서 매일 낸 예보를 옮겨 둔 것),
+# live_days.csv = 이 컴퓨터에서 src/forecast_tomorrow.py 가 쌓는 기록(깃에 안 올림). 같은 날짜는 이 컴퓨터 것을 쓴다
+live = [pd.read_csv(OUT / f, dtype=str) for f in ("live_record.csv", "live_days.csv") if (OUT / f).exists()]
+if live:
+    parts.append(pd.concat(live).drop_duplicates("date", keep="last").assign(period="live"))
 d = pd.concat(parts).fillna("")
 for c in ("p", "thr_high", "thr_watch"):
     d[c] = d[c].astype(float)
@@ -72,7 +75,7 @@ for r in ft[ft.date >= "2025-06-01"].itertuples():
     h = ""
     if r.date in bd.index and pd.notna(bd.start_h.get(r.date)):
         h = f"{int(bd.start_h[r.date])}~{int(bd.end_h[r.date])}시"
-    act[r.date] = [int(r.y), h, hol.get(r.date, ""), int(r.date > "2026-10-06")]
+    act[r.date] = [int(r.y), h, hol.get(r.date, ""), 0]   # 10월 31일까지 실적 반영 완료 (2026-11-25)
 for k in sorted(K, key=len, reverse=True):   # 긴 이름부터 (K25_VH_N 이 K25_VH 보다 먼저)
     tpl = tpl.replace(f"__{k}__", K[k])
 assert "__K2" not in tpl, "채워지지 않은 성적 칸이 있다"

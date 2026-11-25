@@ -6,7 +6,7 @@ EPSIS (data/raw/epsis/*.csv, 5분 단위)
 - 한 시간에 5분 값이 6개(절반) 미만이면 그 시간은 빈칸.
 - 값은 바꾸지 않는다 (평균만 낸다). 몇 개로 평균 냈는지 n_points 로 남긴다.
 
-게시판 (data/raw/kpx_board/kpx_board_scraped_20261105.csv)
+게시판 (data/raw/kpx_board/kpx_board_scraped_20261105.csv + _20261125.csv, 글 목록 kpx_board_list_20261125.csv)
 - 육지만. 날짜마다: 전날 전망 공지가 있었나, 실제 출력제어가 있었나, 시작·종료 시각, 사유(전력망·수급).
 - 2024-10-12 ~ 2026-06-13 기간 출력제어 발생일은 공식 실적 파일과 모두 일치(149일)했다 (2026-11-05 점검).
 """
@@ -39,6 +39,9 @@ def epsis():
 
 def board():
     b = pd.read_csv(RAW / "kpx_board" / "kpx_board_scraped_20261105.csv")
+    # 2026-11-25 수집: 그 뒤에 올라온 실적 글(10월 2일 ~ 11월 7일)의 본문. 같은 날짜가 겹치면 새 수집을 쓴다
+    b2 = pd.read_csv(RAW / "kpx_board" / "kpx_board_scraped_20261125.csv")
+    b = pd.concat([b, b2]).drop_duplicates(["date", "region", "type"], keep="last")
     b = b[b.region == "육지"]
     occ = b[b.type == "실적"].set_index("date")
     fc = set(b[b.type.isin(["전망", "전망후미발생"])].date)
@@ -49,8 +52,8 @@ def board():
     for c in ("start_h", "end_h", "grid", "supply"):
         out[c] = out.date.map(occ[c]) if c in occ else pd.NA
     out = out.rename(columns={"grid": "reason_grid", "supply": "reason_supply"})
-    # 게시판 글 목록 (번호·지역·종류·대상일·등록일, 2026-11-12 수집): 글이 언제 올라왔는지 확인용
-    lst = pd.read_csv(RAW / "kpx_board" / "kpx_board_list_20261112.csv")
+    # 게시판 글 목록 (번호·지역·종류·대상일·등록일, 2026-11-25 수집, 369번 글까지): 글이 언제 올라왔는지 확인용
+    lst = pd.read_csv(RAW / "kpx_board" / "kpx_board_list_20261125.csv")
     lst = lst[lst.region == "육지"]
     # notice_pre: 전망 글이 대상일 전날까지 올라온 날만 1. 당일·사후에 올라온 전망 글(73건 중 22건)은 전날에는 볼 수 없었다
     pre = set(lst[(lst.kind == "전망") & (lst.post_date < lst.target_date)].target_date)

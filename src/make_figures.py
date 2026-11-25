@@ -60,7 +60,7 @@ def yearly():
     ax.tick_params(axis="x", labelsize=12.5, colors=INK)
     ax.set_title(f"육지 출력제어 발생일: 3년 만에 {vals[2] // vals[0] // 10 * 10}배 이상", fontsize=16, fontweight="bold", color=INK,
                  loc="left", pad=16)
-    fig.text(0.125, -0.06, "출처: 한국전력거래소 출력제어 실적(공공데이터포털). 2026년 6월 14일 이후는 전력거래소 게시판 실적, 10월은 잠정.",
+    fig.text(0.125, -0.06, "출처: 한국전력거래소 출력제어 실적(공공데이터포털). 2026년 6월 14일 이후는 전력거래소 게시판 실적(2026-11-25 확인).",
              fontsize=8.5, color=MUTED)
     save(fig, "yearly_curtailment.png")
 
@@ -121,7 +121,7 @@ def levels():
     fig.suptitle("위험도가 한 단계 오를 때마다 실제 출력제어 비율도 올랐다", fontsize=15, fontweight="bold", color=INK, x=0.065,
                  ha="left", y=1.03)
     fig.text(0.065, -0.04, "막대 = 그 위험도로 예보한 날 중 실제로 출력제어가 있던 날의 비율. 미리 보지 않은 기간, 전날 기준. 최근 출력제어 여부와 전력거래소 전날 공지를 안다고 가정. "
-             "2026년 10월 정답은 잠정. 단계 선은 매달 그 전 12개월 예보 결과로만 정한다.", fontsize=8.5, color=MUTED)
+             "단계 선은 매달 그 전 12개월 예보 결과로만 정한다.", fontsize=8.5, color=MUTED)
     fig.subplots_adjust(left=0.065, right=0.97, wspace=0.08)
     save(fig, "risk_levels.png")
 
@@ -152,7 +152,7 @@ def calibration():
     fig.suptitle("모델이 예보한 확률과 실제로 일어난 비율", fontsize=15, fontweight="bold", color=INK, x=0.065, ha="left", y=1.08)
     fig.text(0.065, 0.965, "막대 = 실제 출력제어 비율      ○ = 그 구간에서 모델이 예보한 확률의 평균", fontsize=10, color=INK)
     fig.text(0.065, -0.1, "○가 막대 위에 있으면 모델이 실제보다 높게 예보한 것이다. 확률은 매달 그 전 12개월 예보 결과로만 보정한다. "
-             "최근 출력제어 여부와 전력거래소 전날 공지를 안다고 가정. 2026년 10월 정답은 잠정.", fontsize=8.5, color=MUTED)
+             "최근 출력제어 여부와 전력거래소 전날 공지를 안다고 가정.", fontsize=8.5, color=MUTED)
     fig.subplots_adjust(left=0.065, right=0.97, wspace=0.08, top=0.84)
     save(fig, "calibration.png")
 
