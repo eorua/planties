@@ -4,7 +4,7 @@ const fs = require("fs");
 const F = "Pretendard", FB = "Pretendard Black";
 const K = { bg: "F6F4EF", ink: "15161A", sub: "3A3B40", mute: "6B6B70", line: "D9D5CC", card: "ECE8DF", sig: "E4572E", sigSoft: "F6D3C6",
   tier: ["E4572E", "F2994A", "E2C25F", "7FAF7A"] };
-const DEMO = "require("path").join(__dirname, "../../docs/slides/captures/final_demo_2025-11-02.png")";
+const DEMO = require("path").join(__dirname, "../../docs/slides/captures/final_demo_2025-11-02.png");
 const ASSUME = "출력제어를 지시받는 쪽은 전날까지의 출력제어 여부와 전력거래소의 전날 전망을 안다고 가정. 미리 보지 않은 기간을 전날 17시 기준으로 예측한 결과.";
 
 const p = new pptxgen();
