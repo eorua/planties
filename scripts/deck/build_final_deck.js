@@ -11,6 +11,7 @@ const p = new pptxgen();
 p.layout = "LAYOUT_WIDE"; p.title = "출력제어 예보 AI — 본선 발표자료"; p.author = "플랜티즈";
 p.theme = { headFontFace: F, bodyFontFace: F };
 const W = 13.333;
+const NOTES = JSON.parse(fs.readFileSync(require("path").join(__dirname, "notes.json"), "utf8"));
 
 const T = (s, txt, o) => s.addText(txt, Object.assign({ fontFace: F, isTextBox: true, margin: 0, color: K.ink, valign: "top" }, o));
 const line = (s, x, y, w, h, color, width) => s.addShape(p.shapes.LINE, { x, y, w, h, line: { color: color || K.line, width: width || 1 } });
@@ -24,6 +25,7 @@ function slide(sec, title, opts = {}) {
   line(s, 0.7, 0.85, W - 1.4, 0, K.ink, 1.25);
   T(s, title, { x: 0.7, y: 1.05, w: opts.tw || 11.9, h: opts.th || 1.2, fontFace: FB, fontSize: opts.ts || 30, lineSpacingMultiple: 1.05 });
   T(s, String(page), { x: 12.13, y: 7.0, w: 0.5, h: 0.25, fontSize: 11, color: K.mute, align: "right" });
+  if (NOTES[page]) s.addNotes(NOTES[page]);
   if (opts.note) T(s, "* " + opts.note, { x: 0.7, y: 6.92, w: 11.2, h: 0.4, fontSize: 10, color: K.mute, valign: "bottom" });
   return s;
 }
@@ -31,6 +33,7 @@ function slide(sec, title, opts = {}) {
 // ───────────── 1. 표지
 {
   const s = p.addSlide(); s.background = { color: K.bg }; page++;
+  s.addNotes(NOTES[1]);
   T(s, "2026 안양대학교 AI 경진대회 · 본선", { x: 0.7, y: 0.55, w: 6, h: 0.3, fontSize: 13, color: K.mute });
   T(s, "플랜티즈  AI26-014", { x: 8.6, y: 0.55, w: 4.03, h: 0.3, fontSize: 13, color: K.mute, align: "right" });
   line(s, 0.7, 0.95, W - 1.4, 0, K.ink, 1.25);
@@ -44,7 +47,6 @@ function slide(sec, title, opts = {}) {
   T(s, "2026년 1~10월, 미리 보지 않은 기간을 전날 예측", { x: 8.95, y: 5.55, w: 3.8, h: 0.5, fontSize: 11, color: K.mute });
   line(s, 0.7, 6.45, W - 1.4, 0);
   T(s, "정대겸 · 안성준 · 양성우    정보전기전자공학과", { x: 0.7, y: 6.62, w: 8, h: 0.35, fontSize: 14 });
-  s.addNotes("재생에너지가 멈출 날을 전날 알려 주는 AI, 출력제어 예보 AI입니다. 올해 1~10월 출력제어가 난 82일 중 69일을 전날 미리 알렸습니다.");
 }
 
 // ───────────── 2. 문제
@@ -64,7 +66,6 @@ function slide(sec, title, opts = {}) {
   T(s, [{ text: "2024년 4월 7일, 4시간\n", options: { fontSize: 16 } }, { text: "약 1.6GWh · 1.5억 원어치", options: { fontSize: 22, bold: true } }],
     { x: 8.5, y: 4.8, w: 4.1, h: 1.0, lineSpacingMultiple: 1.2 });
   T(s, "봄·가을 쉬는 날 한낮에 집중", { x: 8.5, y: 5.95, w: 4.1, h: 0.4, fontSize: 14, color: K.sub });
-  s.addNotes("출력제어는 전기가 남을 때 발전소를 강제로 끄는 조치입니다. 육지에서 2023년 2일이던 것이 2025년 82일로 늘었고, 올해는 10월까지 이미 82일입니다.");
   T(s, "* 한국전력거래소 출력제어 실적·게시판(2026년 6/14~10월). 2024.4.7 규모는 전기신문 보도의 업계 추산(시간당 약 400MWh, SMP 약 95원/kWh).", { x: 0.7, y: 6.92, w: 11.2, h: 0.4, fontSize: 10, color: K.mute, valign: "bottom" });
 }
 
@@ -89,7 +90,6 @@ function slide(sec, title, opts = {}) {
   line(s, x0, y0 + 0.55 + 3 * 1.04, cL + cW * 2 + 0.25, 0);
   box(s, 0.7, 6.15, 11.93, 0.62, K.ink);
   T(s, "왜 이 사람인가 — 자기 발전소에 온 지시로 전날까지의 출력제어를 안다. 우리 모델의 가정에 가장 가까운 사용자.", { x: 0.95, y: 6.15, w: 11.5, h: 0.62, fontSize: 15, bold: true, color: "FFFFFF", valign: "middle" });
-  s.addNotes("예선에서는 대상을 발전사업자 전체로 잡았는데, 본선에서는 출력제어 지시를 직접 받아 여러 발전소를 묶어 운영하는 회사로 좁혔습니다. 이 사람은 자기 발전소에 온 지시로 전날까지 출력제어가 있었는지를 알기 때문에, 우리 모델의 가정에 가장 가까운 사용자입니다. 이 사람이 원한다고 조사한 것은 아니고, 이런 사람에게 맞게 설계했다는 뜻입니다.");
 }
 
 // ───────────── 4. 지금의 빈칸
@@ -108,7 +108,6 @@ function slide(sec, title, opts = {}) {
   T(s, "출력제어 3번 중 2번은 예고가 없었다", { x: 8.0, y: 3.7, w: 4.6, h: 0.4, fontSize: 16, bold: true });
   T(s, "전망이 틀린 건 아니다. 낸 날은 정확하다\n(29일 중 28일 실제 출력제어). 다만 다루는 날이 적다.", { x: 8.0, y: 4.35, w: 4.6, h: 0.9, fontSize: 14, color: K.sub, lineSpacingMultiple: 1.25 });
   T(s, "게시판 전망 글 73건 중 51건만 전날까지 올라왔다\n(나머지는 당일·사후 게시)", { x: 8.0, y: 5.4, w: 4.6, h: 0.8, fontSize: 14, color: K.sub, lineSpacingMultiple: 1.25 });
-  s.addNotes("지금은 전력거래소 게시판의 전날 전망을 보는 게 거의 유일한 방법입니다. 그런데 올해 82일 중 54일은 전망 없이 왔습니다. 전망은 낸 날엔 거의 맞지만, 다루는 날이 적습니다.");
   T(s, "* 한국전력거래소 비중앙 출력제어 정보 게시판, 글 등록일 전수 확인(2026년 1~10월).", { x: 0.7, y: 6.92, w: 11.2, h: 0.4, fontSize: 10, color: K.mute, valign: "bottom" });
 }
 
@@ -131,7 +130,6 @@ function slide(sec, title, opts = {}) {
   });
   line(s, x, 6.45, 3.63, 0);
   T(s, "확률·위험도·원인은 모델이 계산하고, 대비 문구는 위험도에 따라 고정", { x, y: 6.5, w: 3.63, h: 0.45, fontSize: 11, color: K.mute });
-  s.addNotes("화면은 일기예보처럼 생겼습니다. 내일 출력제어 확률, 위험도 4단계, 확률을 올린 원인 3가지, 그리고 위험도별 대비 안내를 보여 줍니다. 대비 문구는 AI가 만드는 것이 아니라 위험도에 따라 정해 둔 문구입니다.");
 }
 
 // ───────────── 6. AI 구조
@@ -151,7 +149,6 @@ function slide(sec, title, opts = {}) {
   [4.25, 9.05].forEach((x) => T(s, "→", { x, y: cy + ch / 2 - 0.3, w: 0.5, h: 0.6, fontSize: 26, bold: true, align: "center", valign: "middle" }));
   T(s, [{ text: "왜 이 모델인가  ", options: { bold: true, color: K.sig } }, { text: "출력제어가 난 날이 백여 일뿐인 표 자료라, 모델 종류는 10가지를 같은 조건에서 비교해 정했다(전망 입력을 넣기 전 비교). 도구는 Python·scikit-learn(무료).", options: {} }],
     { x: 0.7, y: 6.1, w: 11.9, h: 0.65, fontSize: 14, lineSpacingMultiple: 1.2 });
-  s.addNotes("기상청과 전력통계 API는 자료만 줍니다. 무엇을 입력으로 쓸지, 어떻게 학습하고 시험할지, 확률을 어떻게 단계로 나눌지, 원인을 어떻게 계산할지는 저희가 설계하고 구현했습니다.");
 }
 
 // ───────────── 7. 공정한 시험
@@ -180,7 +177,6 @@ function slide(sec, title, opts = {}) {
     T(s, c[0], { x, y: 5.85, w: 3.8, h: 0.4, fontSize: 14, bold: true });
     T(s, c[1], { x, y: 6.25, w: 3.8, h: 0.4, fontSize: 12, color: K.sub });
   });
-  s.addNotes("시간 순서대로만 학습하고 예측했습니다. 설정은 2025년 상반기 검증에서만 정했고, 하반기 시험은 한 번만 봤습니다. 2026년은 결과를 보기 전에 시험 계획을 저장소에 먼저 올렸습니다. 그 계획의 모델 결과도 비교 장에서 함께 보여 드립니다.");
 }
 
 // ───────────── 8. 결과 ① 계단
@@ -202,7 +198,6 @@ function slide(sec, title, opts = {}) {
   line(s, 9.1, 5.05, 3.53, 0);
   T(s, "다른 기간(2025년 하반기)도 같은 계단", { x: 9.1, y: 5.15, w: 3.6, h: 0.35, fontSize: 13, color: K.mute });
   T(s, "70% → 6% → 4% → 0%", { x: 9.1, y: 5.5, w: 3.6, h: 0.45, fontSize: 18, bold: true });
-  s.addNotes("가장 중요한 그림입니다. 매우 높음이라고 한 날은 67%가 실제로 출력제어가 났고, 낮음이라고 한 날은 5%뿐이었습니다. 미리 보지 않은 두 기간 모두 같은 계단 모양입니다. 그래서 위험도를 그대로 믿고 계획에 쓸 수 있습니다.");
 }
 
 // ───────────── 9. 결과 ② 대표 숫자
@@ -228,7 +223,6 @@ function slide(sec, title, opts = {}) {
     T(s, t[0], { x, y: 4.9, w: 3.1, h: 0.75, fontFace: FB, fontSize: 36 });
     T(s, t[1], { x, y: 5.7, w: 3.1, h: 0.8, fontSize: 13, color: K.sub, lineSpacingMultiple: 1.2 });
   });
-  s.addNotes("올해 출력제어가 난 82일 중 69일을 전날 알렸습니다. 전력거래소 전망이 있던 28일은 모두 알렸고, 전망이 없던 54일 중 41일을 더 알렸습니다. 시간으로 보면 88%입니다. 헛경보는 59번 있었고 절반 이상이 6월 14일 이후입니다.");
 }
 
 // ───────────── 10. 정직한 비교
@@ -252,7 +246,6 @@ function slide(sec, title, opts = {}) {
   line(s, 0.7, y0 + rh * 5, 11.93, 0);
   T(s, [{ text: "결과를 보기 전에 공개한 계획의 모델  ", options: { bold: true, color: K.sig } }, { text: "70일 중 60일, 헛경보 67번, PR-AUC 0.64 (당시 정답 기준). 전망 입력은 그 뒤에 더했고, 두 결과를 모두 공개한다.", options: {} }],
     { x: 0.7, y: 6.3, w: 11.9, h: 0.45, fontSize: 13 });
-  s.addNotes("숨기지 않고 말씀드립니다. 간단한 규칙은 잡은 날이 73일로 저희보다 많습니다. 대신 헛경보가 더 많고, 위험한 날을 위로 올리는 능력이 0.57로 낮습니다. 무엇보다 확률과 이유를 주지 못합니다. 전력거래소 전망은 정확하지만 28일만 다룹니다.");
 }
 
 // ───────────── 11. 실시간 예보
@@ -282,7 +275,6 @@ function slide(sec, title, opts = {}) {
   line(s, 8.25, 4.8, 4.38, 0);
   T(s, "어떻게 도나", { x: 8.25, y: 4.95, w: 4.4, h: 0.35, fontSize: 14, bold: true });
   T(s, "노트북 작업 스케줄러가 매일 17:20에 기상청 17시 예보와 EPSIS 수요를 받아 계산하고 기록을 쌓는다", { x: 8.25, y: 5.3, w: 4.4, h: 0.9, fontSize: 13, color: K.sub, lineSpacingMultiple: 1.2 });
-  s.addNotes("과거 재현만이 아니라 지금도 매일 내일을 예보하고 있습니다. 11월 22일 일요일은 높음으로 예보했습니다. 실제 결과는 게시판에 늦게 올라와서 올라오는 대로 맞춰 보겠습니다. 그리고 모델을 고정한 뒤 올라온 10월 실적 12일 중 9일을 전날 알렸습니다. 이제 실제 화면을 보여 드리겠습니다.");
 }
 
 // ───────────── 12. 예선 이후
@@ -301,7 +293,6 @@ function slide(sec, title, opts = {}) {
     T(s, c[0], { x: x + 0.75, y: y + 0.2, w: 5.0, h: 0.5, fontSize: 20, bold: true });
     T(s, c[1], { x: x + 0.75, y: y + 0.8, w: 5.0, h: 1.2, fontSize: 15, color: K.sub, lineSpacingMultiple: 1.25 });
   });
-  s.addNotes("예선 이후에 네 가지가 달라졌습니다. 대상을 좁혔고, 새로 올라온 정답으로 고정한 모델을 다시 확인했고, 실시간 예보를 매일 돌리고 있고, 시연 화면을 완성했습니다.");
 }
 
 // ───────────── 13. 한계
@@ -323,7 +314,6 @@ function slide(sec, title, opts = {}) {
   });
   box(s, 0.7, 6.15, 11.93, 0.62, K.ink);
   T(s, "다음 단계 — 출력제어 실적과 전망이 당일 공개되면, 누구나 이 수준의 예보를 쓸 수 있다 (정책 제안)", { x: 0.95, y: 6.15, w: 11.5, h: 0.62, fontSize: 15, bold: true, color: "FFFFFF", valign: "middle" });
-  s.addNotes("한계도 말씀드립니다. 두 정보를 안다는 가정이 필요하고, 그 정보가 없을 때의 결과도 함께 공개했습니다. 여름·가을에는 헛경보가 많고, 송전망 제약처럼 공개되지 않는 원인은 예측할 수 없습니다.");
 }
 
 // ───────────── 14. 팀
