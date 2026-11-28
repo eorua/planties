@@ -23,15 +23,15 @@
 
 | 단계 | 하는 일 | 파일 | 설명 담당(임시) |
 | --- | --- | --- | --- |
-| ① 모으기·정리 | 공개 데이터 8종을 원본 그대로 두고 형식만 통일. 값은 안 고치고 이상한 값은 표시만 | `build_clean.py`, `build_extra.py`, `build_forecast.py` | 양성우 |
-| ② 지문 검사 | 파일 307개의 지문(SHA-256)을 기록해 누가 손으로 고쳤는지 확인 | `manifest.py` | 양성우 |
+| ① 모으기·정리 | 공개 데이터 8종을 원본 그대로 두고 형식만 통일. 값은 안 고치고 이상한 값은 표시만 | `build_clean.py`, `build_extra.py`, `build_forecast.py` | 정대겸 |
+| ② 지문 검사 | 파일 309개의 지문(SHA-256)을 기록해 누가 손으로 고쳤는지 확인 | `manifest.py` | 정대겸 |
 | ③ 특징 표 | "전날 17시에 알 수 있는 값"만 골라 하루 한 줄짜리 표로 만듦 | `build_features.py` | 안성준 |
 | ④ 학습·비교 | 매달 1일에 그 전날까지 자료로 다시 학습하고 그달을 예측. 모델 10가지 비교 | `train.py`, `compare_models.py` | 안성준 |
 | ⑤ 시험 | 2025 하반기, 2026년 1~10월을 미리 보지 않고 예측 | `test_2026.py` | 안성준 |
 | ⑥ 설명 | 확률 → 4단계, 원인 3가지 계산 | `explain.py`, `explain_2026.py` | 안성준 |
-| ⑦ 내일 예보 | 기상청·EPSIS API로 오늘 자료를 받아 내일을 계산 | `forecast_tomorrow.py`, `check_forecast_tomorrow.py` | 양성우 |
-| ⑧ 시연 화면 | 결과를 인터넷 없이 열리는 HTML 한 장으로 | `build_demo.py` → `demo/index.html` | 양성우 |
-| 전체 | 문제 정의, 시험 설계, 결과 해석 | 문서(`docs/`) | 정대겸 |
+| ⑦ 내일 예보 | 기상청·EPSIS API로 오늘 자료를 받아 내일을 계산 | `forecast_tomorrow.py`, `check_forecast_tomorrow.py` | 정대겸 |
+| ⑧ 시연 화면 | 결과를 인터넷 없이 열리는 HTML 한 장으로 | `build_demo.py` → `demo/index.html` | 정대겸 |
+| 전체 | 문제 정의, 시험 설계, 결과 해석 | 문서(`docs/`) | 양성우 |
 
 ## 3. 파일별 한 줄 설명 (외울 문장)
 

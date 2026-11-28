@@ -257,23 +257,24 @@ function slide(sec, title, opts = {}) {
 
 // ───────────── 11. 실시간 예보
 {
-  const live = [["11/20", "금", "7%", 3], ["11/21", "토", "7%", 3], ["11/22", "일", "35%", 1], ["11/23", "월", "0%", 3], ["11/24", "화", "0%", 3], ["11/25", "수", "2%", 3], ["11/26", "목", "7%", 3]];
+  const live = require("fs").readFileSync(require("path").join(__dirname, "../../outputs/live_record.csv"), "utf8").replace(/^\uFEFF/, "").trim().split(/\r?\n/).slice(1).map((l) => l.split(","))
+    .map((c) => [c[0].slice(5).replace("-", "/"), c[1], Math.round(parseFloat(c[5]) * 100) + "%", ["매우 높음", "높음", "주의", "낮음"].indexOf(c[9])]);
   const tierName = ["매우 높음", "높음", "주의", "낮음"];
   const s = slide("10  실시간 예보", "11월 19일부터 매일,\n내일을 실제로 예보하고 있다", { th: 1.3, note: "실제 결과는 전력거래소 게시판에 1일~11주 뒤 올라와, 올라오는 대로 대조한다. 11~2월은 출력제어가 드문 계절이라 ‘낮음’이 많은 것이 정상. 확률은 기록 그대로(1% 단위), 11/25 이전은 보정 곡선 갱신 전 값." });
-  const cx = [0.7, 2.3, 3.6, 5.6], y0 = 2.55, rh = 0.5;
+  const cx = [0.7, 2.3, 3.6, 5.6], y0 = 2.45, rh = 0.39;
   ["예보한 날", "확률", "위험도", "실제"].forEach((h, j) => T(s, h, { x: cx[j], y: y0, w: 1.9, h: 0.4, fontSize: 13, bold: true, color: K.mute }));
   live.forEach((r, i) => {
-    const y = y0 + 0.45 + i * rh;
+    const y = y0 + 0.4 + i * rh;
     line(s, 0.7, y, 6.6, 0);
-    const hi = r[3] < 2;
-    if (hi) box(s, 0.7, y, 6.6, rh, K.sigSoft);
-    T(s, `${r[0]} (${r[1]})`, { x: cx[0], y, w: 1.6, h: rh, fontSize: 15, valign: "middle", bold: hi });
-    T(s, r[2], { x: cx[1], y, w: 1.2, h: rh, fontSize: 15, valign: "middle", bold: hi });
-    box(s, cx[2], y + 0.17, 0.12, 0.16, K.tier[r[3]]);
-    T(s, tierName[r[3]], { x: cx[2] + 0.22, y, w: 1.7, h: rh, fontSize: 15, valign: "middle", bold: hi });
+    const hi = r[3] < 3;
+    if (hi) box(s, 0.7, y, 6.6, rh, r[3] < 2 ? K.sigSoft : K.card);
+    T(s, `${r[0]} (${r[1]})`, { x: cx[0], y, w: 1.6, h: rh, fontSize: 14, valign: "middle", bold: hi });
+    T(s, r[2], { x: cx[1], y, w: 1.2, h: rh, fontSize: 14, valign: "middle", bold: hi });
+    box(s, cx[2], y + 0.12, 0.12, 0.15, K.tier[r[3]]);
+    T(s, tierName[r[3]], { x: cx[2] + 0.22, y, w: 1.7, h: rh, fontSize: 14, valign: "middle", bold: hi });
     T(s, "게시판 공개 대기", { x: cx[3], y, w: 1.7, h: rh, fontSize: 13, color: K.mute, valign: "middle" });
   });
-  line(s, 0.7, y0 + 0.45 + 7 * rh, 6.6, 0);
+  line(s, 0.7, y0 + 0.4 + live.length * rh, 6.6, 0);
   line(s, 7.85, 2.55, 0, 3.95);
   T(s, "10월 실적(과거)으로 고정 모델 확인", { x: 8.25, y: 2.5, w: 4.4, h: 0.4, fontSize: 14, bold: true, color: K.sig });
   T(s, [{ text: "12일 중 9일", options: { fontFace: FB, fontSize: 40 } }], { x: 8.25, y: 2.9, w: 4.4, h: 0.85 });
@@ -329,9 +330,9 @@ function slide(sec, title, opts = {}) {
 {
   const s = slide("13  팀", "각자 만든 부분을 각자 설명합니다");
   const team = [
-    ["정대겸", "기획 · 시험 설계 · 발표", "문제 정의, 시험 계획과 결과 해석, 전력거래소 게시판 등록일 확인", "docs/ (시험 계획, 결과, 누설 점검)"],
-    ["안성준", "AI 모델 · 공정한 시험", "특징 표, 매달 재학습, 모델 10가지 비교, 확률·4단계·원인 계산", "build_features.py · train.py · compare_models.py · test_2026.py · explain.py · explain_2026.py"],
-    ["양성우", "데이터 · 실시간 예보 · 화면", "공개 데이터 8종 정리와 지문 검사, 내일 예보 자동 실행, 시연 화면", "build_clean.py · build_extra.py · build_forecast.py · manifest.py · forecast_tomorrow.py · check_forecast_tomorrow.py · build_demo.py"],
+    ["양성우", "기획 · 시험 설계 · 발표", "문제 정의, 시험 계획과 결과 해석, 전력거래소 게시판 등록일 확인", "왜 시간 순서로만 시험했나, 가정이 바뀌면 숫자가 어떻게 달라지나 (69 → 65 → 74일)"],
+    ["안성준", "AI 모델 · 공정한 시험", "특징 표, 매달 재학습, 모델 10가지 비교, 확률·4단계·원인 계산", "부스팅이 확률을 내는 방식, 확률 보정과 4단계 기준, 원인 3가지를 고르는 법"],
+    ["정대겸", "데이터 · 실시간 예보 · 화면", "공개 데이터 8종 정리와 지문 검사, 내일 예보 자동 실행, 시연 화면", "자료 8종을 날짜·시간에 맞춰 합치는 법, 17시 기준 지키기, 매일 17:20 예보 흐름"],
   ];
   team.forEach((t, i) => {
     const x = 0.7 + i * 4.05;
@@ -340,8 +341,8 @@ function slide(sec, title, opts = {}) {
     T(s, t[1], { x, y: 2.95, w: 3.8, h: 0.4, fontSize: 15, bold: true, color: K.sig });
     T(s, t[2], { x, y: 3.5, w: 3.8, h: 1.3, fontSize: 14, color: K.sub, lineSpacingMultiple: 1.25 });
     box(s, x, 4.85, 3.8, 1.5, K.card);
-    T(s, "설명할 코드", { x: x + 0.2, y: 4.95, w: 3.4, h: 0.3, fontSize: 11, bold: true, color: K.mute });
-    T(s, t[3], { x: x + 0.2, y: 5.25, w: 3.4, h: 1.05, fontSize: 11.5, lineSpacingMultiple: 1.2 });
+    T(s, "설명할 작동 원리", { x: x + 0.2, y: 4.95, w: 3.4, h: 0.3, fontSize: 11, bold: true, color: K.mute });
+    T(s, t[3], { x: x + 0.2, y: 5.25, w: 3.4, h: 1.05, fontSize: 13, lineSpacingMultiple: 1.2 });
   });
   T(s, "정보전기전자공학과 3학년 · 전력공학·제어공학·전력전자·회로이론 수강", { x: 0.7, y: 6.5, w: 11.9, h: 0.35, fontSize: 13, color: K.mute });
 }
