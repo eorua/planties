@@ -151,37 +151,9 @@ function slide(sec, title, opts = {}) {
     { x: 0.7, y: 6.1, w: 11.9, h: 0.65, fontSize: 14, lineSpacingMultiple: 1.2 });
 }
 
-// ───────────── 7. 공정한 시험
-{
-  const s = slide("06  공정한 시험", "미래 자료를 보지 않고, 시간 순서대로만 시험했다");
-  // 2023-01 ~ 2026-10 : 46개월
-  const x0 = 0.9, x1 = 12.4, m = (y, mo) => x0 + ((y - 2023) * 12 + (mo - 1)) / 46 * (x1 - x0);
-  const ty = 2.35;
-  [2023, 2024, 2025, 2026].forEach((y) => { line(s, m(y, 1), ty, 0, 2.55, K.line, 0.75); T(s, String(y), { x: m(y, 1) + 0.06, y: ty, w: 1, h: 0.3, fontSize: 12, color: K.mute }); });
-  const bars = [
-    [2023, 1, 2026, 10, 2.85, "BDB7AA", "학습 자료 — 매달 1일, 그 전날까지 자료로만 다시 학습", K.ink],
-    [2025, 1, 2025, 7, 3.55, "8F8A80", "검증 — 설정은 여기서만 정함", "FFFFFF"],
-    [2025, 7, 2026, 1, 4.25, K.ink, "시험 — 설정을 정한 뒤 평가", "FFFFFF"],
-    [2026, 1, 2026, 11, 4.95, K.sig, "독립 시험 — 시험 계획 먼저 공개", "FFFFFF"],
-  ];
-  bars.forEach(([y1, m1, y2, m2, y, c, t, tc]) => {
-    const xa = m(y1, m1), xb = Math.min(m(y2, m2), x1 + 0.25);
-    box(s, xa, y, xb - xa, 0.5, c);
-    const inside = xb - xa > 3.2;
-    T(s, t, { x: inside ? xa + 0.15 : xa - 4.3, y, w: inside ? xb - xa - 0.2 : 4.15, h: 0.5, fontSize: 13, bold: true, color: inside ? tc : K.ink, valign: "middle", align: inside ? "left" : "right" });
-  });
-  const checks = [["입력은 전날 17시까지 알 수 있는 값만", "열마다 언제 알 수 있는지 문서로 확인"], ["정답이 입력으로 새는 통로 점검", "원자료에서 다시 계산해 대조, 통로 없음"], ["파일 309개 지문 관리", "자동 검증 675개 통과, 처음부터 다시 돌려 같은 결과"]];
-  checks.forEach((c, i) => {
-    const x = 0.7 + i * 4.05;
-    line(s, x, 5.75, 3.8, 0, K.ink, 1);
-    T(s, c[0], { x, y: 5.85, w: 3.8, h: 0.4, fontSize: 14, bold: true });
-    T(s, c[1], { x, y: 6.25, w: 3.8, h: 0.4, fontSize: 12, color: K.sub });
-  });
-}
-
 // ───────────── 8. 결과 ① 계단
 {
-  const s = slide("07  검증 결과 1", "위험도가 높다고 한 날일수록,\n실제로 출력제어가 더 많이 일어났다", { th: 1.3, note: "2026년 1~10월 304일. " + ASSUME });
+  const s = slide("06  검증 결과 1", "위험도가 높다고 한 날일수록,\n실제로 출력제어가 더 많이 일어났다", { th: 1.3, note: "2026년 1~10월 304일. " + ASSUME });
   T(s, "각 위험도로 예보한 날 중 실제로 출력제어가 난 비율 · 2026년 1~10월", { x: 0.7, y: 2.5, w: 8, h: 0.3, fontSize: 13, color: K.mute });
   s.addChart(p.charts.BAR, [{ name: "2026", labels: ["매우 높음", "높음", "주의", "낮음"], values: [67, 26, 12, 5] }], {
     x: 0.55, y: 2.85, w: 7.7, h: 3.85, barDir: "col", barGapWidthPct: 45, chartColors: K.tier,
@@ -202,7 +174,7 @@ function slide(sec, title, opts = {}) {
 
 // ───────────── 9. 결과 ② 대표 숫자
 {
-  const s = slide("08  검증 결과 2", "2026년 출력제어 82일 중 69일을 전날 알렸다", { note: "‘알림’ = 전날 위험도 ‘높음’ 이상. " + ASSUME });
+  const s = slide("07  검증 결과 2", "2026년 출력제어 82일 중 69일을 전날 알렸다", { note: "‘알림’ = 전날 위험도 ‘높음’ 이상. " + ASSUME });
   T(s, "69", { x: 0.6, y: 2.2, w: 3.6, h: 2.2, fontFace: FB, fontSize: 150, color: K.sig });
   T(s, "/ 82일", { x: 3.5, y: 3.45, w: 2.0, h: 0.7, fontSize: 30, bold: true });
   T(s, "출력제어가 난 날 중\n전날 ‘높음’ 이상으로 알린 날", { x: 0.75, y: 4.55, w: 4.5, h: 0.8, fontSize: 15, color: K.sub, lineSpacingMultiple: 1.25 });
@@ -222,6 +194,34 @@ function slide(sec, title, opts = {}) {
     const x = bx + i * 3.3;
     T(s, t[0], { x, y: 4.9, w: 3.1, h: 0.75, fontFace: FB, fontSize: 36 });
     T(s, t[1], { x, y: 5.7, w: 3.1, h: 0.8, fontSize: 13, color: K.sub, lineSpacingMultiple: 1.2 });
+  });
+}
+
+// ───────────── 7. 공정한 시험
+{
+  const s = slide("08  공정한 시험", "이 결과를 믿을 수 있는 이유:\n미래 자료를 보지 않고, 시간 순서대로만 시험했다", { th: 1.3 });
+  // 2023-01 ~ 2026-10 : 46개월
+  const x0 = 0.9, x1 = 12.4, m = (y, mo) => x0 + ((y - 2023) * 12 + (mo - 1)) / 46 * (x1 - x0);
+  const ty = 2.5;
+  [2023, 2024, 2025, 2026].forEach((y) => { line(s, m(y, 1), ty, 0, 2.95, K.line, 0.75); T(s, String(y), { x: m(y, 1) + 0.06, y: ty, w: 1, h: 0.3, fontSize: 12, color: K.mute }); });
+  const bars = [
+    [2023, 1, 2026, 10, 2.95, "BDB7AA", "학습 자료 — 매달 1일, 그 전날까지 자료로만 다시 학습", K.ink],
+    [2025, 1, 2025, 7, 3.6, "8F8A80", "검증 — 설정은 여기서만 정함", "FFFFFF"],
+    [2025, 7, 2026, 1, 4.25, K.ink, "시험 — 설정을 정한 뒤 평가", "FFFFFF"],
+    [2026, 1, 2026, 11, 4.9, K.sig, "독립 시험 — 시험 계획 먼저 공개", "FFFFFF"],
+  ];
+  bars.forEach(([y1, m1, y2, m2, y, c, t, tc]) => {
+    const xa = m(y1, m1), xb = Math.min(m(y2, m2), x1 + 0.25);
+    box(s, xa, y, xb - xa, 0.5, c);
+    const inside = xb - xa > 3.2;
+    T(s, t, { x: inside ? xa + 0.15 : xa - 4.3, y, w: inside ? xb - xa - 0.2 : 4.15, h: 0.5, fontSize: 13, bold: true, color: inside ? tc : K.ink, valign: "middle", align: inside ? "left" : "right" });
+  });
+  const checks = [["입력은 전날 17시까지 알 수 있는 값만", "열마다 언제 알 수 있는지 문서로 확인"], ["정답이 입력으로 새는 통로 점검", "원자료에서 다시 계산해 대조, 통로 없음"], ["파일 309개 지문 관리", "자동 검증 675개 통과, 처음부터 다시 돌려 같은 결과"]];
+  checks.forEach((c, i) => {
+    const x = 0.7 + i * 4.05;
+    line(s, x, 5.75, 3.8, 0, K.ink, 1);
+    T(s, c[0], { x, y: 5.85, w: 3.8, h: 0.4, fontSize: 14, bold: true });
+    T(s, c[1], { x, y: 6.25, w: 3.8, h: 0.4, fontSize: 12, color: K.sub });
   });
 }
 
